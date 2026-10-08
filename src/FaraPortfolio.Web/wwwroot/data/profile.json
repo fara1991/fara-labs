@@ -1,0 +1,38 @@
+{
+  // サイト全体のプロフィール。編集後に GitHub Actions の「Deploy」を実行すると反映されます。
+  "name": "fara",
+  "tagline": "C# を中心に、ゲームや配信をもっと楽しくするツールを作っています。",
+  "bio": "ポケモン対戦のダメージ計算サイトや、Beat Saber の Mod、Twitch 配信向けのボットなどを個人で開発しています。普段使っているのは C# / .NET / Blazor / Unity。作ったものはこのサイトでまとめて紹介していきます。",
+  "skills": ["C#", ".NET", "Blazor", "Unity", "Beat Saber Mod", "Twitch Bot", "GitHub Actions"],
+  // url が空のものはサイトに表示されません。service: github / x / twitch / youtube / bluesky / mail / link
+  "socials": [
+    {
+      "service": "github",
+      "label": "GitHub",
+      "handle": "@fara1991",
+      "url": "https://github.com/fara1991",
+      "description": "作ったもののソースコードを公開しています。"
+    },
+    {
+      "service": "x",
+      "label": "X (Twitter)",
+      "handle": "",
+      "url": "",
+      "description": "日々の開発状況などをつぶやいています。"
+    },
+    {
+      "service": "twitch",
+      "label": "Twitch",
+      "handle": "",
+      "url": "",
+      "description": "ゲーム配信をしています。"
+    },
+    {
+      "service": "youtube",
+      "label": "YouTube",
+      "handle": "",
+      "url": "",
+      "description": "配信のアーカイブや動画を投稿しています。"
+    }
+  ]
+}

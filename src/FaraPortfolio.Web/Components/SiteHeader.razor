@@ -1,0 +1,38 @@
+@implements IDisposable
+@inject NavigationManager Nav
+
+<header class="site-header">
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <div class="container header-inner">
+        <a class="brand" href="" aria-label="ホーム">
+            <span class="brand-mark">f</span>
+            <span class="brand-text">app-fara</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="@(_open ? "true" : "false")"
+                @onclick="() => _open = !_open">
+            <Icon Name="@(_open ? "close" : "menu")" Size="22" />
+        </button>
+
+        <nav class="site-nav @(_open ? "is-open" : null)" aria-label="メイン">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Home</NavLink>
+            <NavLink class="nav-link" href="works">Works</NavLink>
+            <NavLink class="nav-link" href="updates">Updates</NavLink>
+            <NavLink class="nav-link" href="links">Links</NavLink>
+        </nav>
+    </div>
+</header>
+
+@code {
+    private bool _open;
+
+    protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _open = false;
+        StateHasChanged();
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}

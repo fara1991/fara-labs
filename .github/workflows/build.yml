@@ -1,0 +1,26 @@
+name: Build
+
+# PR・push（master / develop）ではビルドとテストだけ行う（公開はしない。公開は Deploy ワークフローを手動実行）。
+on:
+  pull_request:
+  push:
+    branches: [master, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: dotnet test --configuration Release
+
+      - name: Publish (check only)
+        run: dotnet publish src/FaraPortfolio.Web --configuration Release --output publish

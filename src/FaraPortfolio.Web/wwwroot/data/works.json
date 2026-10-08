@@ -1,0 +1,48 @@
+[
+  {
+    "id": "pokemon-assistance",
+    "title": "Fara Pokemon Assistance",
+    "subtitle": "ポケモン対戦アシスタント（ダメージ計算サイト）",
+    "category": "Web アプリ",
+    "status": "公開中",
+    "icon": "pokeball",
+    "accent": "pink",
+    "summary": "ダメージ計算・素早さ比較・タイプ相性をブラウザで。Twitch チャットのコマンドからも使えます。",
+    "description": "ポケモン対戦のダメージ計算をはじめ、素早さ比較・育成済みポケモンとチームの管理・タイプ相性の確認ができる Web アプリです。計算はすべてブラウザ内で行うのでサーバー不要・登録不要。同じ計算ロジックを Twitch ボットにも組み込んでいて、配信のチャットから「!dmg」などのコマンドで計算結果を返せます。",
+    "features": [
+      "ダメージ計算（ポケモンチャンピオンズ / スカーレット・バイオレット / ソード・シールド対応）",
+      "素早さ比較・タイプ相性の確認",
+      "育成済みポケモン・チームの登録（ブラウザに保存）",
+      "Twitch チャットのコマンドからも計算可能",
+      "ポケモン・技・使用率データは毎週自動で更新"
+    ],
+    "tech": ["C#", "Blazor WebAssembly", "GitHub Pages", "GitHub Actions", "Python"],
+    "links": [
+      { "label": "サイトを開く", "url": "https://pokemon.app-fara.com/", "primary": true },
+      { "label": "ソースコード", "url": "https://github.com/fara1991/fara-pokemon-assistance" }
+    ]
+  },
+  {
+    "id": "bomb-rush",
+    "title": "FaraBombRush",
+    "subtitle": "Beat Saber Mod",
+    "category": "Beat Saber Mod",
+    "status": "公開中",
+    "icon": "saber",
+    "accent": "indigo",
+    "summary": "プレイ中にボムを出現させる Beat Saber の Mod。視聴者がチャットでボムを送れます。",
+    "description": "Beat Saber のプレイ中にボム（避けるべきオブジェクト）を出現させる Mod です。Twitch の視聴者がチャットコマンドでボムを送り込めるインタラクティブモードと、曲の BPM に同期してボムを自動生成するオートモードがあり、配信を視聴者参加型で盛り上げられます。",
+    "features": [
+      "Twitch チャットのコマンド（!bomb / !bombline / !bombreset）でボムを出現",
+      "曲の BPM に同期してボムを自動生成するオートモード",
+      "Beginner 〜 Lawless の 7 段階の難易度",
+      "ゲーム内の Mod Settings から設定可能",
+      "Beat Saber 1.29.1 / 1.40.8 に対応"
+    ],
+    "tech": ["C#", "Unity", "BSIPA", "BeatSaberPlus (ChatPlexSDK)"],
+    "links": [
+      { "label": "ダウンロード", "url": "https://github.com/fara1991/fara-bomb-rush/releases", "primary": true },
+      { "label": "ソースコード", "url": "https://github.com/fara1991/fara-bomb-rush" }
+    ]
+  }
+]
