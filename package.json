@@ -1,0 +1,13 @@
+{
+  "name": "fara-portfolio-site",
+  "private": true,
+  "description": "Cloudflare Workers への公開用（wrangler のバージョン固定）。サイト本体は src/FaraPortfolio.Web",
+  "scripts": {
+    "publish:site": "dotnet publish src/FaraPortfolio.Web -c Release -o publish",
+    "preview": "npm run publish:site && wrangler dev",
+    "check": "npm run publish:site && wrangler deploy --dry-run --env=\"\" && wrangler deploy --dry-run --env develop"
+  },
+  "devDependencies": {
+    "wrangler": "4.136.3"
+  }
+}

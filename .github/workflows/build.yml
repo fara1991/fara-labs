@@ -1,10 +1,11 @@
 name: Build
 
-# PR・push（master / develop）ではビルドとテストだけ行う（公開はしない。公開は Deploy ワークフローを手動実行）。
+# PR と master への push ではビルド・テストと公開設定のチェックだけ行う（公開はしない）。
+# develop への push は Deploy (develop) が同じチェックをしたうえで確認用サイトに公開する。
 on:
   pull_request:
   push:
-    branches: [master, develop]
+    branches: [master]
 
 permissions:
   contents: read
@@ -19,8 +20,21 @@ jobs:
         with:
           global-json-file: global.json
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
       - name: Test
         run: dotnet test --configuration Release
 
-      - name: Publish (check only)
+      - name: Publish
         run: dotnet publish src/FaraPortfolio.Web --configuration Release --output publish
+
+      # Cloudflare にはつながずに wrangler.jsonc と公開ファイルを検証する
+      - name: Check Cloudflare config (dry run)
+        run: |
+          npx wrangler deploy --dry-run --env=""
+          npx wrangler deploy --dry-run --env develop

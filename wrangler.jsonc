@@ -1,0 +1,33 @@
+{
+  // Cloudflare Workers（静的アセットのみ・Worker スクリプトなし）で公開する設定。
+  // 公開するのは dotnet publish の出力（publish/wwwroot）。
+  //   本番:   npx wrangler deploy              → https://app-fara.com/       （Deploy ワークフロー・手動）
+  //   確認用: npx wrangler deploy --env develop → https://dev.app-fara.com/   （Deploy (develop) ワークフロー・develop への push）
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fara-portfolio",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./publish/wwwroot",
+    // /works などを直接開いたときも index.html を返す（Blazor 側でページを切り替える）
+    "not_found_handling": "single-page-application"
+  },
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "app-fara.com", "custom_domain": true }
+  ],
+  "env": {
+    "develop": {
+      // Worker 名は自動で fara-portfolio-develop になる
+      "assets": {
+        "directory": "./publish/wwwroot",
+        "not_found_handling": "single-page-application"
+      },
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [
+        { "pattern": "dev.app-fara.com", "custom_domain": true }
+      ]
+    }
+  }
+}

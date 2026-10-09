@@ -1,6 +1,6 @@
 # fara-portfolio-site
 
-自分用のポートフォリオサイト（https://app-fara.com/）。C# / Blazor WebAssembly 製の静的サイトで、GitHub Pages に公開します。
+自分用のポートフォリオサイト（https://app-fara.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
 
 - 公開中の作品（ポケモン対戦アシスタント、Beat Saber Mod など）の紹介
 - 更新履歴（何月何日に何を更新したか）
@@ -14,6 +14,9 @@
 fara-portfolio-site/
 ├── FaraPortfolio.sln
 ├── global.json                       使用する .NET SDK（8.0）
+├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）
+├── package.json                      wrangler（Cloudflare の CLI）のバージョン固定
+├── docs/cloudflare-setup.md          Cloudflare・GitHub の初期設定手順
 ├── src/FaraPortfolio.Web/            Blazor WebAssembly 本体
 │   ├── Components/                   ヘッダー・フッター・アイコン・カードなどの部品
 │   ├── Layout/MainLayout.razor       全ページ共通の枠（パララックス背景）
@@ -25,11 +28,13 @@ fara-portfolio-site/
 │       │   ├── works.json            作品一覧
 │       │   └── updates.json          更新履歴
 │       ├── css/app.css               デザイン（紫ベース）
-│       └── js/site.js                スクロール演出（パララックス・フェードイン）
+│       ├── js/site.js                スクロール演出（パララックス・フェードイン）
+│       └── .assetsignore             Cloudflare にアップロードしないファイル
 ├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック
 └── .github/workflows/
-    ├── build.yml                     PR・push 時にビルドとテストのみ（公開しない）
-    └── deploy.yml                    手動実行で master を公開
+    ├── build.yml                     PR・master への push でビルド・テスト・公開設定チェック（公開しない）
+    ├── deploy-develop.yml            develop への push で確認用サイト（dev.app-fara.com）に公開
+    └── deploy.yml                    手動実行で master を本番（app-fara.com）に公開
 ```
 
 ## サイトの更新
@@ -63,27 +68,19 @@ JSON に書き間違いがあると `dotnet test` が失敗するので、公開
 
 ## 公開（デプロイ）
 
-PR をマージしても自動では公開されません。公開したいタイミングで手動実行します。
+| 公開先 | タイミング |
+|---|---|
+| https://dev.app-fara.com/（確認用） | develop に push（PR のマージ含む）されるたびに自動 |
+| https://app-fara.com/（本番） | **Actions → Deploy → Run workflow** を手動実行したときだけ。常に master の内容 |
 
-1. GitHub の **Actions** タブ → **Deploy** → **Run workflow**
-2. 常に **master ブランチ** の内容がビルド・テストされ、問題なければ公開されます
-
-### 初回だけ必要な設定
-
-1. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** にする
-2. 同じ画面の **Custom domain** に `app-fara.com` を入力して保存し、DNS の確認後に **Enforce HTTPS** を有効にする
-3. Cloudflare の DNS に以下を追加（Proxy status は **DNS only（グレーの雲）**）
-   | Type | Name | Content |
-   |---|---|---|
-   | CNAME | `@`（app-fara.com） | `fara1991.github.io` |
-   | CNAME | `www` | `fara1991.github.io` |
-
-   ※ ルートドメインの CNAME は Cloudflare が自動で A レコード相当に変換（CNAME Flattening）します。`pokemon.app-fara.com` の設定はそのままで大丈夫です。
+どちらもテストが通らなければ公開されません。初回の設定（API トークンの発行・GitHub への登録・DNS）は [docs/cloudflare-setup.md](docs/cloudflare-setup.md) を参照してください。
 
 ## ブランチ運用
 
 ```
 feature/xxx ──PR──▶ develop ──PR──▶ master ──(手動 Deploy)──▶ app-fara.com
+                       │
+                       └──(自動)──▶ dev.app-fara.com
 ```
 
 - 作業ブランチは **develop から** 作成する（`feature/xxx` など）
@@ -93,6 +90,10 @@ feature/xxx ──PR──▶ develop ──PR──▶ master ──(手動 Dep
 ## ローカルで動かす
 
 ```bash
-dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072
+dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（普段の確認はこれ）
 dotnet test                                  # data/*.json のチェック
+
+# Cloudflare と同じ動き（/works などの直接アクセス含む）で確認したいとき（Node.js が必要）
+npm ci                                       # 初回のみ
+npm run preview                              # http://localhost:8787
 ```
