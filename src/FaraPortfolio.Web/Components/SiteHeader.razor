@@ -4,10 +4,6 @@
 <header class="site-header">
     <div class="scroll-progress" aria-hidden="true"></div>
     <div class="container header-inner">
-        <a class="brand" href="" aria-label="ホーム">
-            <span class="brand-mark">f</span>
-        </a>
-
         <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="@(_open ? "true" : "false")"
                 @onclick="() => _open = !_open">
             <Icon Name="@(_open ? "close" : "menu")" Size="22" />
