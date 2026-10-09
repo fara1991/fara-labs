@@ -1,4 +1,5 @@
 @page "/"
+@using System.Globalization
 @inject SiteData Data
 
 <PageTitle>@Data.Profile.Name | Portfolio</PageTitle>
@@ -16,15 +17,23 @@
             </div>
         </div>
 
-        <div class="hero-visual reveal" style="--d:2" aria-hidden="true">
+        <div class="hero-visual reveal" style="--d:2">
+            @* 作品ごとのアイコンを外側の軌道に等間隔で並べる（クリックで作品へ） *@
             <div class="orbit orbit-outer">
-                <span class="satellite s1"><Icon Name="pokeball" Size="22" /></span>
-                <span class="satellite s2"><Icon Name="saber" Size="22" /></span>
+                @for (var i = 0; i < Data.Works.Count; i++)
+                {
+                    var work = Data.Works[i];
+                    var angle = 2 * Math.PI * i / Data.Works.Count;
+                    var top = (50 - 50 * Math.Cos(angle)).ToString("0.##", CultureInfo.InvariantCulture);
+                    var left = (50 + 50 * Math.Sin(angle)).ToString("0.##", CultureInfo.InvariantCulture);
+                    <a @key="work.Id" class="satellite accent-@work.Accent" style="top:@(top)%;left:@(left)%"
+                       href="works#@work.Id" aria-label="@work.Title" title="@work.Title">
+                        <Icon Name="@work.Icon" Size="22" />
+                    </a>
+                }
             </div>
-            <div class="orbit orbit-inner">
-                <span class="satellite s3"><Icon Name="code" Size="20" /></span>
-            </div>
-            <div class="core"><span>F</span></div>
+            <div class="orbit orbit-inner" aria-hidden="true"></div>
+            <div class="core" aria-hidden="true"><span>F</span></div>
         </div>
     </div>
     <a class="scroll-cue" href="#works" aria-label="下へスクロール"><span></span></a>
