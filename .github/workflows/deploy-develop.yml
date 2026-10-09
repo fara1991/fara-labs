@@ -1,0 +1,61 @@
+name: Deploy (develop)
+
+# 確認用（https://dev.app-fara.com/）への公開。develop に push（PR のマージ含む）されるたびに実行。
+# 本番には影響しない。手動で再実行したいときは Actions タブから develop を選んで Run workflow。
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-develop
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    # Settings → Environments の develop（develop からのみ実行可にしておく）
+    environment:
+      name: develop
+      url: https://dev.app-fara.com/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test (data files)
+        run: dotnet test --configuration Release
+
+      - name: Publish Blazor WebAssembly
+        run: >
+          dotnet publish src/FaraPortfolio.Web
+          --configuration Release
+          --output publish
+          -p:SourceRevisionId=$(git rev-parse HEAD)
+
+      # 確認用サイトが検索結果に載らないようにする
+      - name: Add noindex header
+        run: |
+          cat >> publish/wwwroot/_headers <<'HEADERS'
+          /*
+            X-Robots-Tag: noindex, nofollow
+          HEADERS
+
+      - name: Deploy to Cloudflare Workers (develop)
+        run: npx wrangler deploy --env develop
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

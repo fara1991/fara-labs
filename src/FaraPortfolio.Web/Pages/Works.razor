@@ -1,0 +1,74 @@
+@page "/works"
+@inject SiteData Data
+@inject IJSRuntime JS
+
+<PageTitle>Works | @Data.Profile.Name</PageTitle>
+
+<section class="page container">
+    <header class="page-head">
+        <p class="section-kicker reveal">Works</p>
+        <h1 class="reveal" style="--d:1">公開中の作品</h1>
+        <p class="muted reveal" style="--d:2">これまでに作って公開しているサイト・Mod の紹介です。</p>
+    </header>
+
+    <div class="work-detail-list">
+        @foreach (var work in Data.Works)
+        {
+            <article @key="work.Id" id="@work.Id" class="work-detail glass spotlight accent-@work.Accent reveal">
+                <div class="work-detail-visual" aria-hidden="true">
+                    <span class="work-icon big"><Icon Name="@work.Icon" Size="56" /></span>
+                </div>
+                <div class="work-detail-body">
+                    <div class="work-detail-meta">
+                        <span class="chip">@work.Category</span>
+                        @if (!string.IsNullOrWhiteSpace(work.Status))
+                        {
+                            <span class="chip chip-status">@work.Status</span>
+                        }
+                    </div>
+                    <h2>@work.Title</h2>
+                    <p class="work-subtitle">@work.Subtitle</p>
+                    <p>@work.Description</p>
+
+                    @if (work.Features.Length > 0)
+                    {
+                        <h3 class="mini-heading">できること</h3>
+                        <ul class="feature-list">
+                            @foreach (var f in work.Features)
+                            {
+                                <li>@f</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (work.Tech.Length > 0)
+                    {
+                        <div class="chip-row tech">
+                            @foreach (var t in work.Tech)
+                            {
+                                <span class="chip chip-outline">@t</span>
+                            }
+                        </div>
+                    }
+
+                    <div class="work-actions">
+                        @foreach (var link in work.Links)
+                        {
+                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@link.Url" target="_blank" rel="noopener noreferrer">
+                                @link.Label <Icon Name="external" Size="16" />
+                            </a>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // ホームのカードから works#id で来たときに該当の作品までスクロール
+        if (firstRender) await JS.InvokeVoidAsync("faraSite.scrollToHash");
+    }
+}

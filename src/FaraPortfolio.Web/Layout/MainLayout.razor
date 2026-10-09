@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+@inject SiteData Data
+
+@* 背景: スクロール量（--scroll）に合わせて層ごとに違う速さで動くパララックス *@
+<div class="bg-scene" aria-hidden="true">
+    <div class="bg-layer bg-stars"></div>
+    <div class="bg-layer bg-grid"></div>
+    <div class="bg-layer bg-blob blob-1"><span></span></div>
+    <div class="bg-layer bg-blob blob-2"><span></span></div>
+    <div class="bg-layer bg-blob blob-3"><span></span></div>
+    <div class="bg-noise"></div>
+</div>
+
+<SiteHeader />
+
+<main class="site-main">
+    @if (Data.Errors.Count > 0)
+    {
+        <div class="container">
+            <div class="data-error" role="alert">
+                <strong>データの読み込みに失敗しました</strong>
+                <ul>
+                    @foreach (var e in Data.Errors)
+                    {
+                        <li>@e</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    @Body
+</main>
+
+<SiteFooter />

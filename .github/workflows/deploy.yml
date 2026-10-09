@@ -1,0 +1,59 @@
+name: Deploy
+
+# 本番（https://app-fara.com/）への公開。手動実行のみ（Actions タブ →「Deploy」→「Run workflow」）。
+# PR のマージや push では公開されない。常に master ブランチの内容を公開する。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Settings → Environments の production（master からのみ実行可にしておく）
+    environment:
+      name: production
+      url: https://app-fara.com/
+    steps:
+      - name: Require master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "::error::本番の公開は master から実行してください（Use workflow from: master）"
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test (data files)
+        run: dotnet test --configuration Release
+
+      # SourceRevisionId: フッターの build 表示と、data/*.json のキャッシュ回避に使う
+      - name: Publish Blazor WebAssembly
+        run: >
+          dotnet publish src/FaraPortfolio.Web
+          --configuration Release
+          --output publish
+          -p:SourceRevisionId=$(git rev-parse HEAD)
+
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy --env=""
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
