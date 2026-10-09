@@ -44,7 +44,7 @@ jobs:
       - name: Test (data files)
         run: dotnet test --configuration Release
 
-      # SourceRevisionId: フッターの build 表示と、data/*.json のキャッシュ回避に使う
+      # SourceRevisionId: data/*.json のキャッシュ回避に使う
       - name: Publish Blazor WebAssembly
         run: >
           dotnet publish src/FaraPortfolio.Web

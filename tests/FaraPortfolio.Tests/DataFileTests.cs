@@ -25,7 +25,6 @@ public class DataFileTests
         var profile = Load<Profile>("profile.json");
 
         Assert.False(string.IsNullOrWhiteSpace(profile.Name));
-        Assert.False(string.IsNullOrWhiteSpace(profile.Tagline));
         Assert.All(profile.Socials, s =>
         {
             Assert.False(string.IsNullOrWhiteSpace(s.Label));

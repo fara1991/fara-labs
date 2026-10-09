@@ -2,7 +2,8 @@
 
 自分用のポートフォリオサイト（https://app-fara.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
 
-- 公開中の作品（ポケモン対戦アシスタント、Beat Saber Mod など）の紹介
+- プロフィール
+- 作ったもの（ポケモン対戦アシスタント、Beat Saber Mod など）の紹介
 - 更新履歴（何月何日に何を更新したか）
 - SNS リンク
 
@@ -20,7 +21,7 @@ fara-portfolio-site/
 ├── src/FaraPortfolio.Web/            Blazor WebAssembly 本体
 │   ├── Components/                   ヘッダー・フッター・アイコン・カードなどの部品
 │   ├── Layout/MainLayout.razor       全ページ共通の枠（パララックス背景）
-│   ├── Pages/                        Home / Works / Updates / Links
+│   ├── Pages/                        Home / Profile / Works / Updates / Links
 │   ├── Models/ Services/             データの型と読み込み
 │   └── wwwroot/
 │       ├── data/                     ★ サイトの中身（ここを編集する）
