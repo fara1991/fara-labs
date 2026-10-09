@@ -425,14 +425,18 @@ img { max-width: 100%; display: block; }
     border-radius: 16px;
     background: var(--surface-strong);
     border: 1px solid var(--border-strong);
-    color: var(--lavender);
+    color: var(--accent, var(--lavender));
     box-shadow: 0 8px 30px -6px rgba(168, 85, 247, .6);
     animation: spin 28s linear infinite reverse;
+    transition: scale .25s var(--ease-out), border-color .25s ease, box-shadow .25s ease;
 }
-.orbit-inner .satellite { animation-duration: 18s; animation-direction: normal; }
-.s1 { top: 14.6%; left: 14.6%; color: var(--pink); }
-.s2 { top: 85.4%; left: 85.4%; color: var(--indigo); }
-.s3 { top: 50%; left: 100%; color: var(--cyan); }
+/* アイコンにカーソルを乗せている間は軌道を止めてクリックしやすくする */
+.hero-visual:has(.satellite:hover) :is(.orbit, .satellite) { animation-play-state: paused; }
+.satellite:hover, .satellite:focus-visible {
+    scale: 1.15;
+    border-color: var(--accent, var(--lavender));
+    box-shadow: 0 10px 34px -4px var(--accent, var(--violet));
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 .core {
     position: absolute;
