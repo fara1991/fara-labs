@@ -3,7 +3,7 @@
 自分用のポートフォリオサイト（https://app-fara.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
 
 - プロフィール
-- 作ったもの（ポケモン対戦アシスタント、Beat Saber Mod など）の紹介
+- 作ったもの（ポケモン対戦アシスタントなど）の紹介
 - 更新履歴（何月何日に何を更新したか）
 - SNS リンク
 
