@@ -9,7 +9,7 @@
         <div class="footer-socials">
             @foreach (var s in Data.Profile.VisibleSocials)
             {
-                <a href="@s.Url" target="_blank" rel="noopener noreferrer" aria-label="@s.Label" title="@s.Label">
+                <a class="service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer" aria-label="@s.Label" title="@s.Label">
                     <Icon Name="@Icon.ForService(s.Service)" Size="18" />
                 </a>
             }

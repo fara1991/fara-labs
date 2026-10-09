@@ -75,8 +75,8 @@
         <div class="cta-socials">
             @foreach (var s in Data.Profile.VisibleSocials)
             {
-                <a class="social-pill" href="@s.Url" target="_blank" rel="noopener noreferrer">
-                    <Icon Name="@Icon.ForService(s.Service)" Size="18" /> @s.Label
+                <a class="social-pill service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer">
+                    <span class="pill-icon"><Icon Name="@Icon.ForService(s.Service)" Size="16" /></span> @s.Label
                 </a>
             }
         </div>

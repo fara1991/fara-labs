@@ -19,7 +19,7 @@
     "tech": ["C#", "Blazor WebAssembly", "GitHub Pages", "GitHub Actions", "Python"],
     "links": [
       { "label": "サイトを開く", "url": "https://pokemon.app-fara.com/", "primary": true },
-      { "label": "ソースコード", "url": "https://github.com/fara1991/fara-pokemon-assistance" }
+      { "label": "GitHub", "url": "https://github.com/fara1991/fara-pokemon-assistance" }
     ]
   },
   {
@@ -72,7 +72,7 @@
     ],
     "links": [
       {
-        "label": "GitHub で見る",
+        "label": "GitHub",
         "url": "https://github.com/stars/fara1991/lists/beatsaber-mod",
         "primary": true
       }
