@@ -20,7 +20,8 @@
 - JSON の項目を増やしたら `tests/FaraPortfolio.Tests/DataFileTests.cs` のチェックも更新する
 
 - 公開設定は `wrangler.jsonc`（本番はトップレベル、確認用は `env.develop`）。wrangler のバージョンは `package.json` で固定
-- `dotnet publish` が ILLink のエラー（終了コード 139 など）で落ちたら、`src/FaraPortfolio.Web/bin` と `obj` を消して再実行
+- `npm run publish:site`（`preview` / `check` も）は publish 前に `bin` / `obj` / `publish` を削除する（`npm run clean`）
+- ローカル（WSL）では `dotnet publish` の ILLink が `IL1012` や終了コード 139 でたまに落ちる。`bin` / `obj` を消した状態でも起き、再実行すると通る。コードの問題ではないので、まず再実行する
 
 ## 確認
 

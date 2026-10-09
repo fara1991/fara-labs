@@ -3,7 +3,8 @@
   "private": true,
   "description": "Cloudflare Workers への公開用（wrangler のバージョン固定）。サイト本体は src/FaraPortfolio.Web",
   "scripts": {
-    "publish:site": "dotnet publish src/FaraPortfolio.Web -c Release -o publish",
+    "clean": "node -e \"for (const p of ['publish','src/FaraPortfolio.Web/bin','src/FaraPortfolio.Web/obj','tests/FaraPortfolio.Tests/bin','tests/FaraPortfolio.Tests/obj']) require('fs').rmSync(p, { recursive: true, force: true })\"",
+    "publish:site": "npm run clean && dotnet publish src/FaraPortfolio.Web -c Release -o publish",
     "preview": "npm run publish:site && wrangler dev",
     "check": "npm run publish:site && wrangler deploy --dry-run --env=\"\" && wrangler deploy --dry-run --env develop"
   },

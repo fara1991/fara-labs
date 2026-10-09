@@ -95,5 +95,5 @@ dotnet test                                  # data/*.json のチェック
 
 # Cloudflare と同じ動き（/works などの直接アクセス含む）で確認したいとき（Node.js が必要）
 npm ci                                       # 初回のみ
-npm run preview                              # http://localhost:8787
+npm run preview                              # bin / obj を消してから publish → http://localhost:8787
 ```
