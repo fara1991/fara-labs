@@ -27,7 +27,7 @@
     "title": "FaraBombRush",
     "subtitle": "Beat Saber Mod",
     "category": "Beat Saber Mod",
-    "status": "公開中",
+    "status": "",
     "icon": "saber",
     "accent": "indigo",
     "summary": "プレイ中にボムを出現させる Beat Saber の Mod。視聴者がチャットでボムを送れます。",
@@ -41,8 +41,7 @@
     ],
     "tech": ["C#", "Unity", "BSIPA", "BeatSaberPlus (ChatPlexSDK)"],
     "links": [
-      { "label": "ダウンロード", "url": "https://github.com/fara1991/fara-bomb-rush/releases", "primary": true },
-      { "label": "ソースコード", "url": "https://github.com/fara1991/fara-bomb-rush" }
+      { "label": "GitHub", "url": "https://github.com/fara1991/fara-bomb-rush", "primary": true }
     ]
   }
 ]

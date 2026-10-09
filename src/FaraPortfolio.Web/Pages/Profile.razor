@@ -1,0 +1,39 @@
+@page "/profile"
+@inject SiteData Data
+
+<PageTitle>Profile | @Data.Profile.Name</PageTitle>
+
+<section class="page container narrow">
+    <header class="page-head">
+        <p class="section-kicker reveal">Profile</p>
+        <h1 class="reveal" style="--d:1">@Data.Profile.Name</h1>
+    </header>
+
+    <div class="profile-card glass reveal" style="--d:2">
+        <p class="profile-bio">@Data.Profile.Bio</p>
+
+        @if (Data.Profile.Skills.Length > 0)
+        {
+            <h2 class="mini-heading">よく使う技術</h2>
+            <div class="chip-row">
+                @foreach (var skill in Data.Profile.Skills)
+                {
+                    <span class="chip">@skill</span>
+                }
+            </div>
+        }
+
+        @if (Data.Profile.VisibleSocials.Any())
+        {
+            <h2 class="mini-heading">SNS</h2>
+            <div class="cta-socials">
+                @foreach (var s in Data.Profile.VisibleSocials)
+                {
+                    <a class="social-pill" href="@s.Url" target="_blank" rel="noopener noreferrer">
+                        <Icon Name="@Icon.ForService(s.Service)" Size="18" /> @s.Label
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>

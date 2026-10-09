@@ -16,7 +16,6 @@ public static class SiteJson
 public sealed class Profile
 {
     public string Name { get; init; } = "";
-    public string Tagline { get; init; } = "";
     public string Bio { get; init; } = "";
     public string[] Skills { get; init; } = [];
     public List<SocialLink> Socials { get; init; } = [];
@@ -27,7 +26,7 @@ public sealed class Profile
 
 public sealed class SocialLink
 {
-    /// <summary>アイコンの種類: github / x / twitch / youtube / bluesky / mail / link</summary>
+    /// <summary>アイコンの種類: github / twitter / x / twitch / youtube / bluesky / mail / link</summary>
     public string Service { get; init; } = "link";
     public string Label { get; init; } = "";
     public string Handle { get; init; } = "";

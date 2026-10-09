@@ -393,22 +393,6 @@ img { max-width: 100%; display: block; }
     padding-block: 40px 90px;
 }
 .hero-inner { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 48px; }
-.eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: rgba(168, 85, 247, .1);
-    border: 1px solid var(--border);
-    color: var(--lavender);
-    font-size: 13.5px;
-    font-family: var(--font-display);
-    letter-spacing: .04em;
-}
-.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 0 rgba(74, 222, 128, .6); animation: pulse 2s infinite; }
-@keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
-
 .hero-title {
     display: flex;
     flex-direction: column;
@@ -418,7 +402,6 @@ img { max-width: 100%; display: block; }
     letter-spacing: -.02em;
     margin: 24px 0;
 }
-.hero-lead { font-size: clamp(16px, 1.8vw, 19px); color: var(--muted); max-width: 34em; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
 .hero-visual {
@@ -489,34 +472,10 @@ img { max-width: 100%; display: block; }
     .scroll-cue { display: none; }
 }
 
-/* ---------- 横に流れるスキル帯 ---------- */
-.marquee {
-    overflow: hidden;
-    padding-block: 18px;
-    border-block: 1px solid var(--border);
-    background: rgba(20, 10, 38, .5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-}
-.marquee-track {
-    display: flex;
-    gap: 28px;
-    width: max-content;
-    animation: marquee 40s linear infinite;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(18px, 2.4vw, 26px);
-    color: rgba(243, 237, 255, .55);
-    white-space: nowrap;
-}
-.marquee-dot { color: var(--magenta); }
-@keyframes marquee { to { transform: translateX(calc(-50% - 14px)); } }
-
-/* ---------- About ---------- */
-.about-card { padding: clamp(28px, 5vw, 56px); }
-.about-bio { font-size: clamp(15px, 1.6vw, 17px); color: var(--muted); max-width: 46em; }
+/* ---------- プロフィール ---------- */
+.profile-card { padding: clamp(28px, 5vw, 56px); }
+.profile-bio { font-size: clamp(15px, 1.6vw, 17px); color: var(--muted); margin-top: 0; }
+.profile-card .cta-socials { justify-content: flex-start; margin: 0; }
 
 /* ---------- 作品カード ---------- */
 .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
@@ -724,6 +683,7 @@ img { max-width: 100%; display: block; }
 .link-card:hover .link-arrow { color: var(--text); transform: translate(2px, -2px); }
 .service-github { --brand: #6e40c9; }
 .service-x { --brand: #3a3150; }
+.service-twitter { --brand: #1d9bf0; }
 .service-twitch { --brand: #9146ff; }
 .service-youtube { --brand: #e0245e; }
 .service-bluesky { --brand: #3b82f6; }
