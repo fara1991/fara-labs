@@ -213,22 +213,9 @@ img { max-width: 100%; display: block; }
     height: var(--header-h);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 16px;
 }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
-.brand-mark {
-    width: 34px; height: 34px;
-    display: grid; place-items: center;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #c084fc, #6d28d9);
-    color: #fff;
-    font: 800 20px/1 var(--font-display);
-    box-shadow: 0 0 24px rgba(168, 85, 247, .5);
-    transition: transform .4s var(--ease-out);
-}
-.brand-mark.small { width: 26px; height: 26px; font-size: 15px; border-radius: 8px; }
-.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.08); }
 
 .site-nav { display: flex; gap: 4px; }
 .nav-link {
