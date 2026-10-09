@@ -177,16 +177,34 @@
   {
     "id": "multi-vrm-converter",
     "title": "FaraMultiVRMConverter",
-    "subtitle": "VRM 変換ツール",
-    "category": "ツール",
+    "subtitle": "VRChat アバターを VRM へ一括変換する Unity エディタ拡張",
+    "category": "Unity ツール",
     "status": "",
     "icon": "cube",
     "accent": "indigo",
-    "summary": "VRM モデルを変換するためのツールです。",
-    "description": "",
-    "features": [],
-    "tech": [],
-    "links": []
+    "summary": "複数の VRChat アバターを一度に VRM 形式へ変換できる Unity エディタ拡張です。",
+    "description": "VRChat アバターの Prefab をまとめて VRM に変換します。既存の VRM から BlendShapeProxy や Meta 情報などのコンポーネントをコピーしたり、サムネイルを自動生成して VRM Meta に設定したりできます。VRChat 専用のオブジェクトなど、不要なものを変換時に自動で削除する設定も可能です。",
+    "features": [
+      "複数のアバター Prefab を一括で VRM に変換",
+      "既存の VRM からコンポーネント（BlendShapeProxy・Meta 情報など）をコピー",
+      "サムネイルを自動生成して VRM Meta に設定",
+      "不要なオブジェクトを変換時に自動削除",
+      "日本語・英語の表示切り替え"
+    ],
+    "tech": [
+      "C#",
+      "Unity",
+      "UniVRM",
+      "NDMF",
+      "VRChat SDK"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-multi-vrm-converter",
+        "primary": true
+      }
+    ]
   },
   {
     "id": "blender-manual",
