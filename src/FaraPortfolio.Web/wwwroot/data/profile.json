@@ -1,8 +1,7 @@
 {
   // サイト全体のプロフィール。編集後に GitHub Actions の「Deploy」を実行すると反映されます。
   "name": "Fara",
-  "bio": "ポケモン対戦のダメージ計算サイトや、Beat Saber の Mod、Twitch 配信向けのボットなどを個人で開発しています。普段使っているのは C# / .NET / Blazor / Unity。作ったものはこのサイトでまとめて紹介していきます。",
-  "skills": ["C#", ".NET", "Blazor", "Unity", "Beat Saber Mod", "Twitch Bot", "GitHub Actions"],
+  "bio": "I'm Japanese. スノウエルフ族のFaraです。BlenderとかUnityでたまに改変したりBeatSaberやったりしてます。",
   // url が空のものはサイトに表示されません。service: github / twitter / x / twitch / youtube / bluesky / mail / link
   "socials": [
     {
@@ -22,8 +21,8 @@
     {
       "service": "twitch",
       "label": "Twitch",
-      "handle": "",
-      "url": "",
+      "handle": "@game_fara",
+      "url": "https://twitch.tv/game_fara",
       "description": "ゲーム配信をしています。"
     },
     {

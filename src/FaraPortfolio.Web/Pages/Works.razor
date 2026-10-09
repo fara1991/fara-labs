@@ -28,7 +28,7 @@
                     </div>
                     <h2>@work.Title</h2>
                     <p class="work-subtitle">@work.Subtitle</p>
-                    <p>@work.Description</p>
+                    <p>@(string.IsNullOrWhiteSpace(work.Description) ? work.Summary : work.Description)</p>
 
                     @if (work.Features.Length > 0)
                     {

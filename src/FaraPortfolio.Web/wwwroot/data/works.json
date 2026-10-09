@@ -21,5 +21,201 @@
       { "label": "サイトを開く", "url": "https://pokemon.app-fara.com/", "primary": true },
       { "label": "ソースコード", "url": "https://github.com/fara1991/fara-pokemon-assistance" }
     ]
+  },
+  {
+    "id": "bot-moderator",
+    "title": "FaraBotModerator",
+    "subtitle": "Twitch 配信者向けの多機能 BOT ツール",
+    "category": "デスクトップアプリ",
+    "status": "",
+    "icon": "shield",
+    "accent": "violet",
+    "summary": "チャット管理・イベント通知・翻訳・読み上げをまとめてこなす、Twitch 配信向けの BOT ツール。",
+    "description": "Twitch のチャットの取得・送信に加え、Follow / Raid / Sub / Bits / チャンネルポイントなどのイベントを受け取ってチャットで自動応答します。DeepL によるリアルタイム翻訳と棒読みちゃんでの読み上げ、定期メッセージを送るタイマー機能、ポケモンのダメージ計算コマンドも備えています。",
+    "features": [
+      "チャット連携とイベント検知時の自動応答（EventSub）",
+      "DeepL によるリアルタイム翻訳",
+      "棒読みちゃんでの読み上げ",
+      "タイマーでの定期・日時指定チャット",
+      "ポケモンのダメージ計算などのコマンド"
+    ],
+    "tech": [
+      "C#",
+      ".NET 8",
+      "WPF",
+      "TwitchLib",
+      "DeepL API"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-bot-moderator",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "rhythm-marker",
+    "title": "FaraRhythmMarker",
+    "subtitle": "Beat Saber 用リズムマーカー表示 Mod",
+    "category": "Beat Saber Mod",
+    "status": "",
+    "icon": "music",
+    "accent": "indigo",
+    "summary": "プレイ中、一定のビート間隔で流れてくるマーカーを表示して、リズムを目で追いやすくする Mod。",
+    "description": "マーカーは譜面のノーツ速度（NJS）に合わせて奥から手前へ動き、ヒット位置に着いた瞬間に消えます。常に 4 ビート先まで表示し、曲中の BPM 変更にも自動で対応します。設定はゲーム内の Mod Settings から変更できます。",
+    "features": [
+      "NJS に同期して動くマーカー（4 ビート先まで表示）",
+      "BPM 変更の自動検出",
+      "表示間隔を 1/4・1/2・1・2 ビートから選択",
+      "カラーモードとサイドガイドライト",
+      "サイズ・不透明度・レイテンシー補正の調整"
+    ],
+    "tech": [
+      "C#",
+      "Unity",
+      "BSIPA",
+      "SiraUtil",
+      "BSML"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-rhythm-marker",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "acc-field",
+    "title": "FaraAccField",
+    "subtitle": "115 点を狙うためのリアルタイムフィードバック Mod",
+    "category": "Beat Saber Mod",
+    "status": "",
+    "icon": "target",
+    "accent": "cyan",
+    "summary": "ノーツ 1 個あたり最高の 115 点を取るためのフィードバックを、プレイ中にリアルタイムで表示する Beat Saber の Mod。",
+    "description": "振りかぶり（プレスイング 100°）を達成したかをノーツの発光で知らせ、中央精度のゾーンを球体で見える化します。軌道線やカット方向の矢印、ノーツグリッドガイドも表示でき、設定画面は英語・日本語の切り替えとメニュー画面でのプレビューに対応しています。",
+    "features": [
+      "プレスイング 100° 達成時などにノーツを発光",
+      "セイバーから次のノーツへの軌道線",
+      "中心精度の球体と軸線",
+      "カット方向とノーツグリッドガイドの表示",
+      "英語・日本語の切り替え"
+    ],
+    "tech": [
+      "C#",
+      "Unity",
+      "BSIPA",
+      "SiraUtil",
+      "Harmony"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-acc-field",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "beat-saber-mods",
+    "title": "BeatSaber Mod一覧",
+    "subtitle": "GitHub で公開している Beat Saber の Mod",
+    "category": "Beat Saber Mod",
+    "status": "",
+    "icon": "saber",
+    "accent": "pink",
+    "summary": "GitHub で公開している Beat Saber の Mod をまとめて見られます。",
+    "description": "",
+    "features": [],
+    "tech": [
+      "C#",
+      "Unity",
+      "BSIPA"
+    ],
+    "links": [
+      {
+        "label": "GitHub で見る",
+        "url": "https://github.com/search?q=user%3Afara1991+topic%3Abeatsaber&type=repositories",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "music-beat-adjuster",
+    "title": "FaraMusicBeatAdjuster",
+    "subtitle": "音楽ファイルの BPM 分析と開始・終了位置の調整ツール",
+    "category": "デスクトップアプリ",
+    "status": "",
+    "icon": "wave",
+    "accent": "violet",
+    "summary": "音楽ファイルの BPM と拍の位置を検出し、曲の開始・終了位置を調整するアプリ。",
+    "description": "WAV・MP3・M4A などを読み込み、BPM と拍の位置を自動で検出して、冒頭と末尾の空白を調整します。音ズレ補正・音量調整・コンプレッサー・リミッターを備え、BSMG Wiki の基準で音量や準備時間をチェックできます。",
+    "features": [
+      "BPM の自動検出（複数候補・可変 BPM の警告）",
+      "拍の位置の検出と冒頭・末尾の空白の自動調整",
+      "音ズレ補正・音量調整・コンプレッサー・リミッター",
+      "BSMG Wiki 基準での音量・準備時間チェック",
+      "OGG での書き出し"
+    ],
+    "tech": [
+      "C#",
+      ".NET 9",
+      "WPF",
+      "NAudio",
+      "ffmpeg"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-music-beat-adjuster",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "multi-vrm-converter",
+    "title": "FaraMultiVRMConverter",
+    "subtitle": "VRM 変換ツール",
+    "category": "ツール",
+    "status": "",
+    "icon": "cube",
+    "accent": "indigo",
+    "summary": "VRM モデルを変換するためのツールです。",
+    "description": "",
+    "features": [],
+    "tech": [],
+    "links": []
+  },
+  {
+    "id": "blender-manual",
+    "title": "FaraBlenderManual",
+    "subtitle": "Blender の操作方法をまとめた Web サイト",
+    "category": "Web アプリ",
+    "status": "",
+    "icon": "book",
+    "accent": "cyan",
+    "summary": "Blender の基本操作からショートカット、おすすめのアドオン、アバター衣装の作り方までをまとめたサイト。",
+    "description": "Blender の基本操作から応用、よく使うショートカット、おすすめのアドオン、VRChat などで使うアバター衣装の作り方を載せています。スマートフォンでも見やすいレスポンシブデザインです。",
+    "features": [
+      "操作方法の解説",
+      "ショートカット一覧",
+      "おすすめアドオン一覧",
+      "アバター用衣装の作成手順"
+    ],
+    "tech": [
+      "C#",
+      ".NET 8",
+      "Blazor Server",
+      "Bootstrap"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-blender-manual",
+        "primary": true
+      }
+    ]
   }
 ]

@@ -17,7 +17,6 @@ public sealed class Profile
 {
     public string Name { get; init; } = "";
     public string Bio { get; init; } = "";
-    public string[] Skills { get; init; } = [];
     public List<SocialLink> Socials { get; init; } = [];
 
     /// <summary>URL が設定されている SNS だけ（空欄のものはサイトに表示しない）。</summary>
