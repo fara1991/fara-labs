@@ -404,6 +404,18 @@ img { max-width: 100%; display: block; }
 }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
+/* 名前の横のアイコン（文字サイズに合わせて拡大縮小） */
+.name-with-avatar { display: flex; align-items: center; gap: .3em; }
+.avatar {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, .15);
+}
+
 .hero-visual {
     position: relative;
     width: min(400px, 80vw);
