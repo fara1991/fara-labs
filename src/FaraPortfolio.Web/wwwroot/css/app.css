@@ -415,7 +415,8 @@ img { max-width: 100%; display: block; }
     border: 1px dashed rgba(196, 167, 255, .3);
     animation: spin 28s linear infinite;
 }
-.orbit-outer { inset: 0; }
+/* 回転アニメーション（transform）で重なり順のまとまりになるので、説明（.satellite-tip）が中央の .core より上に出るよう前面に置く */
+.orbit-outer { inset: 0; z-index: 1; }
 .orbit-inner { inset: 22%; border-style: solid; border-color: rgba(232, 121, 249, .2); animation-duration: 18s; animation-direction: reverse; }
 .satellite {
     position: absolute;

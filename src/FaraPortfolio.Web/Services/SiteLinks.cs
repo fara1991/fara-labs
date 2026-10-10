@@ -25,6 +25,6 @@ public static class SiteLinks
         else if (host.EndsWith("." + Domain) && !host.StartsWith("dev.") && !host[..^(Domain.Length + 1)].EndsWith("-dev"))
             devHost = host[..^(Domain.Length + 1)] + "-dev." + Domain;
         if (devHost is null) return url;
-        return new UriBuilder(uri) { Host = devHost, Port = -1 }.Uri.ToString();
+        return new UriBuilder(uri) { Host = devHost, Port = -1 }.Uri.AbsoluteUri;
     }
 }

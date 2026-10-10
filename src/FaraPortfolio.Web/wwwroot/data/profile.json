@@ -1,5 +1,5 @@
 {
-  // サイト全体のプロフィール。編集後に GitHub Actions の「Deploy」を実行すると反映されます。
+  // サイト全体のプロフィール。編集は develop 向けの PR で行い、develop → master にマージすると本番に反映されます。
   "name": "Fara",
   "bio": "I'm Japanese. スノウエルフ族のFaraです。BlenderとかUnityでたまに改変したりBeatSaberやったりしてます。",
   // url が空のものはサイトに表示されません。service: github / twitter / x / twitch / youtube / bluesky / mail / link

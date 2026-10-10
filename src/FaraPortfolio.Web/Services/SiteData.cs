@@ -18,7 +18,7 @@ public sealed class SiteData
     public IReadOnlyList<UpdateEntry> Updates { get; private set; } = [];
     public IReadOnlyList<string> Errors => _errors;
 
-    /// <summary>デプロイ時に埋め込まれるコミット SHA（短縮）。ローカル実行では "dev"。</summary>
+    /// <summary>ビルド時に埋め込まれるコミット SHA（短縮。git 管理外でビルドしたときは "dev"）。</summary>
     public static string BuildId { get; } = ReadBuildId();
 
     public async Task LoadAsync(HttpClient http)
