@@ -9,7 +9,7 @@
 | https://fara-labs.com/ | Worker `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
-| https://develop.pokemon.fara-labs.com/ | Worker `fara-pokemon-develop`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
+| https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-develop`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
@@ -86,7 +86,7 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 1. `fara-pokemon-assistance` の **Settings → Secrets and variables → Actions** に、4. と同じ `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` を登録
    （トークンは 3. のものをそのまま使えます。範囲が fara-labs.com のゾーンなので pokemon.fara-labs.com も含まれます）
-2. DNS に `pokemon`・`develop.pokemon` のレコードが **無い** ことを確認（GitHub Pages 時代の CNAME が残っていれば削除）
+2. DNS に `pokemon`・`pokemon-dev` のレコードが **無い** ことを確認（GitHub Pages 時代の CNAME が残っていれば削除）
 3. そのリポジトリの master に push（PR のマージ含む）すると公開される。https://pokemon.fara-labs.com/ が開けることを確認
 4. GitHub Pages を使っていた場合は、そのリポジトリの **Settings → Pages** で公開を停止
 
@@ -129,9 +129,22 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 ### 確認用サイトを自分だけに見せる（Cloudflare Access・50 人まで無料）
 
-dev.fara-labs.com は初期状態だと URL を知っていれば誰でも見られます（検索エンジンには載らないようにしてあります）。
-自分だけにしたい場合: **Zero Trust → Access → Applications → Add an application → Self-hosted** で
-ドメイン `dev.fara-labs.com`、ポリシーを「自分のメールアドレスを Include」にします。開くとメールに届くコードでログインする形になります。
+確認用サイト（dev.fara-labs.com・pokemon-dev.fara-labs.com）は、初期状態だと URL を知っていれば誰でも見られます（検索エンジンには載らないようにしてあります）。
+Cloudflare Access を前に置くと、許可したメールアドレスに届くコードでログインした人だけが見られるようになります。
+
+1. ダッシュボードの左メニュー **Zero Trust**（初回はチーム名の入力と **Free** プランの選択。支払い情報の登録を求められても請求はされません）
+2. **Access → Applications → Add an application → Self-hosted**
+   - **Application name**: `dev sites` など
+   - **Session Duration**: `24 hours` など（ログインし直すまでの期間）
+   - **Add public hostname** で 2 つ追加: Domain `fara-labs.com`、Subdomain `dev` と `pokemon-dev`
+3. **Policies → Add a policy**
+   - **Policy name**: `me` など / **Action**: `Allow`
+   - **Include** → Selector `Emails` → 自分のメールアドレス
+4. **Login methods** は **One-time PIN**（初期状態で有効）のままで OK → 保存
+5. シークレットウィンドウで https://pokemon-dev.fara-labs.com/ を開き、Cloudflare のログイン画面が出ること、メールのコードで入れることを確認
+
+Worker は `workers_dev` / `preview_urls` を無効にしてあるので、`*.workers.dev` から Access を迂回して見られることはありません。
+確認用サイトを増やしたときは、このアプリケーションに public hostname を追加します。
 
 ### うまくいかないとき
 
