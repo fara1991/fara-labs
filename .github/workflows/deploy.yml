@@ -28,9 +28,8 @@ jobs:
           echo "::error::本番の公開は master から実行してください（Use workflow from: master）"
           exit 1
 
+      # 実行のきっかけになったコミット（github.sha）を公開する。master のみなのは上の Require master で保証
       - uses: actions/checkout@v4
-        with:
-          ref: master
 
       - uses: actions/setup-dotnet@v4
         with:

@@ -56,16 +56,21 @@
     }, { passive: true });
 
     // トップの軌道アイコンの説明（.satellite-tip）が画面の左右からはみ出すときは内側に寄せる
-    document.addEventListener('pointerover', (e) => {
+    //  説明の位置は transform のアニメーション途中だと正しく測れないので、アイコンの中心と説明の幅から計算する
+    const placeTip = (e) => {
         const sat = e.target instanceof Element ? e.target.closest('.satellite') : null;
         const tip = sat?.querySelector('.satellite-tip');
         if (!tip) return;
-        sat.classList.remove('tip-left', 'tip-right');
-        const rect = tip.getBoundingClientRect();
+        const rect = sat.getBoundingClientRect();
+        const center = (rect.left + rect.right) / 2;
+        const half = tip.getBoundingClientRect().width / 2;
         const margin = 12;
-        if (rect.right > document.documentElement.clientWidth - margin) sat.classList.add('tip-left');
-        else if (rect.left < margin) sat.classList.add('tip-right');
-    }, { passive: true });
+        const overRight = center + half > root.clientWidth - margin;
+        sat.classList.toggle('tip-left', overRight);
+        sat.classList.toggle('tip-right', !overRight && center - half < margin);
+    };
+    document.addEventListener('pointerover', placeTip, { passive: true });
+    document.addEventListener('focusin', placeTip);
 
     window.faraSite = {
         scrollToHash() {

@@ -28,6 +28,8 @@ public class DataFileTests
         Assert.All(profile.Socials, s =>
         {
             Assert.False(string.IsNullOrWhiteSpace(s.Label));
+            // CSS のサービス色（.service-xxx）は小文字の名前で当てているので、決まった名前だけにする
+            Assert.Contains(s.Service, new[] { "github", "twitter", "x", "twitch", "youtube", "bluesky", "mail", "link" });
             if (!string.IsNullOrWhiteSpace(s.Url))
                 Assert.True(IsAbsoluteHttpUrl(s.Url) || s.Url.StartsWith("mailto:"), $"{s.Label} の url が不正です: {s.Url}");
         });
