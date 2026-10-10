@@ -19,7 +19,7 @@
         @if (!string.IsNullOrWhiteSpace(Entry.Link))
         {
             var external = Entry.Link.StartsWith("http", StringComparison.OrdinalIgnoreCase);
-            <a class="text-link" href="@Entry.Link" target="@(external ? "_blank" : null)" rel="@(external ? "noopener noreferrer" : null)">
+            <a class="text-link" href="@SiteLinks.Localize(Entry.Link)" target="@(external ? "_blank" : null)" rel="@(external ? "noopener noreferrer" : null)">
                 @(Entry.LinkLabel ?? "詳しく見る") <Icon Name="@(external ? "external" : "arrow-right")" Size="15" />
             </a>
         }

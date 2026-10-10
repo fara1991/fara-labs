@@ -144,7 +144,7 @@
   },
   {
     "id": "blender-manual",
-    "title": "FaraBlenderManual",
+    "title": "Blender Manual",
     "subtitle": "Blender の操作方法をまとめた Web サイト",
     "category": "Web アプリ",
     "status": "",
@@ -156,19 +156,22 @@
       "操作方法の解説",
       "ショートカット一覧",
       "おすすめアドオン一覧",
-      "アバター用衣装の作成手順"
+      "アバター用衣装の作成手順",
+      "ブラウザ上で Blender と同じキー操作を試せる練習画面"
     ],
     "tech": [
       "C#",
-      ".NET 8",
-      "Blazor Server",
-      "Bootstrap"
+      ".NET 9",
+      "Blazor（静的 SSR）",
+      "Markdown",
+      "Three.js",
+      "Cloudflare Workers"
     ],
     "links": [
+      { "label": "サイトを開く", "url": "https://blender.fara-labs.com/", "primary": true },
       {
         "label": "GitHub",
-        "url": "https://github.com/fara1991/fara-blender-manual",
-        "primary": true
+        "url": "https://github.com/fara1991/fara-blender-manual"
       }
     ]
   }

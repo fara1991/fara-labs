@@ -7,6 +7,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+SiteLinks.CurrentHost = new Uri(builder.HostEnvironment.BaseAddress).Host;
+
 var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 builder.Services.AddSingleton(http);
 builder.Services.AddSingleton<SiteData>();

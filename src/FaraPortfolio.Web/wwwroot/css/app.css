@@ -437,6 +437,38 @@ img { max-width: 100%; display: block; }
     border-color: var(--accent, var(--lavender));
     box-shadow: 0 10px 34px -4px var(--accent, var(--violet));
 }
+.satellite-tip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    width: max-content;
+    max-width: 240px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(20, 10, 38, .94);
+    border: 1px solid var(--accent, var(--border-strong));
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .6);
+    color: var(--text);
+    font-size: 12.5px;
+    line-height: 1.5;
+    text-align: left;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 6px);
+    transition: opacity .18s ease, transform .18s var(--ease-out);
+    z-index: 5;
+}
+.satellite-tip strong { display: block; font: 700 13.5px/1.3 var(--font-display); color: var(--accent, var(--lavender)); margin-bottom: 3px; }
+.satellite-tip span { display: block; color: var(--muted); }
+.satellite:hover .satellite-tip, .satellite:focus-visible .satellite-tip { opacity: 1; transform: translate(-50%, 0); }
+/* 画面からはみ出す位置にあるときは site.js が tip-left / tip-right を付けて内側に寄せる */
+.satellite.tip-left .satellite-tip { left: auto; right: 0; transform: translate(0, 6px); }
+.satellite.tip-left:hover .satellite-tip, .satellite.tip-left:focus-visible .satellite-tip { transform: translate(0, 0); }
+.satellite.tip-right .satellite-tip { left: 0; transform: translate(0, 6px); }
+.satellite.tip-right:hover .satellite-tip, .satellite.tip-right:focus-visible .satellite-tip { transform: translate(0, 0); }
+.hero-visual:has(.satellite:hover) .satellite:not(:hover) { z-index: 0; }
+.satellite:hover, .satellite:focus-visible { z-index: 4; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 .core {
     position: absolute;
