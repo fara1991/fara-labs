@@ -7,9 +7,11 @@
 | 公開先 | 置き場所 | 公開のタイミング | ワークフロー |
 |---|---|---|---|
 | https://fara-labs.com/ | Worker `fara-portfolio` | master への push ごと | `.github/workflows/deploy.yml` |
-| https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
+| https://dev.fara-labs.com/ | Worker `fara-portfolio-dev` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
-| https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-develop`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
+| https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-dev`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
+| https://blender.fara-labs.com/ | Worker `fara-blender`（`fara-blender-manual` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
+| https://blender-dev.fara-labs.com/ | Worker `fara-blender-dev`（同上） | そのリポジトリの develop への push ごと | 同上 |
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
