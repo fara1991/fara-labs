@@ -1,6 +1,6 @@
 name: Deploy
 
-# 本番（https://app-fara.com/）への公開。手動実行のみ（Actions タブ →「Deploy」→「Run workflow」）。
+# 本番（https://fara-labs.com/）への公開。手動実行のみ（Actions タブ →「Deploy」→「Run workflow」）。
 # PR のマージや push では公開されない。常に master ブランチの内容を公開する。
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     # Settings → Environments の production（master からのみ実行可にしておく）
     environment:
       name: production
-      url: https://app-fara.com/
+      url: https://fara-labs.com/
     steps:
       - name: Require master
         if: github.ref != 'refs/heads/master'

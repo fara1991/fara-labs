@@ -1,6 +1,6 @@
 name: Deploy (develop)
 
-# 確認用（https://dev.app-fara.com/）への公開。develop に push（PR のマージ含む）されるたびに実行。
+# 確認用（https://dev.fara-labs.com/）への公開。develop に push（PR のマージ含む）されるたびに実行。
 # 本番には影響しない。手動で再実行したいときは Actions タブから develop を選んで Run workflow。
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
     # Settings → Environments の develop（develop からのみ実行可にしておく）
     environment:
       name: develop
-      url: https://dev.app-fara.com/
+      url: https://dev.fara-labs.com/
     steps:
       - uses: actions/checkout@v4
 

@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-ポートフォリオサイト（https://app-fara.com/）。.NET 8 / Blazor WebAssembly の静的サイトを Cloudflare Workers（静的アセットのみ）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
+ポートフォリオサイト（https://fara-labs.com/）。.NET 8 / Blazor WebAssembly の静的サイトを Cloudflare Workers（静的アセットのみ）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
 
 ## ブランチ運用（必ず守る）
 
 - 作業ブランチは `develop` から作成する（`master` から切らない）
 - 作業ブランチの PR は `develop` 向けに作る
 - `master` へは `develop` からのみマージする
-- 本番（app-fara.com）の公開は Actions の Deploy ワークフロー（workflow_dispatch・master 固定）を手動実行のみ。master への push / マージで本番に自動公開する仕組みは追加しない
-- develop への push は Deploy (develop) で確認用（dev.app-fara.com）に自動公開される
+- 本番（fara-labs.com）の公開は Actions の Deploy ワークフロー（workflow_dispatch・master 固定）を手動実行のみ。master への push / マージで本番に自動公開する仕組みは追加しない
+- develop への push は Deploy (develop) で確認用（dev.fara-labs.com）に自動公開される
 
 ## 構成メモ
 

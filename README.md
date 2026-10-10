@@ -1,6 +1,6 @@
 # fara-portfolio-site
 
-自分用のポートフォリオサイト（https://app-fara.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
+自分用のポートフォリオサイト（https://fara-labs.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
@@ -34,8 +34,8 @@ fara-portfolio-site/
 ├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック
 └── .github/workflows/
     ├── build.yml                     PR・master への push でビルド・テスト・公開設定チェック（公開しない）
-    ├── deploy-develop.yml            develop への push で確認用サイト（dev.app-fara.com）に公開
-    └── deploy.yml                    手動実行で master を本番（app-fara.com）に公開
+    ├── deploy-develop.yml            develop への push で確認用サイト（dev.fara-labs.com）に公開
+    └── deploy.yml                    手動実行で master を本番（fara-labs.com）に公開
 ```
 
 ## サイトの更新
@@ -50,7 +50,7 @@ fara-portfolio-site/
   "category": "work",          // site（サイト） / work（作品） / news（お知らせ）
   "title": "ダメージ計算サイトに素早さ比較を追加",
   "body": "本文（任意）",
-  "link": "https://pokemon.app-fara.com/",  // 任意。"/works" のようなサイト内パスも可
+  "link": "https://pokemon.fara-labs.com/",  // 任意。"/works" のようなサイト内パスも可
   "linkLabel": "サイトを開く"               // 任意
 }
 ```
@@ -71,17 +71,17 @@ JSON に書き間違いがあると `dotnet test` が失敗するので、公開
 
 | 公開先 | タイミング |
 |---|---|
-| https://dev.app-fara.com/（確認用） | develop に push（PR のマージ含む）されるたびに自動 |
-| https://app-fara.com/（本番） | **Actions → Deploy → Run workflow** を手動実行したときだけ。常に master の内容 |
+| https://dev.fara-labs.com/（確認用） | develop に push（PR のマージ含む）されるたびに自動 |
+| https://fara-labs.com/（本番） | **Actions → Deploy → Run workflow** を手動実行したときだけ。常に master の内容 |
 
 どちらもテストが通らなければ公開されません。初回の設定（API トークンの発行・GitHub への登録・DNS）は [docs/cloudflare-setup.md](docs/cloudflare-setup.md) を参照してください。
 
 ## ブランチ運用
 
 ```
-feature/xxx ──PR──▶ develop ──PR──▶ master ──(手動 Deploy)──▶ app-fara.com
+feature/xxx ──PR──▶ develop ──PR──▶ master ──(手動 Deploy)──▶ fara-labs.com
                        │
-                       └──(自動)──▶ dev.app-fara.com
+                       └──(自動)──▶ dev.fara-labs.com
 ```
 
 - 作業ブランチは **develop から** 作成する（`feature/xxx` など）
