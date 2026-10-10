@@ -1,18 +1,32 @@
-# Cloudflare Workers 公開の初期設定
+# Cloudflare / GitHub Pages の初期設定（fara-labs.com）
 
-このサイトは Cloudflare Workers（静的アセットのみ）で公開します。最初に 1 回だけ、以下の設定が必要です。
-費用はかかりません（API トークンは無料。無料プランのまま無料枠を超えても課金されず、超えた分がエラーになるだけです）。
+このサイトは Cloudflare Workers（静的アセットのみ）で公開します。ドメイン `fara-labs.com` の DNS は Cloudflare で管理し、
+ポケモンツール（pokemon.fara-labs.com）だけは別リポジトリの GitHub Pages で公開しています。最初に 1 回だけ、以下の設定が必要です。
+費用はドメイン代のみです（API トークンは無料。無料プランのまま無料枠を超えても課金されず、超えた分がエラーになるだけです）。
 
-| 公開先 | Worker 名 | 公開のタイミング | ワークフロー |
+| 公開先 | 置き場所 | 公開のタイミング | ワークフロー |
 |---|---|---|---|
-| https://fara-labs.com/ | `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
-| https://dev.fara-labs.com/ | `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
+| https://fara-labs.com/ | Worker `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
+| https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
+| https://pokemon.fara-labs.com/ | GitHub Pages（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの設定による | そのリポジトリ側 |
 
-設定の順番: **1 → 2 → 3 → 4 → 5**。3 と 4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
+設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
+
+> **app-fara.com から移行する場合**（2026-10 に移行）: 4（シークレット）と 5（Environments）は設定済みなのでそのままで OK。
+> **1 → 2 → 3（既存トークンの編集）→ 6 → 7**、最後に「[旧ドメイン app-fara.com から転送する](#旧ドメイン-app-faracom-から-fara-labscom-に転送する)」を行います。
 
 ---
 
-## 1. DNS の事前確認
+## 1. fara-labs.com を Cloudflare に追加する
+
+- **Cloudflare Registrar で取得した場合**: ダッシュボードのアカウントのホームに `fara-labs.com` が最初から並んでいるので、何もしなくて OK。
+- **他社で取得した場合**: アカウントのホーム → **Add a domain** → `fara-labs.com` を入力 → プランは **Free**。
+  表示された 2 つのネームサーバー（`xxx.ns.cloudflare.com`）を、ドメインを取得した会社の管理画面で設定します。
+  ゾーンの画面に **Active** と出たら次へ（数分〜最大 24 時間）。
+
+続けて、そのゾーンの **SSL/TLS → Overview** を **Full (strict)** にします（初期値の Full のままでも動きます）。
+
+## 2. DNS の事前確認
 
 Cloudflare ダッシュボード → `fara-labs.com` → **DNS → Records** で、次の名前のレコードが **無い** ことを確認します。
 Worker のカスタムドメインは初回デプロイ時に自動でレコードを作るため、同じ名前の A / AAAA / CNAME があると失敗します。
@@ -20,33 +34,40 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 - `fara-labs.com`（Name が `@`）
 - `dev.fara-labs.com`（Name が `dev`）
 
-> `pokemon.fara-labs.com`（GitHub Pages）のレコードは触りません。そのままで大丈夫です。
+> 他社から移したときに、取得元の「駐車ページ」用の A レコードなどが自動で取り込まれていることがあります。あれば削除します。
+> `pokemon` のレコードは 6. で作ります。
 
-## 2. API トークンを発行する
+## 3. API トークンを発行する
+
+**app-fara.com から移行する場合**は、既存のトークンを編集するだけで済みます（トークンの値は変わらないので 4. はやり直し不要）:
+**My Profile → API Tokens** → 使っているトークンの **…** → **Edit** → **Zone Resources** に `Include` → `Specific zone` → `fara-labs.com` を追加 → **Continue to summary** → **Update Token**。
+（app-fara.com の行は、下の「旧ドメインから転送する」が終わるまで残しておきます。）
+
+新しく作る場合:
 
 1. Cloudflare ダッシュボード右上のアイコン → **My Profile** → **API Tokens** → **Create Token**
 2. テンプレート **Edit Cloudflare Workers** の **Use template**
 3. 権限（Permissions）はテンプレートのままで OK。範囲を絞ります:
    - **Account Resources**: `Include` → 自分のアカウント
    - **Zone Resources**: `Include` → `Specific zone` → `fara-labs.com`
-   - **TTL**（任意）: 有効期限を付けたい場合は終了日を設定（期限が来たら 2. をやり直して 3. のシークレットを更新）
+   - **TTL**（任意）: 有効期限を付けたい場合は終了日を設定（期限が来たら 3. をやり直して 4. のシークレットを更新）
 4. **Continue to summary** → **Create Token**
 5. 表示されたトークンをコピー（**この画面でしか表示されません**。閉じてしまったら作り直し）
 
 あわせて **アカウント ID** も控えます: ダッシュボードのアカウントのホーム、または **Workers & Pages** の画面右側にある **Account ID** をコピー。
 
-## 3. GitHub にシークレットを登録する
+## 4. GitHub にシークレットを登録する
 
 リポジトリの **Settings → Secrets and variables → Actions**
 
 | タブ | 名前 | 値 |
 |---|---|---|
-| **Secrets** → New repository secret | `CLOUDFLARE_API_TOKEN` | 2. で発行したトークン |
-| **Variables** → New repository variable | `CLOUDFLARE_ACCOUNT_ID` | 2. で控えたアカウント ID |
+| **Secrets** → New repository secret | `CLOUDFLARE_API_TOKEN` | 3. で発行したトークン |
+| **Variables** → New repository variable | `CLOUDFLARE_ACCOUNT_ID` | 3. で控えたアカウント ID |
 
 アカウント ID は秘密情報ではないので Variables に置いています。トークンは Secrets なので、登録後は GitHub 上でも中身を見られません（ログにも `***` で伏せられます）。
 
-## 4. GitHub の Environments を作る
+## 5. GitHub の Environments を作る
 
 本番に公開できるブランチを master に限定するための設定です。
 
@@ -57,7 +78,26 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 | `production` | **Selected branches and tags** → `master` を追加 | **Required reviewers** に自分を入れると、公開前に承認ボタンを押す 1 ステップが入る |
 | `develop` | **Selected branches and tags** → `develop` を追加 | なし |
 
-## 5. 初回の公開
+## 6. pokemon.fara-labs.com（GitHub Pages）を設定する
+
+ポケモンツールは `fara-pokemon-assistance` リポジトリの GitHub Pages で公開しています。以下の `<owner>` は、そのリポジトリの持ち主
+（GitHub のユーザー名か Organization 名。例: `fara-labs`）に読み替えてください。
+
+1. **ドメインの所有確認**（他人に pokemon.fara-labs.com を乗っ取られないための設定・推奨）
+   - `<owner>` が Organization なら **Organization の Settings → Pages**、ユーザーなら **個人の Settings → Pages** → **Add a domain** → `fara-labs.com`
+   - 表示された TXT レコードを Cloudflare の **DNS → Records → Add record** で追加
+     （Type `TXT` / Name `_github-pages-challenge-<owner>` / Content は表示された値）
+   - GitHub に戻って **Verify**（反映まで数分かかることがあります）
+2. **DNS レコードを作る**: Cloudflare の **DNS → Records → Add record**
+   - Type `CNAME` / Name `pokemon` / Target `<owner>.github.io` / Proxy status **DNS only（灰色の雲）**
+   - Proxied（オレンジの雲）にすると GitHub が HTTPS の証明書を発行できないので、必ず **DNS only** にします
+3. **GitHub Pages にドメインを設定する**: `fara-pokemon-assistance` リポジトリの **Settings → Pages → Custom domain** に `pokemon.fara-labs.com` を入力して **Save**
+   - DNS check が成功したら（数分〜1 時間）、**Enforce HTTPS** にチェック
+   - リポジトリに `CNAME` ファイルがある場合（ブランチから公開している、または公開用のワークフローが `CNAME` を書き出している場合）は、
+     中身を `pokemon.fara-labs.com` に書き換えておきます。書き換えないと次の公開で古いドメインに戻ります
+4. https://pokemon.fara-labs.com/ が開けることを確認
+
+## 7. 初回の公開
 
 1. 作業ブランチ → **develop** に PR をマージ
    → Deploy (develop) が自動で動き、https://dev.fara-labs.com/ に公開される（初回はカスタムドメインの作成で数分かかることがあります）
@@ -78,15 +118,22 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 ### 旧ドメイン app-fara.com から fara-labs.com に転送する
 
 2026-10 にドメインを app-fara.com から fara-labs.com に移しました。古いリンクから来た人を新しいドメインに 301 で転送します（app-fara.com の契約を残している間だけ必要）。
+**7. で fara-labs.com への公開と、6. で pokemon.fara-labs.com の表示を確認してから**行います。
 
-1. `app-fara.com` のゾーン → **DNS → Records** で、次の 3 つを Type `AAAA` / IPv6 `100::` / **Proxied（オレンジの雲）** にする（既存のレコードは編集、無ければ追加）
-   - `@`・`www`・`pokemon`（pokemon は GitHub Pages 向けの CNAME を置き換える）
-2. **Rules → Redirect Rules → Create rule**（Single Redirect）
+1. **Worker から古いドメインを外す**: **Workers & Pages** → `fara-portfolio` → **Settings → Domains & Routes** に `app-fara.com` が残っていれば **…** → **Remove**。
+   `fara-portfolio-develop` の `dev.app-fara.com` も同様に外します（外すと DNS レコードも自動で消えます）
+2. `app-fara.com` のゾーン → **DNS → Records**
+   - `pokemon` の CNAME（GitHub Pages 向け）を削除
+   - 次の 3 つを Type `AAAA` / IPv6 `100::` / **Proxied（オレンジの雲）** で追加: `@`・`www`・`pokemon`（同じ名前のレコードが残っていたら先に削除）
+3. **Rules → Redirect Rules → Create rule**（Single Redirect）
    - **If**: Custom filter expression → `(http.host in {"app-fara.com" "www.app-fara.com"})`
      **Then**: Dynamic → `concat("https://fara-labs.com", http.request.uri.path)` / Status `301` / **Preserve query string** にチェック
    - もう 1 つ: `(http.host eq "pokemon.app-fara.com")` → `concat("https://pokemon.fara-labs.com", http.request.uri.path)` / `301` / Preserve query string
+4. https://app-fara.com/ と https://pokemon.app-fara.com/ を開き、fara-labs.com 側に移ることを確認
+5. （任意）3. の API トークンから `app-fara.com` のゾーンを外す
 
-`dev.app-fara.com` は転送不要です（確認用なので消すだけで OK）。
+`dev.app-fara.com` は転送不要です（確認用なので 1. で外すだけで OK）。
+GitHub の Pages 設定で app-fara.com を所有確認していた場合は、その行も削除して構いません。
 
 ### 確認用サイトを自分だけに見せる（Cloudflare Access・50 人まで無料）
 
@@ -98,8 +145,9 @@ dev.fara-labs.com は初期状態だと URL を知っていれば誰でも見ら
 
 | 症状 | 対処 |
 |---|---|
-| `Authentication error [code: 10000]` | トークンの貼り間違い・期限切れ。2. → 3. をやり直す |
-| カスタムドメインの作成で失敗（already exists / conflict） | 1. の DNS レコードが残っている。削除してから再実行 |
+| `Authentication error [code: 10000]` | トークンの貼り間違い・期限切れ、または fara-labs.com がトークンの範囲に入っていない。3. → 4. をやり直す |
+| pokemon.fara-labs.com で証明書エラー / Enforce HTTPS が押せない | `pokemon` の CNAME が Proxied になっている。DNS only にして、Pages の Custom domain を一度消して保存し直す |
+| カスタムドメインの作成で失敗（already exists / conflict） | 2. の DNS レコードが残っている。削除してから再実行 |
 | カスタムドメインの作成で権限エラー | ダッシュボードの **Workers & Pages → 該当 Worker → Settings → Domains & Routes → Add → Custom domain** から 1 回だけ手動で追加し、再実行 |
 | Deploy が「master から実行してください」で失敗 | Run workflow のときに **Use workflow from** を `master` にする |
 
