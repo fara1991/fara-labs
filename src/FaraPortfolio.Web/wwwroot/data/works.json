@@ -19,7 +19,7 @@
     "tech": ["C#", "Blazor WebAssembly", "GitHub Pages", "GitHub Actions", "Python"],
     "links": [
       { "label": "サイトを開く", "url": "https://pokemon.fara-labs.com/", "primary": true },
-      { "label": "GitHub", "url": "https://github.com/fara-labs/fara-pokemon-assistance" }
+      { "label": "GitHub", "url": "https://github.com/fara1991/fara-pokemon-assistance" }
     ]
   },
   {
@@ -49,7 +49,7 @@
     "links": [
       {
         "label": "GitHub",
-        "url": "https://github.com/fara-labs/fara-bot-moderator",
+        "url": "https://github.com/fara1991/fara-bot-moderator",
         "primary": true
       }
     ]
@@ -105,7 +105,7 @@
     "links": [
       {
         "label": "GitHub",
-        "url": "https://github.com/fara-labs/fara-music-beat-adjuster",
+        "url": "https://github.com/fara1991/fara-music-beat-adjuster",
         "primary": true
       }
     ]
@@ -137,7 +137,7 @@
     "links": [
       {
         "label": "GitHub",
-        "url": "https://github.com/fara-labs/fara-multi-vrm-converter",
+        "url": "https://github.com/fara1991/fara-multi-vrm-converter",
         "primary": true
       }
     ]
@@ -167,7 +167,7 @@
     "links": [
       {
         "label": "GitHub",
-        "url": "https://github.com/fara-labs/fara-blender-manual",
+        "url": "https://github.com/fara1991/fara-blender-manual",
         "primary": true
       }
     ]

@@ -12,8 +12,8 @@
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
-> **app-fara.com から移行する場合**（2026-10 に移行。リポジトリも個人アカウントから Organization `fara-labs` に移動）: 5（Environments）はリポジトリと一緒に移っているのでそのままで OK。
-> **1 → 2 → 3（既存トークンの編集）→ 4（Organization に登録し直し、リポジトリ側を削除）→ 6 → 7**、最後に「[旧ドメイン app-fara.com から転送する](#旧ドメイン-app-faracom-から-fara-labscom-に転送する)」を行います。
+> **app-fara.com から移行する場合**（2026-10 に移行）: 4（シークレット）と 5（Environments）は設定済みなのでそのままで OK。
+> **1 → 2 → 3（既存トークンの編集）→ 6 → 7**、最後に「[旧ドメイン app-fara.com から転送する](#旧ドメイン-app-faracom-から-fara-labscom-に転送する)」を行います。
 
 ---
 
@@ -39,7 +39,7 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 ## 3. API トークンを発行する
 
-**app-fara.com から移行する場合**は、既存のトークンを編集するだけで済みます（トークンの値は変わらない）:
+**app-fara.com から移行する場合**は、既存のトークンを編集するだけで済みます（トークンの値は変わらないので 4. はやり直し不要）:
 **My Profile → API Tokens** → 使っているトークンの **…** → **Edit** → **Zone Resources** に `Include` → `Specific zone` → `fara-labs.com` を追加 → **Continue to summary** → **Update Token**。
 （app-fara.com の行は、下の「旧ドメインから転送する」が終わるまで残しておきます。）
 
@@ -50,30 +50,22 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 3. 権限（Permissions）はテンプレートのままで OK。範囲を絞ります:
    - **Account Resources**: `Include` → 自分のアカウント
    - **Zone Resources**: `Include` → `Specific zone` → `fara-labs.com`
-   - **TTL**（任意）: 有効期限を付けたい場合は終了日を設定（期限が来たら 3. をやり直して 4. の Organization のシークレットを更新）
+   - **TTL**（任意）: 有効期限を付けたい場合は終了日を設定（期限が来たら 3. をやり直して 4. のシークレットを更新）
 4. **Continue to summary** → **Create Token**
 5. 表示されたトークンをコピー（**この画面でしか表示されません**。閉じてしまったら作り直し）
 
 あわせて **アカウント ID** も控えます: ダッシュボードのアカウントのホーム、または **Workers & Pages** の画面右側にある **Account ID** をコピー。
 
-## 4. GitHub にシークレットを登録する（Organization）
+## 4. GitHub にシークレットを登録する
 
-シークレットは Organization `fara-labs` にまとめて置き、このリポジトリから使えるようにします。
+リポジトリの **Settings → Secrets and variables → Actions**
 
-> GitHub Free の Organization では、Organization のシークレット・変数を **public リポジトリからしか使えません**。
-> そのため、このリポジトリは public にしています（private に戻すと Deploy がトークン未設定で失敗します）。
+| タブ | 名前 | 値 |
+|---|---|---|
+| **Secrets** → New repository secret | `CLOUDFLARE_API_TOKEN` | 3. で発行したトークン |
+| **Variables** → New repository variable | `CLOUDFLARE_ACCOUNT_ID` | 3. で控えたアカウント ID |
 
-**Organization の Settings → Secrets and variables → Actions**
-
-| タブ | 名前 | 値 | Repository access |
-|---|---|---|---|
-| **Secrets** → New organization secret | `CLOUDFLARE_API_TOKEN` | 3. で発行したトークン | **Selected repositories** → `fara-portfolio-site` |
-| **Variables** → New organization variable | `CLOUDFLARE_ACCOUNT_ID` | 3. で控えたアカウント ID | **Selected repositories** → `fara-portfolio-site` |
-
-- アカウント ID は秘密情報ではないので Variables に置いています。トークンは Secrets なので、登録後は GitHub 上でも中身を見られません（ログにも `***` で伏せられます）。
-- 同じ名前のシークレット・変数がリポジトリ側（**リポジトリの Settings → Secrets and variables → Actions**）にもあると、**リポジトリ側が優先**されます。
-  Organization に登録したら、リポジトリ側の `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` は削除します。
-- 3. でトークンを作り直したときは、Organization のシークレットの **Update** で値を差し替えます。
+アカウント ID は秘密情報ではないので Variables に置いています。トークンは Secrets なので、登録後は GitHub 上でも中身を見られません（ログにも `***` で伏せられます）。
 
 ## 5. GitHub の Environments を作る
 
@@ -88,15 +80,15 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 ## 6. pokemon.fara-labs.com（GitHub Pages）を設定する
 
-ポケモンツールは Organization `fara-labs` の `fara-pokemon-assistance` リポジトリの GitHub Pages で公開しています。
+ポケモンツールは `fara1991/fara-pokemon-assistance` リポジトリの GitHub Pages で公開しています。
 
 1. **ドメインの所有確認**（他人に pokemon.fara-labs.com を乗っ取られないための設定・推奨）
-   - **Organization の Settings → Pages** → **Add a domain** → `fara-labs.com`
+   - **個人の Settings（右上のアイコン → Settings）→ Pages** → **Add a domain** → `fara-labs.com`
    - 表示された TXT レコードを Cloudflare の **DNS → Records → Add record** で追加
-     （Type `TXT` / Name `_github-pages-challenge-fara-labs` / Content は表示された値）
+     （Type `TXT` / Name `_github-pages-challenge-fara1991` / Content は表示された値）
    - GitHub に戻って **Verify**（反映まで数分かかることがあります）
 2. **DNS レコードを作る**: Cloudflare の **DNS → Records → Add record**
-   - Type `CNAME` / Name `pokemon` / Target `fara-labs.github.io` / Proxy status **DNS only（灰色の雲）**
+   - Type `CNAME` / Name `pokemon` / Target `fara1991.github.io` / Proxy status **DNS only（灰色の雲）**
    - Proxied（オレンジの雲）にすると GitHub が HTTPS の証明書を発行できないので、必ず **DNS only** にします
 3. **GitHub Pages にドメインを設定する**: `fara-pokemon-assistance` リポジトリの **Settings → Pages → Custom domain** に `pokemon.fara-labs.com` を入力して **Save**
    - DNS check が成功したら（数分〜1 時間）、**Enforce HTTPS** にチェック
@@ -153,7 +145,6 @@ dev.fara-labs.com は初期状態だと URL を知っていれば誰でも見ら
 | 症状 | 対処 |
 |---|---|
 | `Authentication error [code: 10000]` | トークンの貼り間違い・期限切れ、または fara-labs.com がトークンの範囲に入っていない。3. → 4. をやり直す |
-| ログに `CLOUDFLARE_API_TOKEN` を設定するよう出て失敗 | Organization のシークレットの Repository access にこのリポジトリが入っていない、またはリポジトリが private になっている |
 | pokemon.fara-labs.com で証明書エラー / Enforce HTTPS が押せない | `pokemon` の CNAME が Proxied になっている。DNS only にして、Pages の Custom domain を一度消して保存し直す |
 | カスタムドメインの作成で失敗（already exists / conflict） | 2. の DNS レコードが残っている。削除してから再実行 |
 | カスタムドメインの作成で権限エラー | ダッシュボードの **Workers & Pages → 該当 Worker → Settings → Domains & Routes → Add → Custom domain** から 1 回だけ手動で追加し、再実行 |
