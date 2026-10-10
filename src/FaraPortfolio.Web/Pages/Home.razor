@@ -27,8 +27,13 @@
                     var top = (50 - 50 * Math.Cos(angle)).ToString("0.##", CultureInfo.InvariantCulture);
                     var left = (50 + 50 * Math.Sin(angle)).ToString("0.##", CultureInfo.InvariantCulture);
                     <a @key="work.Id" class="satellite accent-@work.Accent" style="top:@(top)%;left:@(left)%"
-                       href="works#@work.Id" aria-label="@work.Title" title="@work.Title">
+                       href="works#@work.Id" aria-label="@work.Title">
                         <Icon Name="@work.Icon" Size="22" />
+                        @* カーソルを合わせると名前と短い説明を出す（軌道は止まり、アイコンは常に正立しているので上に出す） *@
+                        <span class="satellite-tip" role="tooltip">
+                            <strong>@work.Title</strong>
+                            <span>@work.Summary</span>
+                        </span>
                     </a>
                 }
             </div>

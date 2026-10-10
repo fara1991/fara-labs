@@ -54,7 +54,7 @@
                     <div class="work-actions">
                         @foreach (var link in work.Links)
                         {
-                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@link.Url" target="_blank" rel="noopener noreferrer">
+                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@SiteLinks.Localize(link.Url)" target="_blank" rel="noopener noreferrer">
                                 @link.Label <Icon Name="external" Size="16" />
                             </a>
                         }

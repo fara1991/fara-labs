@@ -55,6 +55,18 @@
         card.style.setProperty('--my', `${e.clientY - rect.top}px`);
     }, { passive: true });
 
+    // トップの軌道アイコンの説明（.satellite-tip）が画面の左右からはみ出すときは内側に寄せる
+    document.addEventListener('pointerover', (e) => {
+        const sat = e.target instanceof Element ? e.target.closest('.satellite') : null;
+        const tip = sat?.querySelector('.satellite-tip');
+        if (!tip) return;
+        sat.classList.remove('tip-left', 'tip-right');
+        const rect = tip.getBoundingClientRect();
+        const margin = 12;
+        if (rect.right > document.documentElement.clientWidth - margin) sat.classList.add('tip-left');
+        else if (rect.left < margin) sat.classList.add('tip-right');
+    }, { passive: true });
+
     window.faraSite = {
         scrollToHash() {
             const id = decodeURIComponent(location.hash.slice(1));
