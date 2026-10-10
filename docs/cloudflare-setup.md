@@ -6,7 +6,7 @@
 
 | 公開先 | 置き場所 | 公開のタイミング | ワークフロー |
 |---|---|---|---|
-| https://fara-labs.com/ | Worker `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
+| https://fara-labs.com/ | Worker `fara-portfolio` | master への push ごと | `.github/workflows/deploy.yml` |
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-develop`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
@@ -86,9 +86,8 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 1. 作業ブランチ → **develop** に PR をマージ
    → Deploy (develop) が自動で動き、https://dev.fara-labs.com/ に公開される（初回はカスタムドメインの作成で数分かかることがあります）
 2. dev.fara-labs.com で表示を確認
-3. **develop → master** に PR をマージ（この時点ではまだ公開されない）
-4. **Actions → Deploy → Run workflow**（Use workflow from: `master`）
-   → https://fara-labs.com/ に公開
+3. **develop → master** に PR をマージ
+   → Deploy が自動で動き、https://fara-labs.com/ に公開される
 
 ---
 
@@ -141,7 +140,7 @@ Worker は `workers_dev` / `preview_urls` を無効にしてあるので、`*.wo
 | `Authentication error [code: 10000]` | トークンの貼り間違い・期限切れ、または fara-labs.com がトークンの範囲に入っていない。3. → 4. をやり直す |
 | カスタムドメインの作成で失敗（already exists / conflict） | 2. の DNS レコードが残っている。削除してから再実行 |
 | カスタムドメインの作成で権限エラー | ダッシュボードの **Workers & Pages → 該当 Worker → Settings → Domains & Routes → Add → Custom domain** から 1 回だけ手動で追加し、再実行 |
-| Deploy が「master から実行してください」で失敗 | Run workflow のときに **Use workflow from** を `master` にする |
+| Deploy を手動実行したら「master から実行してください」で失敗 | Run workflow のときに **Use workflow from** を `master` にする |
 
 ## ローカルで Cloudflare と同じ動きを確認する
 

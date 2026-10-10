@@ -35,7 +35,7 @@ fara-portfolio-site/
 └── .github/workflows/
     ├── build.yml                     PR・master への push でビルド・テスト・公開設定チェック（公開しない）
     ├── deploy-develop.yml            develop への push で確認用サイト（dev.fara-labs.com）に公開
-    └── deploy.yml                    手動実行で master を本番（fara-labs.com）に公開
+    └── deploy.yml                    master への push で本番（fara-labs.com）に公開
 ```
 
 ## サイトの更新
@@ -72,21 +72,21 @@ JSON に書き間違いがあると `dotnet test` が失敗するので、公開
 | 公開先 | タイミング |
 |---|---|
 | https://dev.fara-labs.com/（確認用） | develop に push（PR のマージ含む）されるたびに自動 |
-| https://fara-labs.com/（本番） | **Actions → Deploy → Run workflow** を手動実行したときだけ。常に master の内容 |
+| https://fara-labs.com/（本番） | master に push（develop → master の PR のマージ含む）されるたびに自動。手動で公開し直すときは **Actions → Deploy → Run workflow** |
 
 どちらもテストが通らなければ公開されません。初回の設定（API トークンの発行・GitHub への登録・DNS）は [docs/cloudflare-setup.md](docs/cloudflare-setup.md) を参照してください。
 
 ## ブランチ運用
 
 ```
-feature/xxx ──PR──▶ develop ──PR──▶ master ──(手動 Deploy)──▶ fara-labs.com
+feature/xxx ──PR──▶ develop ──PR──▶ master ──(自動)──▶ fara-labs.com
                        │
                        └──(自動)──▶ dev.fara-labs.com
 ```
 
 - 作業ブランチは **develop から** 作成する（`feature/xxx` など）
 - 作業ブランチは **develop へ** マージする
-- リリースするときは **develop → master** へマージし、Actions の Deploy を手動実行する
+- リリースするときは **develop → master** へマージする（マージすると本番に公開される）
 
 ## ローカルで動かす
 

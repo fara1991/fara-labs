@@ -1,8 +1,10 @@
 name: Deploy
 
-# 本番（https://fara-labs.com/）への公開。手動実行のみ（Actions タブ →「Deploy」→「Run workflow」）。
-# PR のマージや push では公開されない。常に master ブランチの内容を公開する。
+# 本番（https://fara-labs.com/）への公開。master に push（develop → master の PR のマージ含む）されるたびに実行。
+# 手動で公開し直したいときは Actions タブ →「Deploy」→「Run workflow」（master を選ぶ）。常に master の内容を公開する。
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
