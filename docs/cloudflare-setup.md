@@ -9,6 +9,7 @@
 | https://fara-labs.com/ | Worker `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
+| https://develop.pokemon.fara-labs.com/ | Worker `fara-pokemon-develop`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
@@ -85,7 +86,7 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 1. `fara-pokemon-assistance` の **Settings → Secrets and variables → Actions** に、4. と同じ `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` を登録
    （トークンは 3. のものをそのまま使えます。範囲が fara-labs.com のゾーンなので pokemon.fara-labs.com も含まれます）
-2. DNS に `pokemon` のレコードが **無い** ことを確認（GitHub Pages 時代の CNAME が残っていれば削除）
+2. DNS に `pokemon`・`develop.pokemon` のレコードが **無い** ことを確認（GitHub Pages 時代の CNAME が残っていれば削除）
 3. そのリポジトリの master に push（PR のマージ含む）すると公開される。https://pokemon.fara-labs.com/ が開けることを確認
 4. GitHub Pages を使っていた場合は、そのリポジトリの **Settings → Pages** で公開を停止
 
