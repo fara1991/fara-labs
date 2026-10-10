@@ -13,9 +13,6 @@
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
-> **app-fara.com から移行する場合**（2026-10 に移行）: 4（シークレット）と 5（Environments）は設定済みなのでそのままで OK。
-> **1 → 2 → 3（既存トークンの編集）→ 6 → 7**、最後に「[旧ドメイン app-fara.com から転送する](#旧ドメイン-app-faracom-から-fara-labscom-に転送する)」を行います。
-
 ---
 
 ## 1. fara-labs.com を Cloudflare に追加する
@@ -39,12 +36,6 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 > `pokemon` も 6. で Worker が自動で作るので、レコードは不要です。
 
 ## 3. API トークンを発行する
-
-**app-fara.com から移行する場合**は、既存のトークンを編集するだけで済みます（トークンの値は変わらないので 4. はやり直し不要）:
-**My Profile → API Tokens** → 使っているトークンの **…** → **Edit** → **Zone Resources** に `Include` → `Specific zone` → `fara-labs.com` を追加 → **Continue to summary** → **Update Token**。
-（app-fara.com の行は、下の「旧ドメインから転送する」が終わるまで残しておきます。）
-
-新しく作る場合:
 
 1. Cloudflare ダッシュボード右上のアイコン → **My Profile** → **API Tokens** → **Create Token**
 2. テンプレート **Edit Cloudflare Workers** の **Use template**
@@ -107,25 +98,6 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 
 1. **DNS → Records → Add record**: Type `AAAA` / Name `www` / IPv6 `100::` / Proxy status **Proxied（オレンジの雲）**
 2. **Rules → Redirect Rules → Create rule → Templates** の **Redirect from WWW to root** を選んで保存
-
-### 旧ドメイン app-fara.com から fara-labs.com に転送する
-
-2026-10 にドメインを app-fara.com から fara-labs.com に移しました。古いリンクから来た人を新しいドメインに 301 で転送します（app-fara.com の契約を残している間だけ必要）。
-**7. で fara-labs.com への公開と、6. で pokemon.fara-labs.com の表示を確認してから**行います。
-
-1. **Worker から古いドメインを外す**: **Workers & Pages** → `fara-portfolio` → **Settings → Domains & Routes** に `app-fara.com` が残っていれば **…** → **Remove**。
-   `fara-portfolio-develop` の `dev.app-fara.com` も同様に外します（外すと DNS レコードも自動で消えます）
-2. `app-fara.com` のゾーン → **DNS → Records**
-   - `pokemon` の CNAME（GitHub Pages 向け）が残っていれば削除
-   - 次の 3 つを Type `AAAA` / IPv6 `100::` / **Proxied（オレンジの雲）** で追加: `@`・`www`・`pokemon`（同じ名前のレコードが残っていたら先に削除）
-3. **Rules → Redirect Rules → Create rule**（Single Redirect）
-   - **If**: Custom filter expression → `(http.host in {"app-fara.com" "www.app-fara.com"})`
-     **Then**: Dynamic → `concat("https://fara-labs.com", http.request.uri.path)` / Status `301` / **Preserve query string** にチェック
-   - もう 1 つ: `(http.host eq "pokemon.app-fara.com")` → `concat("https://pokemon.fara-labs.com", http.request.uri.path)` / `301` / Preserve query string
-4. https://app-fara.com/ と https://pokemon.app-fara.com/ を開き、fara-labs.com 側に移ることを確認
-5. （任意）3. の API トークンから `app-fara.com` のゾーンを外す
-
-`dev.app-fara.com` は転送不要です（確認用なので 1. で外すだけで OK）。
 
 ### 確認用サイトを自分だけに見せる（Cloudflare Access・50 人まで無料）
 
