@@ -1,14 +1,14 @@
-# Cloudflare / GitHub Pages の初期設定（fara-labs.com）
+# Cloudflare Workers 公開の初期設定（fara-labs.com）
 
 このサイトは Cloudflare Workers（静的アセットのみ）で公開します。ドメイン `fara-labs.com` の DNS は Cloudflare で管理し、
-ポケモンツール（pokemon.fara-labs.com）だけは別リポジトリの GitHub Pages で公開しています。最初に 1 回だけ、以下の設定が必要です。
+ポケモンツール（pokemon.fara-labs.com）は別リポジトリから別の Worker として公開しています。最初に 1 回だけ、以下の設定が必要です。
 費用はドメイン代のみです（API トークンは無料。無料プランのまま無料枠を超えても課金されず、超えた分がエラーになるだけです）。
 
 | 公開先 | 置き場所 | 公開のタイミング | ワークフロー |
 |---|---|---|---|
 | https://fara-labs.com/ | Worker `fara-portfolio` | Actions から手動実行（master） | `.github/workflows/deploy.yml` |
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-develop` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
-| https://pokemon.fara-labs.com/ | GitHub Pages（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの設定による | そのリポジトリ側 |
+| https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
 
@@ -35,7 +35,7 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 - `dev.fara-labs.com`（Name が `dev`）
 
 > 他社から移したときに、取得元の「駐車ページ」用の A レコードなどが自動で取り込まれていることがあります。あれば削除します。
-> `pokemon` のレコードは 6. で作ります。
+> `pokemon` も 6. で Worker が自動で作るので、レコードは不要です。
 
 ## 3. API トークンを発行する
 
@@ -78,23 +78,16 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 | `production` | **Selected branches and tags** → `master` を追加 | **Required reviewers** に自分を入れると、公開前に承認ボタンを押す 1 ステップが入る |
 | `develop` | **Selected branches and tags** → `develop` を追加 | なし |
 
-## 6. pokemon.fara-labs.com（GitHub Pages）を設定する
+## 6. pokemon.fara-labs.com（ポケモンツール）
 
-ポケモンツールは `fara1991/fara-pokemon-assistance` リポジトリの GitHub Pages で公開しています。
+ポケモンツールは `fara1991/fara-pokemon-assistance` リポジトリから、Worker `fara-pokemon` として同じ Cloudflare アカウントに公開します
+（設定はそのリポジトリの `wrangler.jsonc` と `.github/workflows/deploy.yml`）。
 
-1. **ドメインの所有確認**（他人に pokemon.fara-labs.com を乗っ取られないための設定・推奨）
-   - **個人の Settings（右上のアイコン → Settings）→ Pages** → **Add a domain** → `fara-labs.com`
-   - 表示された TXT レコードを Cloudflare の **DNS → Records → Add record** で追加
-     （Type `TXT` / Name `_github-pages-challenge-fara1991` / Content は表示された値）
-   - GitHub に戻って **Verify**（反映まで数分かかることがあります）
-2. **DNS レコードを作る**: Cloudflare の **DNS → Records → Add record**
-   - Type `CNAME` / Name `pokemon` / Target `fara1991.github.io` / Proxy status **DNS only（灰色の雲）**
-   - Proxied（オレンジの雲）にすると GitHub が HTTPS の証明書を発行できないので、必ず **DNS only** にします
-3. **GitHub Pages にドメインを設定する**: `fara-pokemon-assistance` リポジトリの **Settings → Pages → Custom domain** に `pokemon.fara-labs.com` を入力して **Save**
-   - DNS check が成功したら（数分〜1 時間）、**Enforce HTTPS** にチェック
-   - リポジトリに `CNAME` ファイルがある場合（ブランチから公開している、または公開用のワークフローが `CNAME` を書き出している場合）は、
-     中身を `pokemon.fara-labs.com` に書き換えておきます。書き換えないと次の公開で古いドメインに戻ります
-4. https://pokemon.fara-labs.com/ が開けることを確認
+1. `fara-pokemon-assistance` の **Settings → Secrets and variables → Actions** に、4. と同じ `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` を登録
+   （トークンは 3. のものをそのまま使えます。範囲が fara-labs.com のゾーンなので pokemon.fara-labs.com も含まれます）
+2. DNS に `pokemon` のレコードが **無い** ことを確認（GitHub Pages 時代の CNAME が残っていれば削除）
+3. そのリポジトリの master に push（PR のマージ含む）すると公開される。https://pokemon.fara-labs.com/ が開けることを確認
+4. GitHub Pages を使っていた場合は、そのリポジトリの **Settings → Pages** で公開を停止
 
 ## 7. 初回の公開
 
@@ -122,7 +115,7 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 1. **Worker から古いドメインを外す**: **Workers & Pages** → `fara-portfolio` → **Settings → Domains & Routes** に `app-fara.com` が残っていれば **…** → **Remove**。
    `fara-portfolio-develop` の `dev.app-fara.com` も同様に外します（外すと DNS レコードも自動で消えます）
 2. `app-fara.com` のゾーン → **DNS → Records**
-   - `pokemon` の CNAME（GitHub Pages 向け）を削除
+   - `pokemon` の CNAME（GitHub Pages 向け）が残っていれば削除
    - 次の 3 つを Type `AAAA` / IPv6 `100::` / **Proxied（オレンジの雲）** で追加: `@`・`www`・`pokemon`（同じ名前のレコードが残っていたら先に削除）
 3. **Rules → Redirect Rules → Create rule**（Single Redirect）
    - **If**: Custom filter expression → `(http.host in {"app-fara.com" "www.app-fara.com"})`
@@ -132,7 +125,6 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
 5. （任意）3. の API トークンから `app-fara.com` のゾーンを外す
 
 `dev.app-fara.com` は転送不要です（確認用なので 1. で外すだけで OK）。
-GitHub の Pages 設定で app-fara.com を所有確認していた場合は、その行も削除して構いません。
 
 ### 確認用サイトを自分だけに見せる（Cloudflare Access・50 人まで無料）
 
@@ -145,7 +137,6 @@ dev.fara-labs.com は初期状態だと URL を知っていれば誰でも見ら
 | 症状 | 対処 |
 |---|---|
 | `Authentication error [code: 10000]` | トークンの貼り間違い・期限切れ、または fara-labs.com がトークンの範囲に入っていない。3. → 4. をやり直す |
-| pokemon.fara-labs.com で証明書エラー / Enforce HTTPS が押せない | `pokemon` の CNAME が Proxied になっている。DNS only にして、Pages の Custom domain を一度消して保存し直す |
 | カスタムドメインの作成で失敗（already exists / conflict） | 2. の DNS レコードが残っている。削除してから再実行 |
 | カスタムドメインの作成で権限エラー | ダッシュボードの **Workers & Pages → 該当 Worker → Settings → Domains & Routes → Add → Custom domain** から 1 回だけ手動で追加し、再実行 |
 | Deploy が「master から実行してください」で失敗 | Run workflow のときに **Use workflow from** を `master` にする |
