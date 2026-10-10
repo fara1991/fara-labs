@@ -7,7 +7,8 @@
 - 作業ブランチは `develop` から作成する（`master` から切らない）
 - 作業ブランチの PR は `develop` 向けに作る
 - `master` へは `develop` からのみマージする
-- 本番（fara-labs.com）の公開は Actions の Deploy ワークフロー（workflow_dispatch・master 固定）を手動実行のみ。master への push / マージで本番に自動公開する仕組みは追加しない
+- master への push（develop → master の PR のマージ）で Deploy が動き、本番（fara-labs.com）に自動公開される
+- master へのマージはユーザーが行う。Claude は develop → master の PR の作成までで、master へはマージしない
 - develop への push は Deploy (develop) で確認用（dev.fara-labs.com）に自動公開される
 
 ## 構成メモ
