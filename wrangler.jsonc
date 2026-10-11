@@ -1,7 +1,7 @@
 {
   // Cloudflare Workers（静的アセットのみ・Worker スクリプトなし）で公開する設定。
   // 公開するのは dotnet publish の出力（publish/wwwroot）。
-  //   本番:   npx wrangler deploy              → https://fara-labs.com/       （Deploy ワークフロー・手動）
+  //   本番:   npx wrangler deploy              → https://fara-labs.com/       （Deploy ワークフロー・master への push。手動でも実行可）
   //   確認用: npx wrangler deploy --env develop → https://dev.fara-labs.com/   （Deploy (develop) ワークフロー・develop への push）
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fara-portfolio",
