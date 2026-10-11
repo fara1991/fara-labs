@@ -143,21 +143,21 @@
     ]
   },
   {
-    "id": "blender-manual",
-    "title": "Blender Manual",
-    "subtitle": "Blender の操作方法をまとめた Web サイト",
+    "id": "avatar-guide",
+    "title": "Avatar Manual",
+    "subtitle": "VRChat アバター改変のための Blender・Unity 操作マニュアル",
     "category": "Web アプリ",
     "status": "",
     "icon": "book",
     "accent": "cyan",
-    "summary": "Blender の基本操作からショートカット、おすすめのアドオン、アバター衣装の作り方までをまとめたサイト。",
-    "description": "Blender の基本操作から応用、よく使うショートカット、おすすめのアドオン、VRChat などで使うアバター衣装の作り方を載せています。スマートフォンでも見やすいレスポンシブデザインです。",
+    "summary": "Blender と Unity の基本操作から衣装の着せ替え・改変までを、ブラウザで操作を試しながら確認できるサイト。",
+    "description": "VRChat などで使うアバターの改変に向けて、Blender と Unity の操作方法、ショートカット、おすすめのアドオンやツール、衣装の作り方・着せ替えの手順をまとめています。記事の中で Blender や Unity に似た画面を実際に操作して手順を試せるほか、URL を共有して複数人で同じ画面を操作することもできます。改変でよくある質問・TIPS・用語集・リンク集も載せています。",
     "features": [
-      "操作方法の解説",
-      "ショートカット一覧",
-      "おすすめアドオン一覧",
-      "アバター用衣装の作成手順",
-      "ブラウザ上で Blender と同じキー操作を試せる練習画面"
+      "Blender・Unity の操作方法と衣装の作成・着せ替え手順",
+      "ブラウザ上で Blender・Unity と同じキー操作を試せる練習画面",
+      "URL を共有して複数人で同じ画面を操作できる練習部屋",
+      "改変 Q&A・TIPS・用語集・何て名前？・リンク集",
+      "全ページ横断の検索（Ctrl+K）"
     ],
     "tech": [
       "C#",
@@ -165,13 +165,14 @@
       "Blazor（静的 SSR）",
       "Markdown",
       "Three.js",
-      "Cloudflare Workers"
+      "Cloudflare Workers",
+      "Durable Objects"
     ],
     "links": [
-      { "label": "サイトを開く", "url": "https://blender.fara-labs.com/", "primary": true },
+      { "label": "サイトを開く", "url": "https://avatar.fara-labs.com/", "primary": true },
       {
         "label": "GitHub",
-        "url": "https://github.com/fara1991/fara-blender-manual"
+        "url": "https://github.com/fara1991/fara-avatar-guide"
       }
     ]
   }
