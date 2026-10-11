@@ -9,7 +9,7 @@ public class SiteLinksTests
     [InlineData("https://avatar-modding.fara-labs.com/learn/basics", "https://avatar-modding-dev.fara-labs.com/learn/basics")]
     [InlineData("https://fara-labs.com/works", "https://dev.fara-labs.com/works")]
     [InlineData("https://avatar-modding.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b", "https://avatar-modding-dev.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b")]
-    [InlineData("https://github.com/fara1991/fara-avatar-guide", "https://github.com/fara1991/fara-avatar-guide")]
+    [InlineData("https://github.com/fara1991/fara-avatar-modding-guide", "https://github.com/fara1991/fara-avatar-modding-guide")]
     [InlineData("/works", "/works")]
     [InlineData("https://pokemon-dev.fara-labs.com/", "https://pokemon-dev.fara-labs.com/")]
     public void Develop_RewritesFaraLabsLinks(string url, string expected) =>
