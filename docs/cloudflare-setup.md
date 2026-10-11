@@ -8,7 +8,7 @@
 |---|---|---|---|
 | https://fara-labs.com/ | Worker `fara-portfolio` | master への push ごと | `.github/workflows/deploy.yml` |
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-dev` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
-| https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
+| https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-battle-assistant` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-dev`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
 | https://avatar.fara-labs.com/ | Worker `fara-avatar`（`fara-avatar-modding-guide` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://avatar-dev.fara-labs.com/ | Worker `fara-avatar-dev`（同上） | そのリポジトリの develop への push ごと | 同上 |
