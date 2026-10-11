@@ -10,7 +10,7 @@
 | https://dev.fara-labs.com/ | Worker `fara-portfolio-dev` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-assistance` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-dev`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
-| https://avatar.fara-labs.com/ | Worker `fara-avatar`（`fara-avatar-modding-guide` リポジトリ。旧 blender.fara-labs.com はここへ転送） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
+| https://avatar.fara-labs.com/ | Worker `fara-avatar`（`fara-avatar-modding-guide` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://avatar-dev.fara-labs.com/ | Worker `fara-avatar-dev`（同上） | そのリポジトリの develop への push ごと | 同上 |
 
 設定の順番: **1 → 2 → 3 → 4 → 5 → 6 → 7**。4 が終わる前に develop へマージすると Deploy (develop) が失敗します（失敗するだけで害はありません。設定後に Actions から再実行できます）。
