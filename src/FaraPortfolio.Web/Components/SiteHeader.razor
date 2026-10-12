@@ -1,15 +1,9 @@
 @implements IDisposable
 @inject NavigationManager Nav
-@inject SiteData Data
 
 <header class="site-header">
     <div class="scroll-progress" aria-hidden="true"></div>
     <div class="container header-inner">
-        <a class="brand" href="" aria-label="@Data.Profile.Name のホームへ">
-            <span class="brand-mark" aria-hidden="true">@Data.Profile.Name[..1]</span>
-            <span class="brand-name">@Data.Profile.Name</span>
-        </a>
-
         <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="@(_open ? "true" : "false")"
                 @onclick="() => _open = !_open">
             <Icon Name="@(_open ? "close" : "menu")" Size="22" />
