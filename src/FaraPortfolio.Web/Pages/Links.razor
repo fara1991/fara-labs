@@ -5,16 +5,14 @@
 
 <section class="page container narrow">
     <header class="page-head">
-        <p class="section-kicker reveal">Links</p>
-        <h1 class="reveal" style="--d:1">SNS・リンク</h1>
-        <p class="muted reveal" style="--d:2">お気軽にフォローしてください。</p>
+        <h1>SNS・リンク</h1>
+        <p class="muted">お気軽にフォローしてください。</p>
     </header>
 
     <div class="link-list">
-        @{ var i = 0; }
         @foreach (var s in Data.Profile.VisibleSocials)
         {
-            <a class="link-card glass spotlight service-@s.Service reveal" style="--d:@(i++)" href="@s.Url" target="_blank" rel="noopener noreferrer">
+            <a class="link-card glass service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer">
                 <span class="link-icon"><Icon Name="@Icon.ForService(s.Service)" Size="26" /></span>
                 <span class="link-text">
                     <span class="link-label">@s.Label</span>

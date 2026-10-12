@@ -5,28 +5,28 @@
 
 <section class="page container narrow">
     <header class="page-head">
-        <p class="section-kicker reveal">Updates</p>
-        <h1 class="reveal" style="--d:1">更新履歴</h1>
-        <p class="muted reveal" style="--d:2">サイトや作品の更新情報です。</p>
+        <h1>更新履歴</h1>
+        <p class="muted">サイトや作品の更新情報です。</p>
     </header>
 
-    <div class="filter-bar reveal" style="--d:3" role="group" aria-label="カテゴリで絞り込み">
+    @if (Categories.Count >= 2)
+    {
+    <div class="filter-bar" role="group" aria-label="カテゴリで絞り込み">
         <button type="button" class="filter-chip @(_category is null ? "is-active" : null)" @onclick="() => _category = null">
             すべて <span class="count">@Data.Updates.Count</span>
         </button>
-        @foreach (var (key, label) in UpdateCategories.All)
+        @foreach (var (key, label, count) in Categories)
         {
-            var count = Data.Updates.Count(u => u.Category == key);
-            if (count == 0) continue;
             <button type="button" class="filter-chip @(_category == key ? "is-active" : null)" @onclick="() => _category = key">
                 @label <span class="count">@count</span>
             </button>
         }
     </div>
+    }
 
     @foreach (var year in Filtered.GroupBy(u => u.Date.Year))
     {
-        <h2 class="year-heading reveal">@year.Key</h2>
+        <h2 class="year-heading">@year.Key</h2>
         <ol class="update-list">
             @foreach (var entry in year)
             {
@@ -43,6 +43,13 @@
 
 @code {
     private string? _category;
+
+    /// <summary>更新が 1 件以上あるカテゴリ（絞り込みは 2 種類以上あるときだけ出す）。</summary>
+    private List<(string Key, string Label, int Count)> Categories =>
+        UpdateCategories.All
+            .Select(c => (c.Key, c.Label, Count: Data.Updates.Count(u => u.Category == c.Key)))
+            .Where(c => c.Count > 0)
+            .ToList();
 
     private IEnumerable<UpdateEntry> Filtered =>
         _category is null ? Data.Updates : Data.Updates.Where(u => u.Category == _category);

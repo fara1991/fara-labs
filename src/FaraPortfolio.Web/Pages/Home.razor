@@ -11,7 +11,8 @@
                 <span>@(Data.Profile.Name)'s</span>
                 <span class="gradient-text">Portfolio</span>
             </h1>
-            <div class="hero-actions reveal" style="--d:2">
+            <p class="hero-tagline reveal" style="--d:2">@Data.Profile.Tagline</p>
+            <div class="hero-actions reveal" style="--d:3">
                 <a class="btn btn-primary" href="works">作ったものを見る <Icon Name="arrow-right" Size="18" /></a>
                 <a class="btn btn-ghost" href="profile">Profile</a>
             </div>
@@ -43,10 +44,9 @@
     </div>
 </section>
 
-<section id="works" class="section container">
-    <div class="section-head reveal">
+<section id="works" class="section container reveal">
+    <div class="section-head">
         <div>
-            <p class="section-kicker">Works</p>
             <h2>作ったもの</h2>
         </div>
         <a class="text-link" href="works">すべて見る <Icon Name="arrow-right" Size="16" /></a>
@@ -54,15 +54,14 @@
     <div class="work-grid">
         @for (var i = 0; i < Data.Works.Count; i++)
         {
-            <WorkCard @key="Data.Works[i].Id" Work="Data.Works[i]" Delay="i" />
+            <WorkCard @key="Data.Works[i].Id" Work="Data.Works[i]" />
         }
     </div>
 </section>
 
-<section class="section container">
-    <div class="section-head reveal">
+<section class="section container reveal">
+    <div class="section-head">
         <div>
-            <p class="section-kicker">Updates</p>
             <h2>最近の更新</h2>
         </div>
         <a class="text-link" href="updates">更新履歴へ <Icon Name="arrow-right" Size="16" /></a>
@@ -82,9 +81,8 @@
     }
 </section>
 
-<section class="section container">
-    <div class="cta glass reveal">
-        <p class="section-kicker">Links</p>
+<section class="section container reveal">
+    <div class="cta glass">
         <div class="cta-socials">
             @foreach (var s in Data.Profile.VisibleSocials)
             {
