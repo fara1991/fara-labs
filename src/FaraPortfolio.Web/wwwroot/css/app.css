@@ -534,7 +534,7 @@ img { max-width: 100%; display: block; }
         repeating-linear-gradient(45deg, rgba(255, 255, 255, .02) 0 10px, transparent 10px 20px);
     border-right: 1px solid var(--border);
 }
-.work-detail-body { padding: clamp(24px, 4vw, 40px); }
+.work-detail-body { min-width: 0; padding: clamp(24px, 4vw, 40px); }
 .work-detail-head { margin-bottom: 4px; }
 .work-detail-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 .work-detail h2 { font-size: clamp(24px, 3vw, 32px); margin-bottom: 2px; }
