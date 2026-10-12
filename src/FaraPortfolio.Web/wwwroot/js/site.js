@@ -1,7 +1,8 @@
 // サイト全体の演出（Blazor から独立して動く）
-//  - スクロール量を CSS 変数 --scroll / --progress に流す（背景のパララックス・上部の進捗バー）
+//  - スクロール量を CSS 変数 --progress に流す（上部の進捗バー）
 //  - .reveal 要素が画面に入ったら .is-visible を付ける（フェードイン）
-//  - .spotlight 要素にマウス位置 --mx / --my を流す（カードの光）
+//  - 軌道アイコンはタッチ中に止める／スマホのメニューを外側タップ・Esc で閉じる
+//  - works#id で来たら該当の作品カードの枠を 1 回光らせる
 (() => {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -10,7 +11,6 @@
     const update = () => {
         const y = window.scrollY;
         const max = root.scrollHeight - window.innerHeight;
-        root.style.setProperty('--scroll', reduceMotion.matches ? '0' : String(y));
         root.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
         root.classList.toggle('is-scrolled', y > 8);
         ticking = false;
@@ -47,13 +47,36 @@
     scan(document.body);
     root.classList.add('js-ready');
 
-    document.addEventListener('pointermove', (e) => {
-        const card = e.target instanceof Element ? e.target.closest('.spotlight') : null;
-        if (!card) return;
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    // 軌道アイコンはタッチしている間とその直後は止めて、狙いやすくする
+    let touchTimer = 0;
+    document.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch' || !(e.target instanceof Element)) return;
+        const visual = e.target.closest('.hero-visual');
+        if (!visual) return;
+        visual.classList.add('is-touching');
+        clearTimeout(touchTimer);
+        touchTimer = setTimeout(() => visual.classList.remove('is-touching'), 4000);
     }, { passive: true });
+
+    // スマホのメニュー: 開いたら最初のリンクへフォーカス、外側タップ・Esc で閉じる
+    const menuToggle = () => document.querySelector('.menu-toggle');
+    const menuOpen = () => menuToggle()?.getAttribute('aria-expanded') === 'true';
+    document.addEventListener('click', (e) => {
+        if (!menuOpen() || !(e.target instanceof Element)) return;
+        if (e.target.closest('.site-nav, .menu-toggle')) return;
+        menuToggle().click();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape' || !menuOpen()) return;
+        menuToggle().click();
+        menuToggle().focus();
+    });
+    let wasOpen = false;
+    new MutationObserver(() => {
+        const open = menuOpen();
+        if (open && !wasOpen) requestAnimationFrame(() => document.querySelector('.site-nav .nav-link')?.focus());
+        wasOpen = open;
+    }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['aria-expanded'] });
 
     // トップの軌道アイコンの説明（.satellite-tip）が画面の左右からはみ出すときは内側に寄せる
     //  説明の位置は transform のアニメーション途中だと正しく測れないので、アイコンの中心と説明の幅から計算する
@@ -77,7 +100,13 @@
             const id = decodeURIComponent(location.hash.slice(1));
             if (!id) return;
             const el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+            if (!el) return;
+            el.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+            // どの作品に飛んだか分かるよう、枠を 1 回だけ光らせる
+            el.classList.remove('is-target');
+            void el.offsetWidth;
+            el.classList.add('is-target');
+            el.addEventListener('animationend', () => el.classList.remove('is-target'), { once: true });
         },
     };
 })();

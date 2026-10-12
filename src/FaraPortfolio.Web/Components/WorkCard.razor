@@ -1,5 +1,5 @@
 @* 作品の概要カード（ホーム用）。クリックで作品ページの該当箇所へ。 *@
-<a class="work-card spotlight accent-@Work.Accent reveal" style="--d:@Delay" href="works#@Work.Id">
+<a class="work-card accent-@Work.Accent" href="works#@Work.Id">
     <div class="work-card-top">
         <span class="work-icon"><Icon Name="@Work.Icon" Size="28" /></span>
         <span class="chip">@Work.Category</span>
@@ -12,5 +12,4 @@
 
 @code {
     [Parameter, EditorRequired] public Work Work { get; set; } = default!;
-    [Parameter] public int Delay { get; set; }
 }
