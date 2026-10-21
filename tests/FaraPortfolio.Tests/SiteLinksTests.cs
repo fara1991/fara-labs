@@ -6,6 +6,7 @@ public class SiteLinksTests
 {
     [Theory]
     [InlineData("https://pokemon.fara-labs.com/", "https://pokemon-dev.fara-labs.com/")]
+    [InlineData("https://twitch-bot.fara-labs.com/", "https://twitch-bot-dev.fara-labs.com/")]
     [InlineData("https://avatar.fara-labs.com/learn/basics", "https://avatar-dev.fara-labs.com/learn/basics")]
     [InlineData("https://fara-labs.com/works", "https://dev.fara-labs.com/works")]
     [InlineData("https://avatar.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b", "https://avatar-dev.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b")]
