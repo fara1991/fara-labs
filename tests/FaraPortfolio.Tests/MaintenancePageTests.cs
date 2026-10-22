@@ -60,6 +60,13 @@ public class MaintenancePageTests
             Assert.Contains(name, guide);
         // お知らせは、false に戻せば一緒に消える、と書いてある
         Assert.Contains("一緒に消えます", guide);
+        // 公開との連動（本番の公開の前に notice を確かめる・公開と同時に true・飛ばす方法・ゲームデータも止まる・4 サイト）
+        foreach (var topic in new[] { "skip_maintenance_check", "`fara-portfolio`", "自動では戻しません", "/api/game/*", "Workers Scripts", "テキスト" })
+            Assert.Contains(topic, guide);
+        Assert.DoesNotContain("まだこの仕組みに対応していません", guide);
+        // 古い方法（WAF のカスタムルール）は、作っていたら削除するよう案内している（手順としては残っていない）
+        Assert.Contains("削除してください", guide);
+        Assert.DoesNotContain("カスタム応答", guide);
     }
 
     [Fact]
