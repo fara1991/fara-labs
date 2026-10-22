@@ -38,7 +38,9 @@ public class MaintenancePageTests
         Assert.DoesNotContain("rel=\"stylesheet\"", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("<img", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("http://", html);
-        Assert.DoesNotContain("https://", html);
+        // 外へのリンクは、作者の Twitter だけ（読み込むファイルではなく、押して開くリンク）
+        Assert.Equal(1, System.Text.RegularExpressions.Regex.Matches(html, "https://").Count);
+        Assert.Contains("<a href=\"https://twitter.com/game_fara\"", html);
     }
 
     [Fact]
