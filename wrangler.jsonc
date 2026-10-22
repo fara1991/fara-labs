@@ -1,15 +1,21 @@
 {
-  // Cloudflare Workers（静的アセットのみ・Worker スクリプトなし）で公開する設定。
+  // Cloudflare Workers（静的アセット + メンテナンスの状態を返す小さな Worker）で公開する設定。
   // 公開するのは dotnet publish の出力（publish/wwwroot）。
   //   本番:   npx wrangler deploy              → https://fara-labs.com/       （Deploy ワークフロー・master への push。手動でも実行可）
   //   確認用: npx wrangler deploy --env develop → https://dev.fara-labs.com/   （Deploy (develop) ワークフロー・develop への push）
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fara-portfolio",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
+  // ダッシュボードで足した変数（MAINTENANCE・MAINTENANCE_MESSAGE など）を、公開（wrangler deploy）のたびに消さない（トップレベルだけが有効）
+  "keep_vars": true,
   "assets": {
     "directory": "./publish/wwwroot",
+    "binding": "ASSETS",
     // /works などを直接開いたときも index.html を返す（Blazor 側でページを切り替える）
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    // /api/*（メンテナンスの状態）だけ Worker スクリプト（worker/index.js）に渡す。サイト本体は、今までどおり静的アセット
+    "run_worker_first": ["/api/*"]
   },
   "workers_dev": false,
   "preview_urls": false,
@@ -22,7 +28,9 @@
       "name": "fara-portfolio-dev",
       "assets": {
         "directory": "./publish/wwwroot",
-        "not_found_handling": "single-page-application"
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": ["/api/*"]
       },
       "workers_dev": false,
       "preview_urls": false,
