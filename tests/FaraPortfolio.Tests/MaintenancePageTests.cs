@@ -22,7 +22,7 @@ public class MaintenancePageTests
     public void MaintenanceHtml_IsSmallEnoughToPasteIntoTheCustomResponse()
     {
         var bytes = Encoding.UTF8.GetByteCount(File.ReadAllText(RepoFile("docs/maintenance.html")));
-        Assert.True(bytes <= 4096, $"メンテナンス画面が大きすぎます（{bytes} バイト）。カスタム応答の本文には上限があります");
+        Assert.True(bytes <= 1024, $"メンテナンス画面が大きすぎます（{bytes} バイト）。カスタム応答の本文の上限（1 KB 未満に保つ）を超えています");
     }
 
     [Fact]
