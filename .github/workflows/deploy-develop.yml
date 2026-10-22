@@ -39,17 +39,21 @@ jobs:
       - name: Test (data files)
         run: dotnet test --configuration Release
 
-      - name: Publish Blazor WebAssembly
-        run: >
-          dotnet publish src/FaraPortfolio.Web
-          --configuration Release
-          --output publish
-          -p:SourceRevisionId=$(git rev-parse HEAD)
+      - name: Report form script test
+        run: npm run test:js
 
-      # 確認用サイトが検索結果に載らないようにする
+      # 確認用（dev.fara-labs.com）の書き出し。fara-labs.com 配下のリンクは確認用の URL に置き換える（--site-host）
+      - name: Export static site (develop)
+        run: >
+          dotnet run --project src/FaraPortfolio.Web
+          --configuration Release
+          --no-launch-profile
+          -- --export dist --site-host dev.fara-labs.com
+
+      # 確認用サイトが検索結果に載らないようにする（dist/_headers に付ける）
       - name: Add noindex header
         run: |
-          cat >> publish/wwwroot/_headers <<'HEADERS'
+          cat >> dist/_headers <<'HEADERS'
           /*
             X-Robots-Tag: noindex, nofollow
           HEADERS
