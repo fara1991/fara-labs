@@ -35,6 +35,8 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
 
     public static IEnumerable<object[]> PageCases() => Pages.Select(p => new object[] { p.Path, p.Title, p.Canonical });
 
+    public static IEnumerable<object[]> PathCases() => Pages.Select(p => new object[] { p.Path });
+
     [Theory]
     [MemberData(nameof(PageCases))]
     public async Task Each_page_has_its_own_title_description_and_canonical(string path, string title, string canonical)
@@ -48,8 +50,8 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
     }
 
     [Theory]
-    [MemberData(nameof(PageCases))]
-    public async Task Pages_are_static_html_without_the_blazor_runtime(string path, string title, string canonical)
+    [MemberData(nameof(PathCases))]
+    public async Task Pages_are_static_html_without_the_blazor_runtime(string path)
     {
         var html = await GetAsync(path);
         Assert.DoesNotContain("_framework", html);
@@ -59,8 +61,8 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
     }
 
     [Theory]
-    [MemberData(nameof(PageCases))]
-    public async Task Layout_keeps_the_header_fixed_and_the_notice_slot_before_the_scrolling_area(string path, string title, string canonical)
+    [MemberData(nameof(PathCases))]
+    public async Task Layout_keeps_the_header_fixed_and_the_notice_slot_before_the_scrolling_area(string path)
     {
         var html = await GetAsync(path);
         var header = html.IndexOf("<header class=\"site-header\"", StringComparison.Ordinal);
@@ -73,8 +75,8 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
     }
 
     [Theory]
-    [MemberData(nameof(PageCases))]
-    public async Task Footer_has_the_agreed_parts(string path, string title, string canonical)
+    [MemberData(nameof(PathCases))]
+    public async Task Footer_has_the_agreed_parts(string path)
     {
         var html = await GetAsync(path);
         Assert.Contains("<span class=\"site-footer-name\">Fara Portfolio</span>", html);
