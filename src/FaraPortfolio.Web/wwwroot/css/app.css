@@ -68,6 +68,25 @@ body {
     /* ページ内ジャンプ（#id）の止まる位置: 領域の上端から少し下 */
     scroll-padding-top: 16px;
 }
+/* キーボードで操作できるように、フォーカスの枠は細く、本文の内側に出す */
+.site-scroll:focus { outline: none; }
+.site-scroll:focus-visible { outline: 2px solid var(--border-strong); outline-offset: -4px; }
+@media (prefers-reduced-motion: reduce) {
+    .site-scroll { scroll-behavior: auto; }
+}
+/* 印刷: 画面の枠（高さ・スクロール）を解き、本文とフッターを、ページを続けて出す */
+@media print {
+    .bg-scene, .site-header, .maintenance-notice { display: none !important; }
+    html, body, #app, .app-shell, .site-scroll {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        position: static !important;
+    }
+    .app-shell { display: block; }
+    .site-scroll { display: block; }
+    .js-ready .reveal, .js-ready .reveal.is-visible { opacity: 1 !important; animation: none !important; translate: none !important; }
+}
 
 h1, h2, h3 {
     font-family: var(--font-display);

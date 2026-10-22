@@ -70,7 +70,7 @@ public class LayoutScrollTests
     [Fact]
     public void Layout_puts_the_banner_outside_the_scroll_area_and_the_footer_inside_it()
     {
-        var scroll = Layout.IndexOf("<div class=\"site-scroll\">", StringComparison.Ordinal);
+        var scroll = Layout.IndexOf("<div class=\"site-scroll\"", StringComparison.Ordinal);
         Assert.True(scroll > 0, "MainLayout に .site-scroll がありません");
         Assert.True(Layout.IndexOf("<main class=\"site-main\">", StringComparison.Ordinal) > scroll);
         // フッターは、スクロールの中（末尾）に入る
@@ -86,7 +86,9 @@ public class LayoutScrollTests
         // is-scrolled（ヘッダーの見た目）と進捗の線は、この領域の値で決める
         Assert.Contains("root.classList.toggle('is-scrolled', y > 8)", Js);
         // reveal の監視も、この領域を root にする
-        Assert.Contains("{ root: container,", Js);
+        Assert.Contains("{ root: null, threshold: 0.1", Js);
+        // 領域を root に固定すると、作り直しのあとで古い領域を見続けるので、固定しない
+        Assert.DoesNotContain("root: container", Js);
         // スクロールは泡立たないので、capture で受け取る
         Assert.Contains("addEventListener('scroll', onScroll, { passive: true, capture: true })", Js);
     }
@@ -107,6 +109,8 @@ public class LayoutScrollTests
     {
         // 配置の class と、スクリプトが探す class は同じ名前
         Assert.Contains("class=\"site-scroll\"", Layout);
+        // キーボードでも、領域を選んで Space・PageDown で動かせる
+        Assert.Contains("tabindex=\"0\" aria-label=\"本文\"", Layout);
         Assert.Contains("'.site-scroll'", Js);
         Assert.Contains("class=\"app-shell\"", Layout);
     }

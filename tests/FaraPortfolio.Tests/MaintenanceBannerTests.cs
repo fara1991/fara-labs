@@ -45,7 +45,7 @@ public class MaintenanceBannerTests
     {
         // 帯は SiteHeader の直後・スクロールする領域（.site-scroll）の前。順番が変わると、スクロールの中に入ってしまう
         var layout = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Layout/MainLayout.razor"));
-        Assert.Matches(@"<SiteHeader />\s*<MaintenanceBanner />\s*<div class=""site-scroll"">", layout);
+        Assert.Matches(@"<SiteHeader />\s*<MaintenanceBanner />\s*<div class=""site-scroll""", layout);
     }
 
     [Fact]

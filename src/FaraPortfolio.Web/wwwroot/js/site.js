@@ -3,11 +3,29 @@
 //  - .reveal 要素が画面に入ったら .is-visible を付ける（フェードイン）
 //  - 軌道アイコンはタッチ中に止める／スマホのメニューを外側タップ・Esc で閉じる
 //  - works#id で来たら該当の作品カードの枠を 1 回光らせる
+//  - 戻る・進むで、離れたときのスクロール位置に戻す（同じページ内の移動は先頭へ）
 (() => {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     // スクロールするのは、ヘッダーとお知らせの帯の下の領域（Layout/MainLayout.razor の .site-scroll）。ページが読み込まれる前は無いので、都度探す
     const scrollEl = () => document.querySelector('.site-scroll');
+
+    // 別のページに移ったあとの位置の保存と復元。保存先はメモリと sessionStorage（使えないときはメモリだけ）
+    const STORE = 'faraScroll';
+    let positions = {};
+    try { positions = JSON.parse(sessionStorage.getItem(STORE) || '{}') || {}; } catch (e) { positions = {}; }
+    const pageKey = () => location.pathname + location.search;
+    // いま画面に出しているページのキー（Blazor がページを切り替えたら、resetScroll で合わせる）
+    let shownKey = pageKey();
+    // 戻る・進むのとき、ブラウザが popstate を出す（Blazor の処理より先に、ここで印を付ける）
+    let backNav = false;
+    window.addEventListener('popstate', () => { backNav = true; });
+    const savePosition = (el) => {
+        // ページを切り替えている途中（アドレスは新しく、画面はまだ古い）の位置は、保存しない
+        if (pageKey() !== shownKey) return;
+        positions[shownKey] = el.scrollTop;
+        try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch (e) { /* 保存できないときは、メモリだけ */ }
+    };
 
     let ticking = false;
     const update = () => {
@@ -16,6 +34,7 @@
         const max = el ? el.scrollHeight - el.clientHeight : root.scrollHeight - window.innerHeight;
         root.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
         root.classList.toggle('is-scrolled', y > 8);
+        if (el) savePosition(el);
         ticking = false;
     };
     const onScroll = () => {
@@ -29,29 +48,21 @@
     window.addEventListener('resize', onScroll, { passive: true });
     update();
 
-    // 画面に入ったかどうかは、スクロールする領域（.site-scroll）の中で見る。領域がまだ無いときは、作られてから作る
-    let observer = null;
-    const getObserver = () => {
-        if (observer) return observer;
-        const container = scrollEl();
-        if (!container) return null;
-        observer = new IntersectionObserver((entries) => {
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
+    // 画面に入ったかどうか。root は null（ビューポート）: 途中の祖先（.site-scroll）の枠で切られた部分は、見えていないと扱われる。
+    // 領域を root に固定すると、ページの作り直しで領域が替わったあとも古い領域を見続けてしまうので、使わない
+    const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
             }
-        }, { root: container, threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        return observer;
-    };
+        }
+    }, { root: null, threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     const scan = (node) => {
         if (node.nodeType !== Node.ELEMENT_NODE) return;
-        const obs = getObserver();
-        if (!obs) return;
-        if (node.matches('.reveal:not(.is-visible)')) obs.observe(node);
-        node.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => obs.observe(el));
+        if (node.matches('.reveal:not(.is-visible)')) observer.observe(node);
+        node.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => observer.observe(el));
     };
     // Blazor が描画・ページ遷移で追加した要素も自動で監視する
     new MutationObserver((mutations) => {
@@ -110,10 +121,20 @@
     document.addEventListener('focusin', placeTip);
 
     window.faraSite = {
-        // 別のページに移ったら、スクロールする領域を先頭に戻す（#ジャンプの移動では戻さない。scrollToHash が合わせる）
+        // 別のページに移ったあと（Blazor が描き直したあと）に呼ぶ。戻る・進むなら保存した位置へ、通常の移動なら先頭へ
         resetScroll() {
+            const back = backNav;
+            backNav = false;
+            shownKey = pageKey();
+            const el = scrollEl();
+            if (!el) return;
+            if (back) {
+                el.scrollTo({ top: positions[shownKey] || 0, behavior: 'instant' });
+                return;
+            }
+            // #ジャンプ（作品への移動など）は scrollToHash に任せる
             if (location.hash) return;
-            scrollEl()?.scrollTo({ top: 0, behavior: 'instant' });
+            el.scrollTo({ top: 0, behavior: 'instant' });
         },
         scrollToHash() {
             const id = decodeURIComponent(location.hash.slice(1));
