@@ -55,8 +55,10 @@ public class MaintenancePageTests
         // Turnstile に登録するホスト名（サイトのホストと同じ）
         foreach (var host in new[] { "pokemon.fara-labs.com", "pokemon-dev.fara-labs.com", "avatar.fara-labs.com", "avatar-dev.fara-labs.com", "twitch-bot.fara-labs.com", "twitch-bot-dev.fara-labs.com" })
             Assert.Contains(host, guide);
-        // メンテナンス: ルールの式と 503
-        Assert.Contains("http.host in", guide);
+        // メンテナンス: サイトごとのルール（サイトごとに切り替えられる）と 503
+        foreach (var rule in new[] { "maintenance-pokemon", "maintenance-avatar", "maintenance-twitch-bot", "maintenance-portfolio" })
+            Assert.Contains($"`{rule}`", guide);
+        Assert.Contains("http.host eq", guide);
         Assert.Contains("503", guide);
         Assert.Contains("maintenance.html", guide);
     }
