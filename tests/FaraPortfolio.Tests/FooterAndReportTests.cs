@@ -189,8 +189,9 @@ public class FooterAndReportTests
     public async Task Header_has_report_and_policy_links_in_english()
     {
         var html = await RenderAsync<SiteHeader>("https://fara-labs.com/works");
-        Assert.Contains("href=\"report\" class=\"nav-link\">Report</a>", html);
-        Assert.Contains("href=\"privacy\" class=\"nav-link\">Policy</a>", html);
+        // 属性の順に依存しない: href と class を、どちらが先でも見つける
+        Assert.Matches(@"<a\b(?=[^>]*\bhref=""report"")(?=[^>]*\bclass=""nav-link"")[^>]*>Report</a>", html);
+        Assert.Matches(@"<a\b(?=[^>]*\bhref=""privacy"")(?=[^>]*\bclass=""nav-link"")[^>]*>Policy</a>", html);
     }
 
     [Fact]

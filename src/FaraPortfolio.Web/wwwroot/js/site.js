@@ -13,8 +13,15 @@
     // 別のページに移ったあとの位置の保存と復元。保存先はメモリと sessionStorage（使えないときはメモリだけ）
     const STORE = 'faraScroll';
     let positions = {};
-    try { positions = JSON.parse(sessionStorage.getItem(STORE) || '{}') || {}; } catch (e) { positions = {}; }
-    const pageKey = () => location.pathname + location.search;
+    // 読めた値が、位置の入ったオブジェクトでないとき（数値・文字列・配列など）は、空に戻す
+    try {
+        const parsed = JSON.parse(sessionStorage.getItem(STORE) || '{}');
+        positions = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch (e) {
+        positions = {};
+    }
+    // ページのキーはパスだけ（クエリやハッシュだけの違いは、同じページ。Layout/MainLayout.razor の _path と揃える）
+    const pageKey = () => location.pathname;
     // いま画面に出しているページのキー（Blazor がページを切り替えたら、resetScroll で合わせる）
     let shownKey = pageKey();
     // 戻る・進むで、別のページへ移ったときだけ印を付ける（Blazor の処理より先に動く。このときの shownKey は、まだ移る前のページ）。

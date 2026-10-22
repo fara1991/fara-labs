@@ -124,7 +124,10 @@ public class LayoutScrollTests
         Assert.Contains("back ? (positions[shownKey] || 0) : 0", Js);
         // 保存は sessionStorage（使えないときはメモリだけ）。読み書きは try/catch で包む。書き込みは間引く
         Assert.Contains("sessionStorage.setItem(STORE", Js);
-        Assert.Contains("try { positions = JSON.parse(sessionStorage.getItem(STORE) || '{}')", Js);
+        Assert.Contains("const pageKey = () => location.pathname;", Js);
+        Assert.DoesNotContain("location.search", Js);
+        Assert.Contains("Array.isArray(parsed)", Js);
+        Assert.Contains("typeof parsed === 'object'", Js);
         Assert.Contains("flushTimer = setTimeout(flush, 800);", Js);
         Assert.Contains("window.addEventListener('pagehide', flush);", Js);
         // 切り替えの途中（アドレスが新しく、画面が古い）の位置は保存しない
