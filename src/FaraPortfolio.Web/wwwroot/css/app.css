@@ -791,6 +791,10 @@ img { max-width: 100%; display: block; }
 .maintenance-twitter { display: inline-block; margin-top: 8px; padding: 8px 20px; border-radius: 99px; background: #7c3aed; color: #fff; text-decoration: none; font-weight: 700; }
 
 /* ---------- 静的サイトの補助（JS が切り替える状態） ---------- */
+/* 「本文へ」（キーボード利用者向け）。普段は画面の外、Tab でフォーカスされたときだけ出す */
+.skip-link { position: absolute; left: -9999px; top: 8px; z-index: 100; padding: 8px 16px; border-radius: 99px; background: var(--lavender, #c4a7ff); color: #120a22; font-weight: 700; text-decoration: none; }
+.skip-link:focus { left: 16px; }
+#main-content:focus { outline: none; }
 [hidden] { display: none !important; }
 /* スマホのメニューボタン: 閉じているときは「メニュー」、開いているときは「閉じる」のアイコン */
 .menu-toggle .menu-icon-close { display: none; }

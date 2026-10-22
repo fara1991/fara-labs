@@ -13,13 +13,16 @@
 @* 画面の枠。ヘッダーとお知らせの帯は固定し、その下の .site-scroll（フッターも含む）だけがスクロールする。
    ページ移動（将来の拡張ナビゲーション）では、.site-main の中身だけを差し替える想定。 *@
 <div class="app-shell">
+    @* キーボードの利用者向け: Tab の最初で「本文へ」を出し、本文（main）へ飛べる *@
+    <a class="skip-link" href="#main-content">本文へ</a>
+
     <SiteHeader />
 
     @* お知らせの帯（MAINTENANCE=notice のとき、Worker がこの中に差し込む。worker/index.js）。ふだんは空 *@
     <div class="maintenance-slot"></div>
 
     <div class="site-scroll" role="region" tabindex="0" aria-label="本文">
-        <main class="site-main">
+        <main class="site-main" id="main-content" tabindex="-1">
             @Body
         </main>
 

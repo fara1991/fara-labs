@@ -66,7 +66,7 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
         var header = html.IndexOf("<header class=\"site-header\"", StringComparison.Ordinal);
         var slot = html.IndexOf("<div class=\"maintenance-slot\"></div>", StringComparison.Ordinal);
         var scroll = html.IndexOf("<div class=\"site-scroll\"", StringComparison.Ordinal);
-        var main = html.IndexOf("<main class=\"site-main\">", StringComparison.Ordinal);
+        var main = html.IndexOf("<main class=\"site-main\" id=\"main-content\" tabindex=\"-1\">", StringComparison.Ordinal);
         var footer = html.IndexOf("<footer class=\"site-footer\"", StringComparison.Ordinal);
         Assert.True(header >= 0 && slot > header && scroll > slot && main > scroll && footer > main,
             "ヘッダー → お知らせの帯の場所 → スクロールする領域（本文 → フッター）の順になっていません");
@@ -80,6 +80,24 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
         Assert.Contains("<span class=\"site-footer-name\">Fara Portfolio</span>", html);
         Assert.Contains("<a href=\"/privacy\">プライバシーポリシー</a>", html);
         Assert.Contains("© 2026 <a href=\"https://fara-labs.com/\">Fara</a>", html);
+    }
+
+    [Fact]
+    public async Task Each_page_has_a_skip_link_to_the_main_content()
+    {
+        var html = await GetAsync("/works");
+        Assert.Contains("<a class=\"skip-link\" href=\"#main-content\">本文へ</a>", html);
+        Assert.True(html.IndexOf("skip-link", StringComparison.Ordinal) < html.IndexOf("<header class=\"site-header\"", StringComparison.Ordinal),
+            "スキップリンクは、ヘッダーより前（Tab の最初）にあること");
+    }
+
+    [Fact]
+    public async Task Privacy_policy_describes_the_session_storage_use_accurately()
+    {
+        var html = await GetAsync("/privacy");
+        Assert.Contains("sessionStorage には、閲覧位置", html);
+        Assert.Contains("タブを閉じると消えます", html);
+        Assert.DoesNotContain("sessionStorage・Cookie などに、お客さまの情報を保存しません", html);
     }
 
     [Fact]

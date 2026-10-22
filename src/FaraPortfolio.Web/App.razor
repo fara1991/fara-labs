@@ -1,12 +1,11 @@
 @* 静的 SSR の土台。書き出した各ページ（HTML）は、ここから組み立てる。
-   描画の前に js-ready を付けて、フェードインの初期状態（.reveal）を、JS が動くときだけ使う（JS が無ければ本文はそのまま見える） *@
+   js-ready（フェードインの初期状態 .reveal を使う合図）は js/site.js が付ける。JS が読めない・途中で失敗したときは付かないので、本文はそのまま見える *@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#120a22" />
-    <script>document.documentElement.classList.add('js-ready');</script>
     <!-- Google AdSense のサイト所有権の確認（広告のスクリプトはまだ読み込まない） -->
     <meta name="google-adsense-account" content="ca-pub-1153198089337531" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
