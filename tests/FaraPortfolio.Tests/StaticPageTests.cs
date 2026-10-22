@@ -62,16 +62,19 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
 
     [Theory]
     [MemberData(nameof(PathCases))]
-    public async Task Layout_keeps_the_header_fixed_and_the_notice_slot_before_the_scrolling_area(string path)
+    public async Task Layout_keeps_the_header_and_footer_fixed_around_the_scrolling_area(string path)
     {
         var html = await GetAsync(path);
         var header = html.IndexOf("<header class=\"site-header\"", StringComparison.Ordinal);
         var slot = html.IndexOf("<div class=\"maintenance-slot\"></div>", StringComparison.Ordinal);
         var scroll = html.IndexOf("<div class=\"site-scroll\"", StringComparison.Ordinal);
         var main = html.IndexOf("<main class=\"site-main\" id=\"main-content\" tabindex=\"-1\">", StringComparison.Ordinal);
+        var mainEnd = html.IndexOf("</main>", main < 0 ? 0 : main, StringComparison.Ordinal);
         var footer = html.IndexOf("<footer class=\"site-footer\"", StringComparison.Ordinal);
-        Assert.True(header >= 0 && slot > header && scroll > slot && main > scroll && footer > main,
-            "ヘッダー → お知らせの帯の場所 → スクロールする領域（本文 → フッター）の順になっていません");
+        Assert.True(header >= 0 && slot > header && scroll > slot && main > scroll && mainEnd > main && footer > mainEnd,
+            "ヘッダー → お知らせの帯 → スクロールする領域（本文）→ フッター の順になっていません");
+        // フッターは、スクロールする領域（.site-scroll）を閉じたあとに置く（画面の下に固定するため）
+        Assert.Contains("</div>", html.Substring(mainEnd, footer - mainEnd));
     }
 
     [Theory]

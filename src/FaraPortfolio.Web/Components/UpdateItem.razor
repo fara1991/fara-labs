@@ -1,7 +1,7 @@
 @* 更新履歴の 1 件。NEW の表示は js/site.js が、ブラウザの今日の日付で付ける（書き出し時の日付では決めない） *@
 <li class="update-item" data-category="@Entry.Category" data-date="@Entry.Date.ToString("yyyy-MM-dd")">
     <div class="update-date">
-        <time datetime="@Entry.Date.ToString("yyyy-MM-dd")">@Entry.Date.ToString("yyyy.MM.dd")</time>
+        <time datetime="@Entry.Date.ToString("yyyy-MM-dd")" class="nowrap">@Entry.Date.ToString("yyyy.MM.dd")</time>
         <span class="update-dow">@DayOfWeekJa(Entry.Date)</span>
     </div>
     <div class="update-body">
