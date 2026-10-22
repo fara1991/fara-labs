@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-ポートフォリオサイト（https://fara-labs.com/）。.NET 8 の静的 SSR（Razor コンポーネントをページごとの HTML に書き出す。ブラウザの .NET 実行環境は使わない）で作り、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
+ポートフォリオサイト（https://fara-labs.com/）。.NET 10 の静的 SSR（Razor コンポーネントをページごとの HTML に書き出す。ブラウザの .NET 実行環境は使わない）で作り、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
 
 ## ブランチ運用（必ず守る）
 

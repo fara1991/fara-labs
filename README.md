@@ -1,6 +1,6 @@
 # fara-portfolio-site
 
-自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 8 の静的 SSR（Razor コンポーネントを、ページごとの HTML に書き出す）で作り、Cloudflare Workers に公開します。
+自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 10 の静的 SSR（Razor コンポーネントを、ページごとの HTML に書き出す）で作り、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
@@ -14,7 +14,7 @@
 ```
 fara-portfolio-site/
 ├── FaraPortfolio.sln
-├── global.json                       使用する .NET SDK（8.0）
+├── global.json                       使用する .NET SDK（10.0）
 ├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）
 ├── package.json                      wrangler（Cloudflare の CLI）のバージョン固定
 ├── docs/cloudflare-setup.md          Cloudflare・GitHub の初期設定手順
