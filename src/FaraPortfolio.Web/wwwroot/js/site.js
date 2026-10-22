@@ -1,16 +1,19 @@
 // サイト全体の演出（Blazor から独立して動く）
-//  - スクロール量を CSS 変数 --progress に流す（上部の進捗バー）
+//  - スクロール量を CSS 変数 --progress に流す（上部の進捗バー）。スクロールするのは .site-scroll（ヘッダーの下の領域）
 //  - .reveal 要素が画面に入ったら .is-visible を付ける（フェードイン）
 //  - 軌道アイコンはタッチ中に止める／スマホのメニューを外側タップ・Esc で閉じる
 //  - works#id で来たら該当の作品カードの枠を 1 回光らせる
 (() => {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // スクロールするのは、ヘッダーとお知らせの帯の下の領域（Layout/MainLayout.razor の .site-scroll）。ページが読み込まれる前は無いので、都度探す
+    const scrollEl = () => document.querySelector('.site-scroll');
 
     let ticking = false;
     const update = () => {
-        const y = window.scrollY;
-        const max = root.scrollHeight - window.innerHeight;
+        const el = scrollEl();
+        const y = el ? el.scrollTop : window.scrollY;
+        const max = el ? el.scrollHeight - el.clientHeight : root.scrollHeight - window.innerHeight;
         root.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
         root.classList.toggle('is-scrolled', y > 8);
         ticking = false;
@@ -21,23 +24,34 @@
             requestAnimationFrame(update);
         }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
+    // scroll は泡立たないので、捕まえ（capture）で、どの要素のスクロールも受け取る
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
     window.addEventListener('resize', onScroll, { passive: true });
     update();
 
-    const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
+    // 画面に入ったかどうかは、スクロールする領域（.site-scroll）の中で見る。領域がまだ無いときは、作られてから作る
+    let observer = null;
+    const getObserver = () => {
+        if (observer) return observer;
+        const container = scrollEl();
+        if (!container) return null;
+        observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
             }
-        }
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        }, { root: container, threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        return observer;
+    };
 
     const scan = (node) => {
         if (node.nodeType !== Node.ELEMENT_NODE) return;
-        if (node.matches('.reveal:not(.is-visible)')) observer.observe(node);
-        node.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => observer.observe(el));
+        const obs = getObserver();
+        if (!obs) return;
+        if (node.matches('.reveal:not(.is-visible)')) obs.observe(node);
+        node.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => obs.observe(el));
     };
     // Blazor が描画・ページ遷移で追加した要素も自動で監視する
     new MutationObserver((mutations) => {
@@ -46,24 +60,6 @@
     }).observe(document.body, { childList: true, subtree: true });
     scan(document.body);
     root.classList.add('js-ready');
-
-    // メンテナンスの帯の実際の高さを --notice-h に入れる（2 行に折り返しても、ページ内ジャンプの位置が帯の下に隠れない）。
-    //  JS が動かないときは CSS の見積もり（1 行分）のまま
-    const noticeResize = 'ResizeObserver' in window ? new ResizeObserver(() => syncNotice()) : null;
-    let noticeWatched = null;
-    const syncNotice = () => {
-        const el = document.querySelector('.maintenance-notice');
-        if (el !== noticeWatched) {
-            if (noticeWatched) noticeResize?.unobserve(noticeWatched);
-            noticeWatched = el;
-            if (el) noticeResize?.observe(el);
-        }
-        if (el) root.style.setProperty('--notice-h', el.offsetHeight + 'px');
-        else root.style.removeProperty('--notice-h');
-    };
-    // 帯は Blazor が後から描く（出たり消えたりする）ので、DOM の変化を見て付け替える
-    new MutationObserver(syncNotice).observe(document.body, { childList: true, subtree: true });
-    syncNotice();
 
     // 軌道アイコンはタッチしている間とその直後は止めて、狙いやすくする
     let touchTimer = 0;
@@ -114,6 +110,11 @@
     document.addEventListener('focusin', placeTip);
 
     window.faraSite = {
+        // 別のページに移ったら、スクロールする領域を先頭に戻す（#ジャンプの移動では戻さない。scrollToHash が合わせる）
+        resetScroll() {
+            if (location.hash) return;
+            scrollEl()?.scrollTo({ top: 0, behavior: 'instant' });
+        },
         scrollToHash() {
             const id = decodeURIComponent(location.hash.slice(1));
             if (!id) return;

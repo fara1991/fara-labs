@@ -26,7 +26,6 @@
     --radius-sm: 12px;
     --header-h: 68px;
     /* メンテナンスのお知らせの帯の高さ（お知らせがあるときだけ html:has(...) で入る） */
-    --notice-h: 0px;
     --ease-out: cubic-bezier(.16, 1, .3, 1);
 
     --font-display: "Outfit", "Zen Kaku Gothic New", system-ui, sans-serif;
@@ -37,19 +36,13 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* お知らせの帯があるとき: ページ内ジャンプの止まる位置を帯の分だけ下げる。帯の実高は site.js が --notice-h に入れる（JS が無いときは 1 行分の見積もり） */
-html:has(.maintenance-notice) { --notice-h: 2.7rem; }
-
 html {
     overflow-x: clip;
-    scroll-behavior: smooth;
-    scroll-padding-top: calc(var(--header-h) + var(--notice-h) + 16px);
     -webkit-text-size-adjust: 100%;
 }
 
 body {
     margin: 0;
-    min-height: 100vh;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
@@ -59,7 +52,22 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-#app { min-height: 100vh; display: flex; flex-direction: column; }
+#app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* 画面の枠: ヘッダーとお知らせの帯は動かず、その下の .site-scroll（本文とフッター）だけがスクロールする。
+   スマホのアドレスバーの伸縮に合わせて 100dvh を使う（dvh に非対応の古い端末は 100vh） */
+.app-shell { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+.site-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* ページ内ジャンプ（#id）の止まる位置: 領域の上端から少し下 */
+    scroll-padding-top: 16px;
+}
 
 h1, h2, h3 {
     font-family: var(--font-display);
@@ -188,9 +196,10 @@ img { max-width: 100%; display: block; }
 }
 
 /* ---------- ヘッダー ---------- */
+/* ヘッダーは画面の上に固定（.app-shell の 1 段目）。スクロールするのは .site-scroll */
 .site-header {
-    position: sticky;
-    top: 0;
+    position: relative;
+    flex: none;
     z-index: 50;
     transition: background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
     border-bottom: 1px solid transparent;
@@ -696,6 +705,9 @@ img { max-width: 100%; display: block; }
 .site-footer-line a:hover { color: var(--lavender); }
 .site-footer-line .site-footer-name { color: var(--text); font-weight: 600; }
 .site-footer-sep { opacity: .5; }
+.site-footer-copy { white-space: nowrap; }
+.site-footer-line .footer-socials { display: inline-flex; gap: 6px; margin-left: 2px; }
+.site-footer-line .footer-socials a { width: 28px; height: 28px; border-radius: 8px; }
 .footer-socials { display: flex; gap: 10px; }
 .footer-socials a { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #fff; background: var(--brand, var(--violet)); transition: box-shadow .25s ease; }
 .footer-socials a:hover { box-shadow: 0 8px 20px -6px var(--brand, var(--violet)); }
@@ -779,12 +791,9 @@ img { max-width: 100%; display: block; }
 }
 
 /* メンテナンスのお知らせ（MAINTENANCE=notice）と、メンテナンス画面（MAINTENANCE=true） */
-/* 帯はヘッダー（z-index 50）の真下に固定する。本文の要素（z-index 5 まで）より前、ヘッダーより後ろ。
-   ヘッダーは下線 1px ぶん（border-bottom）だけ --header-h より高いので、top にその 1px を足す */
+/* 帯はヘッダーと .site-scroll の間に置く（.app-shell の 2 段目）。スクロールの外なので、動かずに残る */
 .maintenance-notice {
-    position: sticky;
-    top: calc(var(--header-h) + 1px);
-    z-index: 40;
+    flex: none;
     padding: 0.5rem 1rem;
     background: #f59e0b;
     color: #1a0b33;
