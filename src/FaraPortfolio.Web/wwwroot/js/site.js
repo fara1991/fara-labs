@@ -47,6 +47,24 @@
     scan(document.body);
     root.classList.add('js-ready');
 
+    // メンテナンスの帯の実際の高さを --notice-h に入れる（2 行に折り返しても、ページ内ジャンプの位置が帯の下に隠れない）。
+    //  JS が動かないときは CSS の見積もり（1 行分）のまま
+    const noticeResize = 'ResizeObserver' in window ? new ResizeObserver(() => syncNotice()) : null;
+    let noticeWatched = null;
+    const syncNotice = () => {
+        const el = document.querySelector('.maintenance-notice');
+        if (el !== noticeWatched) {
+            if (noticeWatched) noticeResize?.unobserve(noticeWatched);
+            noticeWatched = el;
+            if (el) noticeResize?.observe(el);
+        }
+        if (el) root.style.setProperty('--notice-h', el.offsetHeight + 'px');
+        else root.style.removeProperty('--notice-h');
+    };
+    // 帯は Blazor が後から描く（出たり消えたりする）ので、DOM の変化を見て付け替える
+    new MutationObserver(syncNotice).observe(document.body, { childList: true, subtree: true });
+    syncNotice();
+
     // 軌道アイコンはタッチしている間とその直後は止めて、狙いやすくする
     let touchTimer = 0;
     document.addEventListener('pointerdown', (e) => {

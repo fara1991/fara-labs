@@ -37,7 +37,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* お知らせの帯があるとき: 帯はヘッダーの下に固定されるので、ページ内ジャンプの止まる位置を帯の分だけ下げる（帯は 1 行の高さで見積もる） */
+/* お知らせの帯があるとき: ページ内ジャンプの止まる位置を帯の分だけ下げる。帯の実高は site.js が --notice-h に入れる（JS が無いときは 1 行分の見積もり） */
 html:has(.maintenance-notice) { --notice-h: 2.7rem; }
 
 html {
@@ -518,7 +518,6 @@ img { max-width: 100%; display: block; }
     display: grid;
     grid-template-columns: 128px 1fr;
     overflow: hidden;
-    scroll-margin-top: calc(var(--header-h) + var(--notice-h) + 24px);
 }
 .work-detail-visual {
     display: grid;
@@ -780,10 +779,11 @@ img { max-width: 100%; display: block; }
 }
 
 /* メンテナンスのお知らせ（MAINTENANCE=notice）と、メンテナンス画面（MAINTENANCE=true） */
-/* 帯はヘッダー（z-index 50）の真下に固定する。本文の要素（z-index 5 まで）より前、ヘッダーより後ろ */
+/* 帯はヘッダー（z-index 50）の真下に固定する。本文の要素（z-index 5 まで）より前、ヘッダーより後ろ。
+   ヘッダーは下線 1px ぶん（border-bottom）だけ --header-h より高いので、top にその 1px を足す */
 .maintenance-notice {
     position: sticky;
-    top: var(--header-h);
+    top: calc(var(--header-h) + 1px);
     z-index: 40;
     padding: 0.5rem 1rem;
     background: #f59e0b;

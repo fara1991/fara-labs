@@ -31,11 +31,12 @@ public class MaintenanceBannerTests
     }
 
     [Fact]
-    public void Notice_IsStickyBelowTheHeader()
+    public void Notice_IsStickyJustBelowTheHeader()
     {
         var body = RuleBody(".maintenance-notice");
         Assert.Matches(@"position:\s*sticky;", body);
-        Assert.Matches(@"top:\s*var\(--header-h\);", body);
+        // ヘッダーは下線 1px ぶん --header-h より高い
+        Assert.Matches(@"top:\s*calc\(var\(--header-h\)\s*\+\s*1px\);", body);
         Assert.DoesNotMatch(@"position:\s*relative;", body);
     }
 
@@ -57,18 +58,37 @@ public class MaintenanceBannerTests
     }
 
     [Fact]
-    public void Notice_IsTallerThanZeroOnlyWhenPresent()
+    public void NoticeSpace_IsAddedOnlyWhenTheNoticeIsOnThePage()
     {
-        // 帯の分の余白は、帯があるページ（html:has(.maintenance-notice)）でだけ入る
+        // 帯の分の余白（--notice-h）は、帯があるページ（html:has(.maintenance-notice)）でだけ入る。普段は 0
         Assert.Matches(@"--notice-h:\s*0px;", RuleBody(":root"));
         Assert.Matches(@"html:has\(\.maintenance-notice\)\s*\{[^}]*--notice-h:\s*[\d.]+rem;", Css);
     }
 
     [Fact]
-    public void PageJumps_ClearTheHeaderAndTheNotice()
+    public void PageJumps_StopBelowTheHeaderAndTheNoticeOnce()
     {
-        // html の scroll-padding-top と、作品の scroll-margin-top が、帯の高さ（--notice-h）を含む
-        Assert.Matches(@"scroll-padding-top:\s*calc\(var\(--header-h\)\s*\+\s*var\(--notice-h\)", RuleBody("html"));
-        Assert.Matches(@"scroll-margin-top:\s*calc\(var\(--header-h\)\s*\+\s*var\(--notice-h\)", RuleBody(".work-detail"));
+        // ページ内ジャンプは html の scroll-padding-top だけで決まる（作品側に scroll-margin-top を足すと二重に計上される）
+        Assert.Matches(@"scroll-padding-top:\s*calc\(var\(--header-h\)\s*\+\s*var\(--notice-h\)\s*\+\s*16px\);", RuleBody("html"));
+        Assert.DoesNotMatch("scroll-margin-top", RuleBody(".work-detail"));
+    }
+
+    [Fact]
+    public void NoticeHeight_IsMeasuredByScript()
+    {
+        var js = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/js/site.js"));
+        Assert.Contains("'--notice-h'", js);
+        Assert.Contains("ResizeObserver", js);
+        Assert.Contains(".maintenance-notice", js);
+        // 帯が消えたら、測った値を外して CSS の既定（0）に戻す
+        Assert.Contains("removeProperty('--notice-h')", js);
+    }
+
+    [Fact]
+    public void Banner_IsRightAfterTheHeaderAndBeforeMain()
+    {
+        // 帯は SiteHeader の直後・<main> の前。順番が変わると、ヘッダーの下に固定できない
+        var layout = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Layout/MainLayout.razor"));
+        Assert.Matches(@"<SiteHeader />\s*<MaintenanceBanner />\s*<main class=""site-main"">", layout);
     }
 }
