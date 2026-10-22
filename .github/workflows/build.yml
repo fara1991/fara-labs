@@ -30,6 +30,12 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release
 
+      - name: Maintenance test
+        run: npm run test:maintenance
+
+      - name: Deploy gate test
+        run: npm run test:gate
+
       - name: Publish
         run: dotnet publish src/FaraPortfolio.Web --configuration Release --output publish
 
