@@ -18,9 +18,9 @@ public class LayoutScrollTests
         throw new FileNotFoundException(relative);
     }
 
-    private static readonly string Css = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css"));
-    private static readonly string Js = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/js/site.js"));
-    private static readonly string Layout = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Layout/MainLayout.razor"));
+    private static readonly string Css = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css")).Replace("\r\n", "\n");
+    private static readonly string Js = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/js/site.js")).Replace("\r\n", "\n");
+    private static readonly string Layout = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Layout/MainLayout.razor")).Replace("\r\n", "\n");
 
     /// <summary>セレクタの本体（{ } の中身）を取る。同じセレクタが複数あれば、すべてつなげて返す。</summary>
     private static string RuleBody(string selector)
@@ -97,8 +97,9 @@ public class LayoutScrollTests
     public void Navigating_to_another_page_resets_the_scroll_area_but_not_on_hash_jumps()
     {
         Assert.Contains("resetScroll()", Js);
-        Assert.Contains("if (location.hash) return;", Js);
-        Assert.Contains("scrollTo({ top: 0, behavior: 'instant' })", Js);
+        Assert.Contains("location.hash) return;", Js);
+        Assert.Contains("back ? (positions[shownKey] || 0) : 0", Js);
+        Assert.Contains("behavior: 'instant'", Js);
         Assert.Contains("faraSite.resetScroll", Layout);
         // 同じページ内の移動（パスが同じ）では戻さない
         Assert.Contains("if (path != _path)", Layout);
@@ -113,5 +114,52 @@ public class LayoutScrollTests
         Assert.Contains("tabindex=\"0\" aria-label=\"本文\"", Layout);
         Assert.Contains("'.site-scroll'", Js);
         Assert.Contains("class=\"app-shell\"", Layout);
+    }
+
+    [Fact]
+    public void Back_and_forward_restore_the_saved_position_and_normal_moves_go_to_the_top()
+    {
+        Assert.Contains("window.addEventListener('popstate'", Js);
+        Assert.Contains("backNav = pageKey() !== shownKey;", Js);
+        Assert.Contains("back ? (positions[shownKey] || 0) : 0", Js);
+        // 保存は sessionStorage（使えないときはメモリだけ）。読み書きは try/catch で包む。書き込みは間引く
+        Assert.Contains("sessionStorage.setItem(STORE", Js);
+        Assert.Contains("try { positions = JSON.parse(sessionStorage.getItem(STORE) || '{}')", Js);
+        Assert.Contains("flushTimer = setTimeout(flush, 800);", Js);
+        Assert.Contains("window.addEventListener('pagehide', flush);", Js);
+        // 切り替えの途中（アドレスが新しく、画面が古い）の位置は保存しない
+        Assert.Contains("if (pageKey() !== shownKey) return;", Js);
+    }
+
+    [Fact]
+    public void A_hash_in_the_address_wins_over_the_saved_position()
+    {
+        // #付きの URL（戻る先の作品など）は、scrollToHash に任せる。保存位置の復元と競合させない
+        Assert.Contains("location.hash) return;", Js);
+    }
+
+    [Fact]
+    public void Print_releases_the_frame_so_all_content_is_printed()
+    {
+        var print = Regex.Match(Css, @"@media print \{([\s\S]*?)\n\}\n").Groups[1].Value;
+        Assert.False(string.IsNullOrWhiteSpace(print), "@media print がありません");
+        Assert.Contains(".site-scroll", print);
+        Assert.Contains("overflow: visible !important", print);
+        Assert.Contains("height: auto !important", print);
+        Assert.Contains(".js-ready .reveal", print);
+        // お知らせの帯は、印刷では出さない（意図どおり）
+        Assert.Contains(".maintenance-notice", print);
+    }
+
+    [Fact]
+    public void Reduced_motion_turns_off_smooth_scrolling_in_the_scroll_area()
+    {
+        Assert.Matches(@"@media \(prefers-reduced-motion: reduce\) \{\s*\.site-scroll \{ scroll-behavior: auto; \}", Css);
+    }
+
+    [Fact]
+    public void The_scroll_area_is_a_labelled_keyboard_region()
+    {
+        Assert.Contains("role=\"region\" tabindex=\"0\" aria-label=\"本文\"", Layout);
     }
 }

@@ -194,14 +194,35 @@ public class FooterAndReportTests
     }
 
     [Fact]
-    public void Footer_social_services_have_icons_and_a_profile_entry()
+    public void Footer_social_services_have_icons_in_the_agreed_order()
     {
-        // フッターの SNS アイコンは、プロフィールの SNS（URL が入っているもの）から作る。Discord も、同じ並びで扱う
+        // フッターの SNS アイコンは、プロフィールの SNS（URL が入っているもの）を、その順に並べる。GitHub・Twitter・Twitch・Discord
         var profile = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/data/profile.json"));
-        foreach (var service in new[] { "github", "twitter", "twitch" })
-        {
-            Assert.Contains($"\"service\": \"{service}\"", profile);
+        var order = new[] { "github", "twitter", "twitch", "discord" };
+        var positions = order.Select(s => profile.IndexOf($"\"service\": \"{s}\"", StringComparison.Ordinal)).ToArray();
+        Assert.All(positions, p => Assert.True(p > 0));
+        Assert.Equal(positions.OrderBy(p => p), positions);
+        foreach (var service in order)
             Assert.Equal(service, Icon.ForService(service));
-        }
+    }
+
+    [Fact]
+    public void Discord_entry_links_to_the_invite_in_a_new_tab_with_a_safe_rel()
+    {
+        var profile = System.Text.Json.JsonSerializer.Deserialize<FaraPortfolio.Web.Models.Profile>(File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/data/profile.json")), FaraPortfolio.Web.Models.SiteJson.Options)!;
+        var discord = profile.Socials.Single(s => s.Service == "discord");
+        Assert.Equal("Discord", discord.Label);
+        Assert.Equal("https://discord.com/invite/B38eCSYyk5", discord.Url);
+        // 外部のリンクなので、フッターと SNS のページは別のタブで開き、rel を付ける（Links.razor・SiteFooter.razor の並び）
+        Assert.Contains("target=\"_blank\" rel=\"noopener noreferrer\"", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Components/SiteFooter.razor")));
+        Assert.Contains("target=\"_blank\" rel=\"noopener noreferrer\"", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Pages/Links.razor")));
+    }
+
+    [Fact]
+    public void Discord_icon_and_brand_color_exist()
+    {
+        Assert.Equal("discord", Icon.ForService("Discord"));
+        Assert.Contains(".service-discord { --brand: #5865f2; }", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css")));
+        Assert.Contains("[\"discord\"] = ", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Components/Icon.razor")));
     }
 }

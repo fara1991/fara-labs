@@ -17,15 +17,29 @@
     const pageKey = () => location.pathname + location.search;
     // いま画面に出しているページのキー（Blazor がページを切り替えたら、resetScroll で合わせる）
     let shownKey = pageKey();
-    // 戻る・進むのとき、ブラウザが popstate を出す（Blazor の処理より先に、ここで印を付ける）
+    // 戻る・進むで、別のページへ移ったときだけ印を付ける（Blazor の処理より先に動く。このときの shownKey は、まだ移る前のページ）。
+    //  同じページの中の移動（#やクエリだけの変化）では立てない。立てたままだと、あとの通常の移動が保存位置へ飛んでしまう
     let backNav = false;
-    window.addEventListener('popstate', () => { backNav = true; });
+    window.addEventListener('popstate', () => { backNav = pageKey() !== shownKey; });
+    // 位置はメモリに置き、sessionStorage への書き込みは間引く（ページの切り替え・非表示・離脱のときにまとめて書く）
+    let dirty = false;
+    let flushTimer = 0;
+    const flush = () => {
+        clearTimeout(flushTimer);
+        flushTimer = 0;
+        if (!dirty) return;
+        dirty = false;
+        try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch (e) { /* 保存できないときは、メモリだけ */ }
+    };
     const savePosition = (el) => {
         // ページを切り替えている途中（アドレスは新しく、画面はまだ古い）の位置は、保存しない
         if (pageKey() !== shownKey) return;
         positions[shownKey] = el.scrollTop;
-        try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch (e) { /* 保存できないときは、メモリだけ */ }
+        dirty = true;
+        if (!flushTimer) flushTimer = setTimeout(flush, 800);
     };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
 
     let ticking = false;
     const update = () => {
@@ -125,16 +139,13 @@
         resetScroll() {
             const back = backNav;
             backNav = false;
+            flush();
             shownKey = pageKey();
             const el = scrollEl();
-            if (!el) return;
-            if (back) {
-                el.scrollTo({ top: positions[shownKey] || 0, behavior: 'instant' });
-                return;
-            }
-            // #ジャンプ（作品への移動など）は scrollToHash に任せる
-            if (location.hash) return;
-            el.scrollTo({ top: 0, behavior: 'instant' });
+            // #ジャンプ（作品への移動・戻る先の作品など）は、どの移動でも scrollToHash に任せる（保存位置の復元と競合させない）
+            if (!el || location.hash) return;
+            // 戻る・進む: 離れたときの位置（保存が無ければ先頭）。通常の移動: 先頭
+            el.scrollTo({ top: back ? (positions[shownKey] || 0) : 0, behavior: 'instant' });
         },
         scrollToHash() {
             const id = decodeURIComponent(location.hash.slice(1));

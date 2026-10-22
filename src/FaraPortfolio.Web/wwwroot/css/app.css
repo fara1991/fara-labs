@@ -697,6 +697,7 @@ img { max-width: 100%; display: block; }
 .service-x { --brand: #3a3150; }
 .service-twitter { --brand: #1d9bf0; }
 .service-twitch { --brand: #9146ff; }
+.service-discord { --brand: #5865f2; }
 .service-youtube { --brand: #e0245e; }
 .service-bluesky { --brand: #3b82f6; }
 
