@@ -135,6 +135,10 @@ Worker は `workers_dev` / `preview_urls` を無効にしてあるので、`*.wo
 - アプリケーションの **認証 → インスタント認証を適用** をオンにすると、「Sign in with」のボタンを押す画面を飛ばしてメールアドレスの入力から始まる
 - チーム名（**設定 → チーム ドメイン**）は `fara-labs`（ログイン画面の URL が `fara-labs.cloudflareaccess.com` になる）
 
+### 作者への報告・メンテナンス画面
+
+3 つのサイトの「作者へ報告」（Discord に通知）と、メンテナンス画面（Cloudflare の WAF ルール）の設定は、[report-and-maintenance.md](report-and-maintenance.md) にまとめています。
+
 ### うまくいかないとき
 
 | 症状 | 対処 |
