@@ -11,6 +11,7 @@ public class SiteLinksTests
     [InlineData("https://fara-labs.com/works", "https://dev.fara-labs.com/works")]
     [InlineData("https://avatar.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b", "https://avatar-dev.fara-labs.com/learn/%E5%9F%BA%E6%9C%AC?q=a%20b")]
     [InlineData("https://github.com/fara1991/fara-avatar-modding-guide", "https://github.com/fara1991/fara-avatar-modding-guide")]
+    [InlineData("https://discord.com/invite/B38eCSYyk5", "https://discord.com/invite/B38eCSYyk5")]     // 外部のリンクは、確認用でも書き換えない
     [InlineData("/works", "/works")]
     [InlineData("https://pokemon-dev.fara-labs.com/", "https://pokemon-dev.fara-labs.com/")]
     public void Develop_RewritesFaraLabsLinks(string url, string expected) =>

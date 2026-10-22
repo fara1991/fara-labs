@@ -28,6 +28,13 @@
       "description": "ゲーム配信をしています。"
     },
     {
+      "service": "discord",
+      "label": "Discord",
+      "handle": "",
+      "url": "https://discord.com/invite/B38eCSYyk5",
+      "description": ""
+    },
+    {
       "service": "youtube",
       "label": "YouTube",
       "handle": "",

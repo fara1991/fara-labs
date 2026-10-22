@@ -1,28 +1,28 @@
-@* 4 サイト共通の形のフッター: サイト名 | 作者へ報告 | プライバシーポリシー | © 公開年 Fara（Fara は作者のホームページへ）。
-   SNS のアイコンは、その上の段に残す（SNS・リンクのページと同じ内容）。
-   「作者へ報告」には、いま見ているページを ?from= で付ける（報告に、どのページかが分かるように） *@
+@* 4 サイト共通の形のフッター: サイト名 | 問い合わせ | プライバシーポリシー | © 公開年 Fara（Fara は作者のホームページへ）。
+   © の横に SNS のアイコン（プロフィールの SNS のうち、URL が入っているもの）。
+   「問い合わせ」には、いま見ているページを ?from= で付ける（報告に、どのページかが分かるように） *@
 @inject SiteData Data
 @inject NavigationManager Nav
 @implements IDisposable
 
 <footer class="site-footer">
     <div class="container site-footer-inner">
-        <div class="footer-socials">
-            @foreach (var s in Data.Profile.VisibleSocials)
-            {
-                <a class="service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer" aria-label="@s.Label" title="@s.Label">
-                    <Icon Name="@Icon.ForService(s.Service)" Size="18" />
-                </a>
-            }
-        </div>
         <div class="site-footer-line">
-            <a class="site-footer-name" href="/">@SiteInfo.Name</a>
+            <span class="site-footer-name">@SiteInfo.Name</span>
             <span class="site-footer-sep" aria-hidden="true">|</span>
-            <a href="@ReportHref">作者へ報告</a>
+            <a href="@ReportHref">問い合わせ</a>
             <span class="site-footer-sep" aria-hidden="true">|</span>
             <a href="/privacy">プライバシーポリシー</a>
             <span class="site-footer-sep" aria-hidden="true">|</span>
-            <span>© @SiteInfo.PublishedYear <a href="@SiteInfo.AuthorHomeUrl">@SiteInfo.Author</a></span>
+            <span class="site-footer-copy">© @SiteInfo.PublishedYear <a href="@SiteInfo.AuthorHomeUrl">@SiteInfo.Author</a></span>
+            <span class="footer-socials">
+                @foreach (var s in Data.Profile.VisibleSocials)
+                {
+                    <a class="service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer" aria-label="@s.Label" title="@s.Label">
+                        <Icon Name="@Icon.ForService(s.Service)" Size="16" />
+                    </a>
+                }
+            </span>
         </div>
     </div>
 </footer>

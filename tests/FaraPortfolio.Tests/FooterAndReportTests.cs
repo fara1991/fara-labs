@@ -11,7 +11,7 @@ using Microsoft.JSInterop;
 
 namespace FaraPortfolio.Tests;
 
-/// <summary>4 サイト共通の形のフッター（サイト名 | 作者へ報告 | プライバシーポリシー | © 公開年 Fara）と、報告・プライバシーポリシーのページ。</summary>
+/// <summary>4 サイト共通の形のフッター（サイト名 | 問い合わせ | プライバシーポリシー | © 公開年 Fara）と、問い合わせ・プライバシーポリシーのページ。</summary>
 public class FooterAndReportTests
 {
     private sealed class TestNav : NavigationManager
@@ -64,14 +64,15 @@ public class FooterAndReportTests
     public async Task Footer_line_has_the_agreed_parts_in_order()
     {
         var html = await RenderAsync<SiteFooter>();
-        Assert.Equal("Fara Portfolio | 作者へ報告 | プライバシーポリシー | © 2026 Fara", TextOf(html, "<div class=\"site-footer-line\">"));
+        Assert.Equal("Fara Portfolio | 問い合わせ | プライバシーポリシー | © 2026 Fara", TextOf(html, "<div class=\"site-footer-line\">"));
     }
 
     [Fact]
-    public async Task Footer_links_go_to_the_site_home_the_report_page_the_privacy_page_and_the_author_homepage()
+    public async Task Footer_links_go_to_the_report_page_the_privacy_page_and_the_author_homepage()
     {
         var html = await RenderAsync<SiteFooter>("https://fara-labs.com/works");
-        Assert.Contains("<a class=\"site-footer-name\" href=\"/\">Fara Portfolio</a>", html);
+        Assert.Contains("<span class=\"site-footer-name\">Fara Portfolio</span>", html);
+        Assert.DoesNotContain("href=\"/\"", html);
         Assert.Contains("href=\"/report?from=%2Fworks\"", html);
         Assert.Contains("href=\"/privacy\"", html);
         Assert.Contains("href=\"https://fara-labs.com/\">Fara</a>", html);
@@ -165,7 +166,7 @@ public class FooterAndReportTests
     {
         var html = await RenderAsync<Privacy>();
         var text = Regex.Replace(System.Net.WebUtility.HtmlDecode(Regex.Replace(html, "<[^>]+>", " ")), @"\s+", " ");
-        foreach (var topic in new[] { "運営者", "ブラウザに保存する情報", "アクセス解析", "作者へ報告で送る情報", "Turnstile", "Discord", "外部のサービス", "広告", "第三者への提供", "Google Fonts", "Cloudflare" })
+        foreach (var topic in new[] { "運営者", "ブラウザに保存する情報", "アクセス解析", "問い合わせで送る情報", "Turnstile", "Discord", "外部のサービス", "広告", "第三者への提供", "Google Fonts", "Cloudflare" })
             Assert.Contains(topic, text);
     }
 
@@ -179,7 +180,50 @@ public class FooterAndReportTests
         // Cookie は Cloudflare・Turnstile の仕組みで使われることがある、と条件つきで書く
         Assert.Contains("Cloudflare・Turnstile の仕組みで Cookie が使われることがあります", text);
         // アクセス解析は、使う場合がある、と条件つきで書く（リポジトリだけでは有効かどうか確認できないため）
-        Assert.Contains("Web Analytics）を使う場合があります", text);
+        Assert.Contains("Web Analytics）を使っています", text);
+        Assert.Contains("EU 圏内からのアクセスは、計測の対象外", text);
         Assert.DoesNotContain("Web Analytics を使って", text);
+    }
+
+    [Fact]
+    public async Task Header_has_report_and_policy_links_in_english()
+    {
+        var html = await RenderAsync<SiteHeader>("https://fara-labs.com/works");
+        // 属性の順に依存しない: href と class を、どちらが先でも見つける
+        Assert.Matches(@"<a\b(?=[^>]*\bhref=""report"")(?=[^>]*\bclass=""nav-link"")[^>]*>Report</a>", html);
+        Assert.Matches(@"<a\b(?=[^>]*\bhref=""privacy"")(?=[^>]*\bclass=""nav-link"")[^>]*>Policy</a>", html);
+    }
+
+    [Fact]
+    public void Footer_social_services_have_icons_in_the_agreed_order()
+    {
+        // フッターの SNS アイコンは、プロフィールの SNS（URL が入っているもの）を、その順に並べる。GitHub・Twitter・Twitch・Discord
+        var profile = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/data/profile.json"));
+        var order = new[] { "github", "twitter", "twitch", "discord" };
+        var positions = order.Select(s => profile.IndexOf($"\"service\": \"{s}\"", StringComparison.Ordinal)).ToArray();
+        Assert.All(positions, p => Assert.True(p > 0));
+        Assert.Equal(positions.OrderBy(p => p), positions);
+        foreach (var service in order)
+            Assert.Equal(service, Icon.ForService(service));
+    }
+
+    [Fact]
+    public void Discord_entry_links_to_the_invite_in_a_new_tab_with_a_safe_rel()
+    {
+        var profile = System.Text.Json.JsonSerializer.Deserialize<FaraPortfolio.Web.Models.Profile>(File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/data/profile.json")), FaraPortfolio.Web.Models.SiteJson.Options)!;
+        var discord = profile.Socials.Single(s => s.Service == "discord");
+        Assert.Equal("Discord", discord.Label);
+        Assert.Equal("https://discord.com/invite/B38eCSYyk5", discord.Url);
+        // 外部のリンクなので、フッターと SNS のページは別のタブで開き、rel を付ける（Links.razor・SiteFooter.razor の並び）
+        Assert.Contains("target=\"_blank\" rel=\"noopener noreferrer\"", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Components/SiteFooter.razor")));
+        Assert.Contains("target=\"_blank\" rel=\"noopener noreferrer\"", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Pages/Links.razor")));
+    }
+
+    [Fact]
+    public void Discord_icon_and_brand_color_exist()
+    {
+        Assert.Equal("discord", Icon.ForService("Discord"));
+        Assert.Contains(".service-discord { --brand: #5865f2; }", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css")));
+        Assert.Contains("[\"discord\"] = ", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Components/Icon.razor")));
     }
 }

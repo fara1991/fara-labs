@@ -1,5 +1,8 @@
 @inherits LayoutComponentBase
 @inject SiteData Data
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IDisposable
 
 @* 背景: 静止した星とグリッドの上で、ぼかした光だけがゆっくり浮かぶ（常時動く背景はこれだけ） *@
 <div class="bg-scene" aria-hidden="true">
@@ -11,26 +14,65 @@
     <div class="bg-noise"></div>
 </div>
 
-<SiteHeader />
+@* 画面の枠。ヘッダーとお知らせの帯は固定し、その下の .site-scroll（フッターも含む）だけがスクロールする *@
+<div class="app-shell">
+    <SiteHeader />
 
-<MaintenanceBanner />
+    <MaintenanceBanner />
 
-<main class="site-main">
-    @if (Data.Errors.Count > 0)
+    <div class="site-scroll" role="region" tabindex="0" aria-label="本文">
+        <main class="site-main">
+            @if (Data.Errors.Count > 0)
+            {
+                <div class="container">
+                    <div class="data-error" role="alert">
+                        <strong>データの読み込みに失敗しました</strong>
+                        <ul>
+                            @foreach (var e in Data.Errors)
+                            {
+                                <li>@e</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+            @Body
+        </main>
+
+        <SiteFooter />
+    </div>
+</div>
+
+@code {
+    private string _path = "";
+    private bool _resetScroll;
+
+    protected override void OnInitialized()
     {
-        <div class="container">
-            <div class="data-error" role="alert">
-                <strong>データの読み込みに失敗しました</strong>
-                <ul>
-                    @foreach (var e in Data.Errors)
-                    {
-                        <li>@e</li>
-                    }
-                </ul>
-            </div>
-        </div>
+        _path = PathOf(Nav.Uri);
+        Nav.LocationChanged += OnLocationChanged;
     }
-    @Body
-</main>
 
-<SiteFooter />
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // 別のページに移ったときだけ、スクロールを先頭に戻す（同じページの #ジャンプや、同じページの再描画では戻さない）
+        var path = PathOf(e.Location);
+        if (path != _path)
+        {
+            _path = path;
+            _resetScroll = true;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_resetScroll) return;
+        _resetScroll = false;
+        await JS.InvokeVoidAsync("faraSite.resetScroll");
+    }
+
+    private static string PathOf(string url) => new Uri(url).AbsolutePath;
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}
