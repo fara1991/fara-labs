@@ -5,6 +5,24 @@ import worker from "./index.js";
 
 const HOST = "https://fara-labs.com";
 
+// Node には Workers の HTMLRewriter が無いので、テストだけに、.maintenance-slot の中に append する最小限の代わりを入れる（本番の Worker では使われない）
+globalThis.HTMLRewriter = class {
+  handlers = null;
+  on(_selector, handlers) { this.handlers = handlers; return this; }
+  transform(response) {
+    let inserted = "";
+    this.handlers.element({ append(html) { inserted += html; } });
+    const body = new ReadableStream({
+      async start(controller) {
+        const text = await response.text();
+        controller.enqueue(new TextEncoder().encode(text.replace('<div class="maintenance-slot"></div>', `<div class="maintenance-slot">${inserted}</div>`)));
+        controller.close();
+      },
+    });
+    return new Response(body, { status: response.status, headers: response.headers });
+  }
+};
+
 /** 静的アセットの代わり。ここまで来たら 418 を返す（API の経路で、アセットに流れていないことを確かめる）。 */
 const ASSETS = { fetch: async () => new Response("asset", { status: 418 }) };
 
