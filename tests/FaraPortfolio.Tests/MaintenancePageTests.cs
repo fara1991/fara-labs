@@ -47,14 +47,14 @@ public class MaintenancePageTests
     public void SetupGuide_ExplainsTheSteps()
     {
         var guide = File.ReadAllText(RepoFile("docs/report-and-maintenance.md"));
-        // 報告: 登録する 3 つの値と、6 つの Worker
+        // 報告: 登録する 3 つの値と、8 つの Worker（4 サイト・本番と確認用）
         foreach (var name in new[] { "TURNSTILE_SITE_KEY", "TURNSTILE_SECRET", "DISCORD_WEBHOOK_URL" })
             Assert.Contains(name, guide);
-        foreach (var worker in new[] { "fara-pokemon", "fara-pokemon-dev", "fara-avatar", "fara-avatar-dev", "fara-twitch-bot", "fara-twitch-bot-dev" })
+        foreach (var worker in new[] { "fara-pokemon", "fara-pokemon-dev", "fara-avatar", "fara-avatar-dev", "fara-twitch-bot", "fara-twitch-bot-dev", "fara-portfolio", "fara-portfolio-dev" })
             Assert.Contains($"`{worker}`", guide);
-        // Turnstile に登録するホスト名（サイトのホストと同じ）
-        foreach (var host in new[] { "pokemon.fara-labs.com", "pokemon-dev.fara-labs.com", "avatar.fara-labs.com", "avatar-dev.fara-labs.com", "twitch-bot.fara-labs.com", "twitch-bot-dev.fara-labs.com" })
-            Assert.Contains(host, guide);
+        // Turnstile に登録するホスト名（サイトのホストと同じ）。バッククォートで囲んで比べる（fara-labs.com だけだと、ほかのホストに一致してしまうため）
+        foreach (var host in new[] { "pokemon.fara-labs.com", "pokemon-dev.fara-labs.com", "avatar.fara-labs.com", "avatar-dev.fara-labs.com", "twitch-bot.fara-labs.com", "twitch-bot-dev.fara-labs.com", "fara-labs.com", "dev.fara-labs.com" })
+            Assert.Contains($"`{host}`", guide);
         // メンテナンス: Worker の変数で切り替える（3 つの状態と、お知らせの文）
         foreach (var name in new[] { "MAINTENANCE", "MAINTENANCE_MESSAGE", "`notice`", "`true`", "`false`", "keep_vars" })
             Assert.Contains(name, guide);

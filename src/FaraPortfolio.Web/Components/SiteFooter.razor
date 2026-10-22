@@ -1,10 +1,12 @@
+@* 4 サイト共通の形のフッター: サイト名 | 作者へ報告 | プライバシーポリシー | © 公開年 Fara（Fara は作者のホームページへ）。
+   SNS のアイコンは、その上の段に残す（SNS・リンクのページと同じ内容）。
+   「作者へ報告」には、いま見ているページを ?from= で付ける（報告に、どのページかが分かるように） *@
 @inject SiteData Data
+@inject NavigationManager Nav
+@implements IDisposable
 
 <footer class="site-footer">
-    <div class="container footer-inner">
-        <div class="footer-brand">
-            <span>© @DateTime.Now.Year @Data.Profile.Name</span>
-        </div>
+    <div class="container site-footer-inner">
         <div class="footer-socials">
             @foreach (var s in Data.Profile.VisibleSocials)
             {
@@ -13,6 +15,24 @@
                 </a>
             }
         </div>
-        <p class="footer-note">Built with C# &amp; Blazor WebAssembly</p>
+        <div class="site-footer-line">
+            <a class="site-footer-name" href="/">@SiteInfo.Name</a>
+            <span class="site-footer-sep" aria-hidden="true">|</span>
+            <a href="@ReportHref">作者へ報告</a>
+            <span class="site-footer-sep" aria-hidden="true">|</span>
+            <a href="/privacy">プライバシーポリシー</a>
+            <span class="site-footer-sep" aria-hidden="true">|</span>
+            <span>© @SiteInfo.PublishedYear <a href="@SiteInfo.AuthorHomeUrl">@SiteInfo.Author</a></span>
+        </div>
     </div>
 </footer>
+
+@code {
+    private string ReportHref => SiteFooterLinks.ReportHref(new Uri(Nav.Uri).AbsolutePath);
+
+    protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}
