@@ -24,14 +24,14 @@ public class NoticeBannerTests
     public async Task The_label_comes_first_and_the_text_follows_it_in_its_own_element()
     {
         var html = await RenderAsync(new MaintenanceInfo(MaintenanceState.Notice, "10月25日（土）20:00〜21:00 ごろ、サイトを更新します"));
-        Assert.Contains("<div class=\"maintenance-notice\" role=\"status\"><strong class=\"maintenance-notice-label\">【お知らせ】</strong><span class=\"maintenance-notice-text\">10月25日（土）20:00〜21:00 ごろ、サイトを更新します</span></div>", html);
+        Assert.Contains("<div class=\"maintenance-notice\" role=\"status\"><strong class=\"maintenance-notice-title\">【お知らせ】</strong><span class=\"maintenance-notice-text\">10月25日（土）20:00〜21:00 ごろ、サイトを更新します</span></div>", html);
     }
 
     [Fact]
     public async Task With_no_message_the_default_text_is_shown_after_the_label()
     {
         var html = await RenderAsync(new MaintenanceInfo(MaintenanceState.Notice, ""));
-        Assert.Contains("<strong class=\"maintenance-notice-label\">【お知らせ】</strong><span class=\"maintenance-notice-text\">まもなくメンテナンスを行います。</span>", html);
+        Assert.Contains("<strong class=\"maintenance-notice-title\">【お知らせ】</strong><span class=\"maintenance-notice-text\">まもなくメンテナンスを行います。</span>", html);
     }
 
     [Fact]
