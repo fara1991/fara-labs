@@ -1,13 +1,13 @@
 # fara-portfolio-site
 
-自分用のポートフォリオサイト（https://fara-labs.com/）。C# / Blazor WebAssembly 製の静的サイトで、Cloudflare Workers に公開します。
+自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 8 の静的 SSR（Razor コンポーネントを、ページごとの HTML に書き出す）で作り、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
 - 更新履歴（何月何日に何を更新したか）
 - SNS リンク
 
-サーバー・データベースは使っていません。サイトの中身は `wwwroot/data/` の JSON を編集して更新します。
+サーバー・データベースは使っていません（Worker は、お知らせ・メンテナンス・問い合わせの受け口だけ）。サイトの中身は `wwwroot/data/` の JSON を編集して更新します。JSON は書き出すときに HTML へ埋め込まれ、ブラウザは JSON を読みません。
 
 ## フォルダ構成
 
@@ -18,10 +18,12 @@ fara-portfolio-site/
 ├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）
 ├── package.json                      wrangler（Cloudflare の CLI）のバージョン固定
 ├── docs/cloudflare-setup.md          Cloudflare・GitHub の初期設定手順
-├── src/FaraPortfolio.Web/            Blazor WebAssembly 本体
-│   ├── Components/                   ヘッダー・フッター・アイコン・カードなどの部品
+├── src/FaraPortfolio.Web/            静的 SSR のサイト本体（dotnet run -- --export dist で HTML を書き出す）
+│   ├── App.razor / Routes.razor      HTML の土台（head・ルーティング）
+│   ├── Components/                   ヘッダー・フッター・アイコン・カード・ページごとの title / OGP（PageMeta）
+│   ├── Publishing/                   HTML の書き出し（StaticSiteExporter.cs）
 │   ├── Layout/MainLayout.razor       全ページ共通の枠（パララックス背景）
-│   ├── Pages/                        Home / Profile / Works / Updates / Links
+│   ├── Pages/                        Home / Profile / Works / Updates / Links / Report / Privacy / NotFound
 │   ├── Models/ Services/             データの型と読み込み
 │   └── wwwroot/
 │       ├── data/                     ★ サイトの中身（ここを編集する）
@@ -29,9 +31,13 @@ fara-portfolio-site/
 │       │   ├── works.json            作品一覧
 │       │   └── updates.json          更新履歴
 │       ├── css/app.css               デザイン（紫ベース）
-│       ├── js/site.js                スクロール演出（パララックス・フェードイン）
+│       ├── js/site.js                スクロール演出・メニュー・更新履歴の絞り込み
+│       ├── js/report.js              問い合わせフォームの送信（Turnstile・POST /api/report）
 │       └── .assetsignore             Cloudflare にアップロードしないファイル
-├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック
+├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック、書き出しと同じページの検証（StaticPageTests）
+├── tests/js/                         問い合わせフォームの純粋な関数（node --test）
+├── worker/                           Worker（お知らせ・メンテナンス・問い合わせの受け口）と、そのテスト
+├── dist/                             書き出した静的サイト（Git に入れない。公開するのはこの中身）
 └── .github/workflows/
     ├── build.yml                     PR・master への push でビルド・テスト・公開設定チェック（公開しない）
     ├── deploy-develop.yml            develop への push で確認用サイト（dev.fara-labs.com）に公開
@@ -91,10 +97,13 @@ feature/xxx ──PR──▶ develop ──PR──▶ master ──(自動)─
 ## ローカルで動かす
 
 ```bash
-dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（普段の確認はこれ）
-dotnet test                                  # data/*.json のチェック
+dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（普段の確認はこれ。お知らせ・問い合わせの送信は Worker が無いので動かない）
+dotnet test                                  # data/*.json と、ページの中身のチェック
 
 # Cloudflare と同じ動き（/works などの直接アクセス含む）で確認したいとき（Node.js が必要）
 npm ci                                       # 初回のみ
-npm run preview                              # bin / obj を消してから publish → http://localhost:8787
+npm run preview                              # dist/ を書き出してから wrangler dev → http://localhost:8787（Worker も動く）
+
+# 静的サイトを書き出すだけ（dist/ に HTML と静的ファイルが出る）
+dotnet run --project src/FaraPortfolio.Web -c Release --no-launch-profile -- --export dist
 ```

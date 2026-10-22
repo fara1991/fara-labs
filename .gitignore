@@ -429,3 +429,6 @@ FodyWeavers.xsd
 
 # Cloudflare wrangler
 .wrangler/
+
+# 静的サイトの書き出し先（npm run publish:site）
+dist/

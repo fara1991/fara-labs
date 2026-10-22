@@ -1,20 +1,15 @@
 namespace FaraPortfolio.Web.Services;
 
 /// <summary>
-/// 確認用サイト（dev.fara-labs.com）で開いているときは、fara-labs.com 配下のリンクを確認用の URL に置き換える。
+/// 確認用サイト（dev.fara-labs.com）の書き出しでは、fara-labs.com 配下のリンクを確認用の URL に置き換える。
 /// 例: https://pokemon.fara-labs.com/ → https://pokemon-dev.fara-labs.com/、https://fara-labs.com/ → https://dev.fara-labs.com/
-/// GitHub など fara-labs.com 以外のリンクはそのまま。
+/// GitHub など fara-labs.com 以外のリンクはそのまま。本番（fara-labs.com）の書き出しでは何も置き換えない。
 /// </summary>
 public static class SiteLinks
 {
     private const string Domain = "fara-labs.com";
 
-    /// <summary>いま開いているサイトのホスト名。Program.cs で起動時に設定する。</summary>
-    public static string CurrentHost { get; set; } = "";
-
     public static bool IsDevelop(string host) => host.Equals("dev." + Domain, StringComparison.OrdinalIgnoreCase);
-
-    public static string Localize(string url) => Localize(url, CurrentHost);
 
     public static string Localize(string url, string currentHost)
     {

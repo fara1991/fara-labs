@@ -7,11 +7,6 @@ public static class SiteInfo
     /// <summary>サイトを公開した年（© の年）。</summary>
     public const int PublishedYear = 2026;
     public const string Author = "Fara";
+    /// <summary>作者のホームページ（確認用の書き出しでは SiteOptions.Localize で置き換える）。</summary>
     public const string PortfolioUrl = "https://fara-labs.com/";
-
-    /// <summary>© の表示（例: © 2026 Fara）。</summary>
-    public static string Copyright => $"© {PublishedYear} {Author}";
-
-    /// <summary>作者のホームページ（確認用サイトで開いているときは、確認用の URL に置き換える）。</summary>
-    public static string AuthorHomeUrl => SiteLinks.Localize(PortfolioUrl);
 }

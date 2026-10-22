@@ -1,6 +1,6 @@
 {
-  // Cloudflare Workers（静的アセット + メンテナンスの状態を返す小さな Worker）で公開する設定。
-  // 公開するのは dotnet publish の出力（publish/wwwroot）。
+  // Cloudflare Workers（静的アセット + 小さな Worker）で公開する設定。
+  // 公開するのは書き出した静的サイト（dist/。dotnet run --project src/FaraPortfolio.Web -c Release --no-launch-profile -- --export dist）。
   //   本番:   npx wrangler deploy              → https://fara-labs.com/       （Deploy ワークフロー・master への push。手動でも実行可）
   //   確認用: npx wrangler deploy --env develop → https://dev.fara-labs.com/   （Deploy (develop) ワークフロー・develop への push）
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -10,12 +10,12 @@
   // ダッシュボードで足した変数（MAINTENANCE・MAINTENANCE_MESSAGE など）を、公開（wrangler deploy）のたびに消さない（トップレベルだけが有効）
   "keep_vars": true,
   "assets": {
-    "directory": "./publish/wwwroot",
+    "directory": "./dist",
     "binding": "ASSETS",
-    // /works などを直接開いたときも index.html を返す（Blazor 側でページを切り替える）
-    "not_found_handling": "single-page-application",
-    // /api/*（メンテナンスの状態）だけ Worker スクリプト（worker/index.js）に渡す。サイト本体は、今までどおり静的アセット
-    "run_worker_first": ["/api/*"]
+    // 存在しない URL は、書き出した 404 ページ（dist/404.html）を 404 で返す
+    "not_found_handling": "404-page",
+    // すべてのリクエストを Worker（worker/index.js）に通す。お知らせの帯・メンテナンス中の 503・報告の受け口のため
+    "run_worker_first": true
   },
   "workers_dev": false,
   "preview_urls": false,
@@ -27,10 +27,10 @@
       // Worker 名（ダッシュボードで変更した名前に合わせる）
       "name": "fara-portfolio-dev",
       "assets": {
-        "directory": "./publish/wwwroot",
+        "directory": "./dist",
         "binding": "ASSETS",
-        "not_found_handling": "single-page-application",
-        "run_worker_first": ["/api/*"]
+        "not_found_handling": "404-page",
+        "run_worker_first": true
       },
       "workers_dev": false,
       "preview_urls": false,

@@ -50,13 +50,16 @@ jobs:
       - name: Test (data files)
         run: dotnet test --configuration Release
 
-      # SourceRevisionId: data/*.json のキャッシュ回避に使う
-      - name: Publish Blazor WebAssembly
+      - name: Report form script test
+        run: npm run test:js
+
+      # 静的 SSR の書き出し（dist/。ページごとの HTML）
+      - name: Export static site
         run: >
-          dotnet publish src/FaraPortfolio.Web
+          dotnet run --project src/FaraPortfolio.Web
           --configuration Release
-          --output publish
-          -p:SourceRevisionId=$(git rev-parse HEAD)
+          --no-launch-profile
+          -- --export dist
 
       # 本番の公開は、Cloudflare の Worker の変数 MAINTENANCE が notice（更新予定のお知らせを出している）のときだけ行う。
       # 確認できないとき・notice でないときは、ここで止める（手動実行の skip_maintenance_check で飛ばせる）

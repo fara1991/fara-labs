@@ -1,4 +1,5 @@
-<li class="update-item">
+@* 更新履歴の 1 件。NEW の表示は js/site.js が、ブラウザの今日の日付で付ける（書き出し時の日付では決めない） *@
+<li class="update-item" data-category="@Entry.Category" data-date="@Entry.Date.ToString("yyyy-MM-dd")">
     <div class="update-date">
         <time datetime="@Entry.Date.ToString("yyyy-MM-dd")">@Entry.Date.ToString("yyyy.MM.dd")</time>
         <span class="update-dow">@DayOfWeekJa(Entry.Date)</span>
@@ -6,10 +7,7 @@
     <div class="update-body">
         <div class="update-meta">
             <span class="chip cat-@Entry.Category">@UpdateCategories.Label(Entry.Category)</span>
-            @if (IsNew)
-            {
-                <span class="chip chip-new">NEW</span>
-            }
+            <span class="chip chip-new" data-new hidden>NEW</span>
         </div>
         <h3>@Entry.Title</h3>
         @if (!string.IsNullOrWhiteSpace(Entry.Body))
@@ -19,7 +17,7 @@
         @if (!string.IsNullOrWhiteSpace(Entry.Link))
         {
             var external = Entry.Link.StartsWith("http", StringComparison.OrdinalIgnoreCase);
-            <a class="text-link" href="@SiteLinks.Localize(Entry.Link)" target="@(external ? "_blank" : null)" rel="@(external ? "noopener noreferrer" : null)">
+            <a class="text-link" href="@Site.Localize(Entry.Link)" target="@(external ? "_blank" : null)" rel="@(external ? "noopener noreferrer" : null)">
                 @(Entry.LinkLabel ?? "詳しく見る") <Icon Name="@(external ? "external" : "arrow-right")" Size="15" />
             </a>
         }
@@ -28,9 +26,7 @@
 
 @code {
     [Parameter, EditorRequired] public UpdateEntry Entry { get; set; } = default!;
-
-    /// <summary>更新から 14 日以内なら NEW を付ける。</summary>
-    private bool IsNew => DateOnly.FromDateTime(DateTime.Now).DayNumber - Entry.Date.DayNumber is >= 0 and <= 14;
+    [Inject] private SiteOptions Site { get; set; } = default!;
 
     // ブラウザの言語に依存しないよう曜日は自前で持つ
     private static string DayOfWeekJa(DateOnly date) => "日月火水木金土"[(int)date.DayOfWeek].ToString();

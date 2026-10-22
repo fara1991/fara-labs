@@ -1,6 +1,6 @@
 @page "/privacy"
 
-<PageTitle>プライバシーポリシー | @SiteInfo.Name</PageTitle>
+<PageMeta Title="@($"プライバシーポリシー | {SiteInfo.Name}")" Description="このサイトで扱う情報と、その目的をまとめたプライバシーポリシーです。" Path="/privacy" />
 
 <section class="page container narrow">
     <header class="page-head">
@@ -13,7 +13,7 @@
         <p>このサイトは、Fara（個人）が運営しています。ご意見・お問い合わせは、<a href="/report">問い合わせ</a>のページからお願いします。</p>
 
         <h2>ブラウザに保存する情報</h2>
-        <p>このサイトのコードは、localStorage・sessionStorage・Cookie などに、お客さまの情報を保存しません。ただし、Cloudflare・Turnstile の仕組みで Cookie が使われることがあります。</p>
+        <p>このサイトは、お客さまを特定する情報を、localStorage・Cookie などに保存しません。ブラウザの sessionStorage には、閲覧位置（どのページを、どこまでスクロールしたか）を一時的に保存します。これは、前のページに戻ったときに同じ位置へ戻すためで、タブを閉じると消えます。ただし、Cloudflare・Turnstile の仕組みで Cookie が使われることがあります。</p>
 
         <h2>アクセス解析</h2>
         <p>Cloudflare が提供するアクセス解析（Web Analytics）を使っています。EU 圏内からのアクセスは、計測の対象外にしています。計測するのは、閲覧数や、閲覧されたページ・国・ブラウザなどの統計です。個人を特定する情報の収集を目的とせず、サイトの改善にだけ使います。</p>

@@ -1,11 +1,12 @@
 @page "/profile"
 @inject SiteData Data
+@inject SiteOptions Site
 
-<PageTitle>Profile | @Data.Profile.Name</PageTitle>
+<PageMeta Title="@($"Profile | {Data.Profile.Name}")" Description="@Data.Profile.Bio" Path="/profile" />
 
 <section class="page container narrow">
     <header class="page-head">
-        <h1 class="name-with-avatar"><img class="avatar" src="images/avatar.jpg" alt="" />@Data.Profile.Name</h1>
+        <h1 class="name-with-avatar"><img class="avatar" src="/images/avatar.jpg" alt="" />@Data.Profile.Name</h1>
     </header>
 
     <div class="profile-card glass">
@@ -17,7 +18,7 @@
             <div class="cta-socials">
                 @foreach (var s in Data.Profile.VisibleSocials)
                 {
-                    <a class="social-pill service-@s.Service" href="@s.Url" target="_blank" rel="noopener noreferrer">
+                    <a class="social-pill service-@s.Service" href="@Site.Localize(s.Url)" target="_blank" rel="noopener noreferrer">
                         <span class="pill-icon"><Icon Name="@Icon.ForService(s.Service)" Size="16" /></span> @s.Label
                     </a>
                 }

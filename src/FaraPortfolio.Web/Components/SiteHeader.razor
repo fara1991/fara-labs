@@ -1,36 +1,33 @@
-@implements IDisposable
 @inject NavigationManager Nav
 
 <header class="site-header">
     <div class="scroll-progress" aria-hidden="true"></div>
     <div class="container header-inner">
-        <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="@(_open ? "true" : "false")"
-                @onclick="() => _open = !_open">
-            <Icon Name="@(_open ? "close" : "menu")" Size="22" />
+        @* 開閉の見た目とアイコンは js/site.js と CSS（aria-expanded）で切り替える。JS が無いときは、スマホではメニューを開けない（本文のリンクは使える） *@
+        <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="false" aria-controls="site-nav">
+            <span class="menu-icon-open"><Icon Name="menu" Size="22" /></span>
+            <span class="menu-icon-close"><Icon Name="close" Size="22" /></span>
         </button>
 
-        <nav class="site-nav @(_open ? "is-open" : null)" aria-label="メイン">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Home</NavLink>
-            <NavLink class="nav-link" href="profile">Profile</NavLink>
-            <NavLink class="nav-link" href="works">Works</NavLink>
-            <NavLink class="nav-link" href="updates">Updates</NavLink>
-            <NavLink class="nav-link" href="links">Links</NavLink>
-            <NavLink class="nav-link" href="report">Report</NavLink>
-            <NavLink class="nav-link" href="privacy">Policy</NavLink>
+        <nav id="site-nav" class="site-nav" aria-label="メイン">
+            <a class="nav-link @Active("/")" href="/" aria-current="@Current("/")">Home</a>
+            <a class="nav-link @Active("/profile")" href="/profile" aria-current="@Current("/profile")">Profile</a>
+            <a class="nav-link @Active("/works")" href="/works" aria-current="@Current("/works")">Works</a>
+            <a class="nav-link @Active("/updates")" href="/updates" aria-current="@Current("/updates")">Updates</a>
+            <a class="nav-link @Active("/links")" href="/links" aria-current="@Current("/links")">Links</a>
+            <a class="nav-link @Active("/report")" href="/report" aria-current="@Current("/report")">Report</a>
+            <a class="nav-link @Active("/privacy")" href="/privacy" aria-current="@Current("/privacy")">Policy</a>
         </nav>
     </div>
 </header>
 
 @code {
-    private bool _open;
+    /// <summary>いま表示しているページのパス（末尾の / は外す。トップは空）。</summary>
+    private string Path => new Uri(Nav.Uri).AbsolutePath.TrimEnd('/');
 
-    protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
+    private bool IsCurrent(string href) => Path == href.TrimEnd('/');
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _open = false;
-        StateHasChanged();
-    }
+    private string Active(string href) => IsCurrent(href) ? "active" : "";
 
-    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+    private string? Current(string href) => IsCurrent(href) ? "page" : null;
 }

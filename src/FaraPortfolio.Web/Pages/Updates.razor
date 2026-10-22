@@ -1,7 +1,7 @@
 @page "/updates"
 @inject SiteData Data
 
-<PageTitle>Updates | @Data.Profile.Name</PageTitle>
+<PageMeta Title="@($"Updates | {Data.Profile.Name}")" Description="サイトや作品の更新履歴です。" Path="/updates" />
 
 <section class="page container narrow">
     <header class="page-head">
@@ -9,48 +9,43 @@
         <p class="muted">サイトや作品の更新情報です。</p>
     </header>
 
+    @* 絞り込みは js/site.js が付ける（JS が無いときは、すべての更新を並べたままにする） *@
     @if (Categories.Count >= 2)
     {
-    <div class="filter-bar" role="group" aria-label="カテゴリで絞り込み">
-        <button type="button" class="filter-chip @(_category is null ? "is-active" : null)" @onclick="() => _category = null">
-            すべて <span class="count">@Data.Updates.Count</span>
-        </button>
-        @foreach (var (key, label, count) in Categories)
-        {
-            <button type="button" class="filter-chip @(_category == key ? "is-active" : null)" @onclick="() => _category = key">
-                @label <span class="count">@count</span>
+        <div class="filter-bar" role="group" aria-label="カテゴリで絞り込み" data-filter-bar hidden>
+            <button type="button" class="filter-chip is-active" data-filter="all" aria-pressed="true">
+                すべて <span class="count">@Data.Updates.Count</span>
             </button>
-        }
-    </div>
-    }
-
-    @foreach (var year in Filtered.GroupBy(u => u.Date.Year))
-    {
-        <h2 class="year-heading">@year.Key</h2>
-        <ol class="update-list">
-            @foreach (var entry in year)
+            @foreach (var (key, label, count) in Categories)
             {
-                <UpdateItem @key="entry" Entry="entry" />
+                <button type="button" class="filter-chip" data-filter="@key" aria-pressed="false">
+                    @label <span class="count">@count</span>
+                </button>
             }
-        </ol>
+        </div>
     }
 
-    @if (!Filtered.Any())
+    @foreach (var year in Data.Updates.GroupBy(u => u.Date.Year))
     {
-        <p class="muted">該当する更新はありません。</p>
+        <div class="year-group" data-year-group>
+            <h2 class="year-heading">@year.Key</h2>
+            <ol class="update-list">
+                @foreach (var entry in year)
+                {
+                    <UpdateItem Entry="entry" />
+                }
+            </ol>
+        </div>
     }
+
+    <p class="muted" data-filter-empty hidden>該当する更新はありません。</p>
 </section>
 
 @code {
-    private string? _category;
-
     /// <summary>更新が 1 件以上あるカテゴリ（絞り込みは 2 種類以上あるときだけ出す）。</summary>
     private List<(string Key, string Label, int Count)> Categories =>
         UpdateCategories.All
             .Select(c => (c.Key, c.Label, Count: Data.Updates.Count(u => u.Category == c.Key)))
             .Where(c => c.Count > 0)
             .ToList();
-
-    private IEnumerable<UpdateEntry> Filtered =>
-        _category is null ? Data.Updates : Data.Updates.Where(u => u.Category == _category);
 }

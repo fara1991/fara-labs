@@ -1,8 +1,4 @@
 @inherits LayoutComponentBase
-@inject SiteData Data
-@inject NavigationManager Nav
-@inject IJSRuntime JS
-@implements IDisposable
 
 @* 背景: 静止した星とグリッドの上で、ぼかした光だけがゆっくり浮かぶ（常時動く背景はこれだけ） *@
 <div class="bg-scene" aria-hidden="true">
@@ -14,65 +10,22 @@
     <div class="bg-noise"></div>
 </div>
 
-@* 画面の枠。ヘッダーとお知らせの帯は固定し、その下の .site-scroll（フッターも含む）だけがスクロールする *@
+@* 画面の枠。ヘッダーとお知らせの帯は固定し、その下の .site-scroll（フッターも含む）だけがスクロールする。
+   ページ移動（将来の拡張ナビゲーション）では、.site-main の中身だけを差し替える想定。 *@
 <div class="app-shell">
+    @* キーボードの利用者向け: Tab の最初で「本文へ」を出し、本文（main）へ飛べる *@
+    <a class="skip-link" href="#main-content">本文へ</a>
+
     <SiteHeader />
 
-    <MaintenanceBanner />
+    @* お知らせの帯（MAINTENANCE=notice のとき、Worker がこの中に差し込む。worker/index.js）。ふだんは空 *@
+    <div class="maintenance-slot"></div>
 
     <div class="site-scroll" role="region" tabindex="0" aria-label="本文">
-        <main class="site-main">
-            @if (Data.Errors.Count > 0)
-            {
-                <div class="container">
-                    <div class="data-error" role="alert">
-                        <strong>データの読み込みに失敗しました</strong>
-                        <ul>
-                            @foreach (var e in Data.Errors)
-                            {
-                                <li>@e</li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            }
+        <main class="site-main" id="main-content" tabindex="-1">
             @Body
         </main>
 
         <SiteFooter />
     </div>
 </div>
-
-@code {
-    private string _path = "";
-    private bool _resetScroll;
-
-    protected override void OnInitialized()
-    {
-        _path = PathOf(Nav.Uri);
-        Nav.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        // 別のページに移ったときだけ、スクロールを先頭に戻す（同じページの #ジャンプや、同じページの再描画では戻さない）
-        var path = PathOf(e.Location);
-        if (path != _path)
-        {
-            _path = path;
-            _resetScroll = true;
-        }
-        InvokeAsync(StateHasChanged);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!_resetScroll) return;
-        _resetScroll = false;
-        await JS.InvokeVoidAsync("faraSite.resetScroll");
-    }
-
-    private static string PathOf(string url) => new Uri(url).AbsolutePath;
-
-    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
-}
