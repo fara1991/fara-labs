@@ -152,7 +152,7 @@ public class FooterAndReportTests
     }
 
     [Fact]
-    public void Index_loads_the_turnstile_script_before_blazor()
+    public void Index_includes_report_js_before_the_blazor_script()
     {
         var index = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/index.html"));
         var report = index.IndexOf("js/report.js", StringComparison.Ordinal);
@@ -167,5 +167,19 @@ public class FooterAndReportTests
         var text = Regex.Replace(System.Net.WebUtility.HtmlDecode(Regex.Replace(html, "<[^>]+>", " ")), @"\s+", " ");
         foreach (var topic in new[] { "運営者", "ブラウザに保存する情報", "アクセス解析", "作者へ報告で送る情報", "Turnstile", "Discord", "外部のサービス", "広告", "第三者への提供", "Google Fonts", "Cloudflare" })
             Assert.Contains(topic, text);
+    }
+
+    [Fact]
+    public async Task Privacy_page_states_cookies_only_as_a_limited_claim()
+    {
+        var text = Regex.Replace(System.Net.WebUtility.HtmlDecode(Regex.Replace(await RenderAsync<Privacy>(), "<[^>]+>", " ")), @"\s+", " ");
+        // このサイトのコードは保存しない、と限定している（断定の「保存しません」だけにしない）
+        Assert.Contains("このサイトのコードは", text);
+        Assert.Contains("localStorage・sessionStorage・Cookie などに、お客さまの情報を保存しません", text);
+        // Cookie は Cloudflare・Turnstile の仕組みで使われることがある、と条件つきで書く
+        Assert.Contains("Cloudflare・Turnstile の仕組みで Cookie が使われることがあります", text);
+        // アクセス解析は、使う場合がある、と条件つきで書く（リポジトリだけでは有効かどうか確認できないため）
+        Assert.Contains("Web Analytics）を使う場合があります", text);
+        Assert.DoesNotContain("Web Analytics を使って", text);
     }
 }

@@ -127,8 +127,9 @@
             error = ReportForm.DescribeFailure((int)response.StatusCode, await response.Content.ReadAsStringAsync());
             await JS.InvokeVoidAsync("faraReport.reset");   // 確認は 1 回で使い切りなので、やり直せるように作り直す
         }
-        catch (HttpRequestException)
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
         {
+            // タイムアウト（TaskCanceledException）も、通信の失敗として扱う
             error = "通信できませんでした。通信の状態を確かめて、もう一度お試しください";
             await JS.InvokeVoidAsync("faraReport.reset");
         }

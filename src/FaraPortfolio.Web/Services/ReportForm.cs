@@ -4,7 +4,9 @@ namespace FaraPortfolio.Web.Services;
 
 /// <summary>
 /// 「作者へ報告」の入力（Pages/Report.razor）。送り先は同じサイトの POST /api/report（worker/report.js）。
-/// 長さ・種類の制限は、サーバー側（worker/report.js）と同じにしておく（先にここで確かめて、無駄な通信をしない）。
+/// 長さ・種類の制限は、サーバー側（worker/report.js）と数値を同じにしてある（先にここで確かめて、無駄な通信をしない）。
+/// ただし数え方は同じではない: ここは C# の文字列の Length（UTF-16 の単位）で数え、サーバーは文字（コードポイント）で数える。
+/// 絵文字など、UTF-16 で 2 単位になる文字は、ここのほうが多く数える（画面で先に弾く側）。上限ちょうどの絵文字の本文は、画面で弾かれることがある。
 /// </summary>
 public sealed class ReportForm
 {
@@ -33,6 +35,7 @@ public sealed class ReportForm
     public string? Validate()
     {
         if (!Categories.Any(c => c.Id == Category)) return "種類を選んでください";
+        // 数え方はサーバーと違う（上の説明を参照）。ここでは UTF-16 の単位で数える
         var message = Message.Trim();
         if (message.Length < MinMessage) return $"内容を {MinMessage} 文字以上で書いてください";
         if (message.Length > MaxMessage) return $"内容は {MaxMessage} 文字までにしてください（いま {message.Length} 文字）";
