@@ -126,6 +126,9 @@ public sealed class StaticPageTests(SiteFactory factory) : IClassFixture<SiteFac
         var data = SiteData.Load(Path.Combine(AppContext.BaseDirectory, "data"));
         var html = await GetAsync("/");
         Assert.Equal(Math.Min(3, data.Updates.Count), CountOccurrences(html, "<li class=\"update-item\""));
+        var newest = data.Updates[0].Date.ToString("yyyy-MM-dd");
+        var firstTime = System.Text.RegularExpressions.Regex.Match(html, "<time datetime=\"([0-9-]+)\"").Groups[1].Value;
+        Assert.Equal(newest, firstTime);
     }
 
     [Fact]
@@ -209,6 +212,14 @@ public sealed class DevelopSiteTests(DevelopSiteFactory factory) : IClassFixture
         Assert.Contains("https://pokemon-dev.fara-labs.com/", html);
         Assert.Contains("href=\"https://dev.fara-labs.com/\"", html);
         Assert.DoesNotContain("https://pokemon.fara-labs.com/", html);
+    }
+
+    [Fact]
+    public async Task Develop_pages_are_noindex_and_have_no_canonical()
+    {
+        var html = WebUtility.HtmlDecode(await _client.GetStringAsync("/"));
+        Assert.Contains("<meta name=\"robots\" content=\"noindex\">", html);
+        Assert.DoesNotContain("<link rel=\"canonical\"", html);
     }
 
     [Fact]

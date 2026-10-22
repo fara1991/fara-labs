@@ -5,7 +5,7 @@
 <PageTitle>@Title</PageTitle>
 <HeadContent>
     <meta name="description" content="@Description" />
-    @if (Noindex)
+    @if (IsNoindex)
     {
         <meta name="robots" content="noindex" />
     }
@@ -28,6 +28,9 @@
     /// <summary>ページのパス（例: /works）。canonical と og:url に使う。</summary>
     [Parameter, EditorRequired] public string Path { get; set; } = "/";
     [Parameter] public bool Noindex { get; set; }
+
+    /// <summary>確認用（dev）は、ページの指定によらず noindex にする（_headers の X-Robots-Tag と二重にする）。</summary>
+    private bool IsNoindex => Noindex || Site.IsDevelop;
 
     private string Url => Site.Origin + Path;
 }
