@@ -1,0 +1,33 @@
+@* ページごとの <title>・description・canonical・OGP・Twitter カード（書き出すページの HTML の head に入る）。
+   確認用（dev.fara-labs.com）は noindex にする（canonical は本番の URL を指す）。 *@
+@inject SiteOptions Site
+
+<PageTitle>@Title</PageTitle>
+<HeadContent>
+    <meta name="description" content="@Description" />
+    @if (Noindex)
+    {
+        <meta name="robots" content="noindex" />
+    }
+    else
+    {
+        <link rel="canonical" href="@Url" />
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@SiteInfo.Name" />
+    <meta property="og:title" content="@Title" />
+    <meta property="og:description" content="@Description" />
+    <meta property="og:url" content="@Url" />
+    <meta property="og:image" content="@Site.Origin/images/logo.png" />
+    <meta name="twitter:card" content="summary" />
+</HeadContent>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Description { get; set; } = "";
+    /// <summary>ページのパス（例: /works）。canonical と og:url に使う。</summary>
+    [Parameter, EditorRequired] public string Path { get; set; } = "/";
+    [Parameter] public bool Noindex { get; set; }
+
+    private string Url => Site.Origin + Path;
+}

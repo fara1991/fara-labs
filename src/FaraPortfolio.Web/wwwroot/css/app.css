@@ -52,7 +52,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-#app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 /* 画面の枠: ヘッダーとお知らせの帯は動かず、その下の .site-scroll（本文とフッター）だけがスクロールする。
    スマホのアドレスバーの伸縮に合わせて 100dvh を使う（dvh に非対応の古い端末は 100vh） */
@@ -77,7 +76,7 @@ body {
 /* 印刷: 画面の枠（高さ・スクロール）を解き、本文とフッターを、ページを続けて出す */
 @media print {
     .bg-scene, .site-header, .maintenance-notice { display: none !important; }
-    html, body, #app, .app-shell, .site-scroll {
+    html, body, .app-shell, .site-scroll {
         height: auto !important;
         min-height: 0 !important;
         overflow: visible !important;
@@ -125,34 +124,6 @@ img { max-width: 100%; display: block; }
     -webkit-backdrop-filter: blur(16px) saturate(140%);
     box-shadow: 0 20px 60px -30px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 255, 255, .05);
 }
-
-/* ---------- 起動時のローディング ---------- */
-.boot {
-    margin: auto;
-    display: grid;
-    justify-items: center;
-    gap: 18px;
-    padding: 40px;
-}
-.boot-mark {
-    width: 72px; height: 72px;
-    display: grid; place-items: center;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #c084fc, #6d28d9);
-    font: 800 40px/1 "Outfit", sans-serif;
-    color: #fff;
-    box-shadow: 0 0 60px rgba(168, 85, 247, .55);
-    animation: boot-pulse 1.6s ease-in-out infinite;
-}
-@keyframes boot-pulse { 50% { transform: scale(.92); box-shadow: 0 0 30px rgba(168, 85, 247, .3); } }
-.boot-bar { width: 180px; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, .08); overflow: hidden; }
-.boot-bar span {
-    display: block; height: 100%;
-    width: var(--blazor-load-percentage, 0%);
-    background: var(--grad);
-    transition: width .2s ease;
-}
-.boot-text { color: var(--muted); font-size: 13px; letter-spacing: .2em; margin: 0; }
 
 /* ---------- 背景（常時動くのはぼかした光の浮遊だけ） ---------- */
 .bg-scene {
@@ -773,7 +744,6 @@ img { max-width: 100%; display: block; }
 /* ---------- 404 / エラー ---------- */
 .not-found { text-align: center; display: grid; justify-items: center; }
 .not-found-code { font: 800 clamp(96px, 20vw, 180px)/1 var(--font-display); margin: 0; }
-.data-error {
     margin-top: 20px;
     padding: 16px 20px;
     border-radius: var(--radius-sm);
@@ -781,21 +751,6 @@ img { max-width: 100%; display: block; }
     background: rgba(127, 29, 29, .35);
     font-size: 14px;
 }
-.data-error ul { margin: 6px 0 0; padding-left: 20px; }
-
-#blazor-error-ui {
-    display: none;
-    position: fixed;
-    left: 16px; right: 16px; bottom: 16px;
-    z-index: 1000;
-    padding: 14px 20px;
-    border-radius: var(--radius-sm);
-    background: #3b0764;
-    border: 1px solid var(--border-strong);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
-}
-#blazor-error-ui .reload { color: var(--pink); text-decoration: underline; margin-left: 8px; }
-#blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: 16px; top: 12px; }
 
 /* works#id で来たとき、その作品の枠を 1 回だけ光らせる */
 .work-detail.is-target { animation: target-glow 1.8s ease-out 1 both; }
@@ -834,3 +789,11 @@ img { max-width: 100%; display: block; }
 .maintenance-screen p { color: #b4a7d1; margin: 0 0 0.5rem; }
 .maintenance-screen .maintenance-schedule { color: #f3edff; font-weight: 700; }
 .maintenance-twitter { display: inline-block; margin-top: 8px; padding: 8px 20px; border-radius: 99px; background: #7c3aed; color: #fff; text-decoration: none; font-weight: 700; }
+
+/* ---------- 静的サイトの補助（JS が切り替える状態） ---------- */
+[hidden] { display: none !important; }
+/* スマホのメニューボタン: 閉じているときは「メニュー」、開いているときは「閉じる」のアイコン */
+.menu-toggle .menu-icon-close { display: none; }
+.menu-toggle[aria-expanded="true"] .menu-icon-open { display: none; }
+.menu-toggle[aria-expanded="true"] .menu-icon-close { display: inline-flex; }
+.menu-icon-open, .menu-icon-close { display: inline-flex; }
