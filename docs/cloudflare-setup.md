@@ -152,6 +152,6 @@ Worker は `workers_dev` / `preview_urls` を無効にしてあるので、`*.wo
 
 ```bash
 npm ci            # 初回のみ（wrangler をインストール）
-npm run preview   # dotnet publish → wrangler dev（http://localhost:8787）
+npm run preview   # 書き出し（dist/）→ wrangler dev（http://localhost:8787）
 npm run check     # 公開設定の検証（Cloudflare にはつながない）
 ```
