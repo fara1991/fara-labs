@@ -1,6 +1,6 @@
 # 作者への報告とメンテナンス画面の設定（Cloudflare・Discord）
 
-3 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・FaraBotModerator）に共通の設定です。
+4 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・FaraBotModerator・Fara Portfolio）に共通の設定です。
 コードの側（フッター・`/report`・`/privacy`・`POST /api/report`）は、各リポジトリに入っています。**ここに書いた設定をするまで、報告ページは「いまは報告を受け付けていません」と表示されます**（壊れてはいません）。
 
 ---
@@ -19,13 +19,14 @@
 ### 1-2. Cloudflare Turnstile（ボット判定）を作る
 
 1. Cloudflare のダッシュボード →「Turnstile」→「ウィジェットを追加」。
-2. 名前: `fara sites report`、ホスト名に次の 6 つを追加します。
+2. 名前: `fara sites report`、ホスト名に次の 8 つを追加します。
    - `pokemon.fara-labs.com` / `pokemon-dev.fara-labs.com`
    - `avatar.fara-labs.com` / `avatar-dev.fara-labs.com`
    - `twitch-bot.fara-labs.com` / `twitch-bot-dev.fara-labs.com`
+   - `fara-labs.com` / `dev.fara-labs.com`（このポートフォリオ。フッターの「作者へ報告」を送る先）
 3. ウィジェットのモードは「Managed（管理）」にします。作成すると、**サイトキー**（公開してよい）と**シークレットキー**（秘密）が表示されます。
 
-### 1-3. 6 つの Worker に値を登録する
+### 1-3. 8 つの Worker に値を登録する
 
 Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker を 1 つずつ開き、「設定」→「変数とシークレット」→「追加」で、下の 3 つを登録します（**種類は 3 つとも「シークレット」**にしてください。理由は下の注意）。
 
@@ -37,6 +38,8 @@ Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker �
 | `fara-avatar-dev` | https://avatar-dev.fara-labs.com/ |
 | `fara-twitch-bot` | https://twitch-bot.fara-labs.com/ |
 | `fara-twitch-bot-dev` | https://twitch-bot-dev.fara-labs.com/ |
+| `fara-portfolio` | https://fara-labs.com/ |
+| `fara-portfolio-dev` | https://dev.fara-labs.com/ |
 
 | 名前 | 値 |
 | --- | --- |
