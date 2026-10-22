@@ -55,7 +55,7 @@ body {
 
 /* 画面の枠: ヘッダーとお知らせの帯は動かず、その下の .site-scroll（本文とフッター）だけがスクロールする。
    スマホのアドレスバーの伸縮に合わせて 100dvh を使う（dvh に非対応の古い端末は 100vh） */
-.app-shell { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+.app-shell { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 .site-scroll {
     flex: 1 1 auto;
     min-height: 0;
@@ -107,6 +107,8 @@ img { max-width: 100%; display: block; }
 
 .container { width: min(1120px, 100% - 32px); margin-inline: auto; }
 .container.narrow { width: min(820px, 100% - 32px); }
+/* 長文のページ（プライバシーポリシー）: PC では横幅を広く使う。スマホは 100% - 32px のまま */
+.container.wide { width: min(72rem, 100% - 32px); }
 .muted { color: var(--muted); }
 
 .gradient-text {
@@ -689,8 +691,8 @@ img { max-width: 100%; display: block; }
 .pill-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--brand, var(--violet)); }
 
 /* ---------- フッター ---------- */
-.site-footer { border-top: 1px solid var(--border); background: rgba(10, 5, 20, .6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.site-footer-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: 24px 26px; }
+.site-footer { flex: none; border-top: 1px solid var(--border); background: rgba(10, 5, 20, .6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding-bottom: env(safe-area-inset-bottom); }
+.site-footer-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-block: 12px 14px; }
 .site-footer-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; color: var(--muted); font-size: 13px; text-align: center; }
 .site-footer-line a { color: inherit; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
 .site-footer-line a:hover { color: var(--lavender); }
@@ -740,6 +742,18 @@ img { max-width: 100%; display: block; }
 .policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
 .policy ul { padding-left: 1.4em; }
 .policy a { color: var(--lavender); }
+
+/* ---------- 日本語の改行（本文の中。語の途中で折り返さない） ----------
+   word-break: auto-phrase は Chromium 系だけ。対応しない環境は normal（既定）のまま。日付の塊は .nowrap で分けない */
+.site-main p, .site-main li, .site-main h1, .site-main h2, .site-main h3, .site-main .muted,
+.site-main .policy, .site-main .policy p, .site-main .policy li {
+    word-break: normal;
+    word-break: auto-phrase;
+    line-break: strict;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+}
+.nowrap { white-space: nowrap; }
 
 /* ---------- 404 / エラー ---------- */
 .not-found { text-align: center; display: grid; justify-items: center; }

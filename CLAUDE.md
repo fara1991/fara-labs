@@ -15,7 +15,7 @@
 
 - サイトの中身は `src/FaraPortfolio.Web/wwwroot/data/*.json`。文言変更はまずここを見る。JSON は書き出しのとき HTML に埋め込まれる（ブラウザは読まない）
 - データの型は `Models/SiteModels.cs`、読み込みは `Services/SiteData.cs`（書き出し・起動のときに 1 回だけ。壊れていれば失敗する）
-- ページは `Pages/`（`@page`）、共通の枠は `Layout/MainLayout.razor`（ヘッダー・お知らせの帯は固定し、`.site-main` だけを差し替える想定）、ページごとの title・OGP は `Components/PageMeta.razor`
+- ページは `Pages/`（`@page`）、共通の枠は `Layout/MainLayout.razor`（ヘッダー・お知らせの帯・フッターは画面に固定し、その間の `.site-scroll`（`.site-main`）だけがスクロールする。`.site-main` だけを差し替える想定）、ページごとの title・OGP は `Components/PageMeta.razor`
 - 書き出しは `Publishing/StaticSiteExporter.cs`（`dotnet run --project src/FaraPortfolio.Web -c Release --no-launch-profile -- --export dist`。相対パスはリポジトリのルートから）。確認用は `--site-host dev.fara-labs.com`
 - スタイルは `wwwroot/css/app.css` 1 ファイル（色は `:root` の CSS 変数）。演出・メニュー・更新履歴の絞り込みは `wwwroot/js/site.js`、問い合わせフォームは `wwwroot/js/report.js`
   - `.reveal` を付けた要素は画面に入るとフェードイン（`style="--d:N"` で遅延）。`js-ready` が付いたときだけ隠す（JS が無ければ本文は見える）
