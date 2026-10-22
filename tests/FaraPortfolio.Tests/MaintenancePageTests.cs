@@ -55,14 +55,11 @@ public class MaintenancePageTests
         // Turnstile に登録するホスト名（サイトのホストと同じ）
         foreach (var host in new[] { "pokemon.fara-labs.com", "pokemon-dev.fara-labs.com", "avatar.fara-labs.com", "avatar-dev.fara-labs.com", "twitch-bot.fara-labs.com", "twitch-bot-dev.fara-labs.com" })
             Assert.Contains(host, guide);
-        // メンテナンス: 本番用と確認用の 2 つのルール（無料プランのルール数の上限が 5 つのため）と 503
-        Assert.Contains("`production-maintenance`", guide);
-        Assert.Contains("`develop-maintenance`", guide);
-        Assert.Contains("http.host in", guide);
-        // 新しいルールは「アクティブ」から始まる。無効にしてから作るよう案内している
-        Assert.Contains("「無効」を選んでから", guide);
-        Assert.Contains("503", guide);
-        Assert.Contains("maintenance.html", guide);
+        // メンテナンス: Worker の変数で切り替える（3 つの状態と、お知らせの文）
+        foreach (var name in new[] { "MAINTENANCE", "MAINTENANCE_MESSAGE", "`notice`", "`true`", "`false`", "keep_vars" })
+            Assert.Contains(name, guide);
+        // お知らせは、false に戻せば一緒に消える、と書いてある
+        Assert.Contains("一緒に消えます", guide);
     }
 
     [Fact]
