@@ -686,12 +686,48 @@ img { max-width: 100%; display: block; }
 
 /* ---------- フッター ---------- */
 .site-footer { border-top: 1px solid var(--border); background: rgba(10, 5, 20, .6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-block: 28px; }
-.footer-brand { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.site-footer-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: 24px 26px; }
+.site-footer-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; color: var(--muted); font-size: 13px; text-align: center; }
+.site-footer-line a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.site-footer-line a:hover { color: var(--lavender); }
+.site-footer-line .site-footer-name { color: var(--text); font-weight: 600; }
+.site-footer-sep { opacity: .5; }
 .footer-socials { display: flex; gap: 10px; }
 .footer-socials a { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #fff; background: var(--brand, var(--violet)); transition: box-shadow .25s ease; }
 .footer-socials a:hover { box-shadow: 0 8px 20px -6px var(--brand, var(--violet)); }
-.footer-note { width: 100%; margin: 0; color: var(--faint); font-size: 12.5px; }
+
+/* ---------- 作者へ報告・プライバシーポリシー ---------- */
+.report-card { padding: clamp(20px, 3vw, 32px); }
+.report-form { display: grid; gap: 18px; }
+.report-field { display: grid; gap: 6px; }
+.report-field label { font-weight: 600; color: var(--text); }
+.report-field label small { font-weight: 400; color: var(--faint); }
+.report-field input, .report-field select, .report-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: rgba(12, 6, 22, .6);
+    color: var(--text);
+    font: inherit;
+}
+.report-field textarea { resize: vertical; min-height: 9em; }
+.report-field input:focus, .report-field select:focus, .report-field textarea:focus { outline: none; border-color: var(--lavender); box-shadow: 0 0 0 3px rgba(168, 85, 247, .25); }
+/* 罠の欄: 人には見えない（画面の外に出す。表示を消すと、ボットが埋めにくくなるため、画面の外に置く） */
+.report-trap { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.report-turnstile:empty { display: none; }
+.report-error { margin: 0; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid #f87171; color: #fecaca; }
+.report-notice { padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid #f59e0b; color: #fde68a; }
+.report-notice a, .report-privacy a { color: var(--lavender); }
+.report-privacy { margin: 0; font-size: 13px; color: var(--faint); }
+.report-done { display: grid; justify-items: start; gap: 16px; }
+.report-done p { margin: 0; }
+.policy { padding: clamp(20px, 3vw, 36px); line-height: 1.85; }
+.policy h2 { font-size: 1.15rem; margin: 1.8em 0 .5em; }
+.policy h2:first-child { margin-top: 0; }
+.policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
+.policy ul { padding-left: 1.4em; }
+.policy a { color: var(--lavender); }
 
 /* ---------- 404 / エラー ---------- */
 .not-found { text-align: center; display: grid; justify-items: center; }

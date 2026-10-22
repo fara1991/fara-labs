@@ -1,0 +1,153 @@
+@page "/report"
+@using System.Text
+@inject HttpClient Http
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>作者へ報告 | @SiteInfo.Name</PageTitle>
+
+<section class="page container narrow">
+    <header class="page-head">
+        <h1>作者へ報告</h1>
+        <p class="muted">不具合・要望・ご意見を、作者に直接送れます。いただいた内容は、作者に通知されます（公開はされません）。</p>
+    </header>
+
+    <div class="glass report-card">
+        @if (sent)
+        {
+            <div class="report-done" role="status">
+                <p>送信しました。ありがとうございます。返信が必要な場合は、書いていただいた連絡先にお返事することがあります。</p>
+                <button type="button" class="btn btn-ghost" @onclick="StartOver">もう 1 件送る</button>
+            </div>
+        }
+        else
+        {
+            @if (disabled)
+            {
+                <p class="report-notice" role="status">いまは報告を受け付けていません。お急ぎの場合は、<a href="/links">SNS・リンク</a>から連絡してください。</p>
+            }
+            <form class="report-form" @onsubmit="SendAsync" @onsubmit:preventDefault>
+                <div class="report-field">
+                    <label for="report-category">種類</label>
+                    <select id="report-category" @bind="form.Category">
+                        <option value="">選んでください</option>
+                        @foreach (var (id, label) in ReportForm.Categories)
+                        {
+                            <option value="@id">@label</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="report-field">
+                    <label for="report-message">内容 <small>（@ReportForm.MinMessage〜@ReportForm.MaxMessage 文字。いま @form.Message.Trim().Length 文字）</small></label>
+                    <textarea id="report-message" rows="6" maxlength="@ReportForm.MaxMessage" @bind="form.Message" @bind:event="oninput"
+                              placeholder="例: 〇〇のページで、画像が表示されません（使っている環境・操作の手順も書いてもらえると助かります）"></textarea>
+                </div>
+
+                <div class="report-field">
+                    <label for="report-contact">連絡先（任意） <small>返信が欲しいときだけ、メールアドレスや SNS の ID などを書いてください</small></label>
+                    <input id="report-contact" type="text" maxlength="@ReportForm.MaxContact" @bind="form.Contact" placeholder="返信が必要なときだけ" />
+                </div>
+
+                @* ボット対策の罠。人には見えない（CSS で画面の外に出す）。入っていたら、サーバーは何も送らずに成功を返す *@
+                <div class="report-trap" aria-hidden="true">
+                    <label>ウェブサイト <input type="text" tabindex="-1" autocomplete="off" @bind="form.Website" /></label>
+                </div>
+
+                <div id="report-turnstile" class="report-turnstile"></div>
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <p class="report-error" role="alert">@error</p>
+                }
+
+                <button type="submit" class="btn btn-primary" disabled="@(sending || disabled)">@(sending ? "送信中…" : "送信する")</button>
+                <p class="report-privacy">送信すると、<a href="/privacy">プライバシーポリシー</a>に書いたとおり、内容が作者に通知されます。個人情報（パスワード・アクセスキーなど）は書かないでください。</p>
+            </form>
+        }
+    </div>
+</section>
+
+@code {
+    /// <summary>報告のきっかけになったページ（フッターのリンクが ?from= に付ける。パスだけ）。</summary>
+    [SupplyParameterFromQuery(Name = "from")] public string? From { get; set; }
+
+    private ReportForm form = new();
+    private bool sent;
+    private bool sending;
+    private bool disabled;
+    private string error = "";
+    private bool mounted;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // 送信後に「もう 1 件送る」で戻ったときも、確認の欄を作り直す
+        if (sent || mounted) return;
+        try
+        {
+            mounted = true;
+            var enabled = await JS.InvokeAsync<bool>("faraReport.mount", "report-turnstile");
+            if (!enabled)
+            {
+                disabled = true;
+                StateHasChanged();
+            }
+        }
+        catch
+        {
+            // JS が使えない・確認の部品を読み込めないとき。mounted は戻さない（戻すと、描画のたびに読み込みを繰り返してしまう）
+            disabled = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SendAsync()
+    {
+        if (sending) return;
+        error = "";
+        form.Page = ReportForm.CleanPage(From);
+        // 確認以外の入力を先に確かめる（確認を待たずに、入力の間違いを知らせる）
+        form.TurnstileToken = "pending";
+        if (form.Validate() is { } problem) { form.TurnstileToken = ""; error = problem; return; }
+        sending = true;
+        try
+        {
+            // 確認のトークンは、読み込み直後や、送信に失敗して作り直した直後は、数秒かかることがある。待ってから送る
+            try { form.TurnstileToken = await JS.InvokeAsync<string>("faraReport.waitToken", 5000) ?? ""; } catch { form.TurnstileToken = ""; }
+            if (form.Validate() is { } notChecked) { error = notChecked; return; }
+            using var request = new HttpRequestMessage(HttpMethod.Post, "api/report") { Content = new StringContent(form.ToJson(), Encoding.UTF8, "application/json") };
+            using var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                sent = true;
+                mounted = false;
+                await JS.InvokeVoidAsync("faraReport.dispose");
+                return;
+            }
+            error = ReportForm.DescribeFailure((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            await JS.InvokeVoidAsync("faraReport.reset");   // 確認は 1 回で使い切りなので、やり直せるように作り直す
+        }
+        catch (HttpRequestException)
+        {
+            error = "通信できませんでした。通信の状態を確かめて、もう一度お試しください";
+            await JS.InvokeVoidAsync("faraReport.reset");
+        }
+        finally
+        {
+            sending = false;
+        }
+    }
+
+    private void StartOver()
+    {
+        form = new ReportForm();
+        sent = false;
+        error = "";
+        mounted = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try { await JS.InvokeVoidAsync("faraReport.dispose"); } catch { /* ページを離れるだけなので、失敗しても何もしない */ }
+    }
+}
