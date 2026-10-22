@@ -721,11 +721,16 @@ img { max-width: 100%; display: block; }
 .site-footer { border-top: 1px solid var(--border); background: rgba(10, 5, 20, .6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .site-footer-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: 24px 26px; }
 .site-footer-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; color: var(--muted); font-size: 13px; text-align: center; }
-.site-footer-line a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.site-footer-line a { color: inherit; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
 .site-footer-line a:hover { color: var(--lavender); }
 .site-footer-line .site-footer-name { color: var(--text); font-weight: 600; }
 .site-footer-sep { opacity: .5; }
 .site-footer-copy { white-space: nowrap; }
+/* 狭い画面: 折り返したときに区切りの | が行頭・行末に残らないよう、区切りは出さず、項目の間を gap で空ける（PC は区切りを残す） */
+@media (max-width: 720px) {
+    .site-footer-line { gap: 6px 16px; }
+    .site-footer-sep { display: none; }
+}
 .site-footer-line .footer-socials { display: inline-flex; gap: 6px; margin-left: 2px; }
 .site-footer-line .footer-socials a { width: 28px; height: 28px; border-radius: 8px; }
 .footer-socials { display: flex; gap: 10px; }

@@ -226,4 +226,17 @@ public class FooterAndReportTests
         Assert.Contains(".service-discord { --brand: #5865f2; }", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css")));
         Assert.Contains("[\"discord\"] = ", File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Components/Icon.razor")));
     }
+
+    [Fact]
+    public void Narrow_screens_hide_the_separators_and_keep_each_link_on_one_line()
+    {
+        var css = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/wwwroot/css/app.css")).Replace("\r\n", "\n");
+        // 狭い画面（720px 以下）だけ、区切りを隠して項目の間を gap で空ける
+        Assert.Contains("@media (max-width: 720px) {\n    .site-footer-line { gap: 6px 16px; }\n    .site-footer-sep { display: none; }\n}", css);
+        // リンクと名前・コピーライトは、途中で改行しない
+        Assert.Contains(".site-footer-line a { color: inherit; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }", css);
+        Assert.Contains(".site-footer-copy { white-space: nowrap; }", css);
+        // PC では区切りを残す（区切りを消す規則は、画面幅の条件の中にだけある）
+        Assert.DoesNotMatch(@"(?m)^\.site-footer-sep \{[^}]*display:\s*none", css);
+    }
 }
