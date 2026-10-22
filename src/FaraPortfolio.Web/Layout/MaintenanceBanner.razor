@@ -3,5 +3,5 @@
 
 @if (Info.State == MaintenanceState.Notice)
 {
-    <div class="maintenance-notice" role="status"><strong>お知らせ</strong> @Info.NoticeText</div>
+    <div class="maintenance-notice" role="status"><strong class="maintenance-notice-title">【お知らせ】</strong><span class="maintenance-notice-text">@Info.NoticeText</span></div>
 }

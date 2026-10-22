@@ -57,4 +57,15 @@ public class MaintenanceBannerTests
         Assert.DoesNotMatch("notice-h", js);
         Assert.DoesNotMatch("ResizeObserver", js);
     }
+
+    [Fact]
+    public void Notice_label_is_the_first_line_and_the_text_is_on_the_next_line()
+    {
+        var banner = File.ReadAllText(RepoFile("src/FaraPortfolio.Web/Layout/MaintenanceBanner.razor"));
+        Assert.Matches(@"<strong class=""maintenance-notice-title"">【お知らせ】</strong><span class=""maintenance-notice-text"">@Info\.NoticeText</span>", banner);
+        // 見出しと本文は、それぞれ行の箱（block）にする。太字は帯から継承する
+        var css = Css.Replace("\r\n", "\n");
+        Assert.Contains(".maintenance-notice-title, .maintenance-notice-text { display: block; }", css);
+        Assert.Matches(@"\.maintenance-notice \{[^}]*font-weight:\s*700;", css);
+    }
 }
