@@ -66,7 +66,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Every_page_has_the_site_name_link_in_the_header()
     {
-        Assert.All(production, p => Assert.Contains("<a class=\"brand\" href=\"/\">Fara Lab</a>", p.BodyHtml));
+        Assert.All(production, p => Assert.Contains("<a class=\"brand\" href=\"/\">Fara Labs</a>", p.BodyHtml));
     }
 
     [Fact]
