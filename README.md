@@ -78,7 +78,7 @@ JSON に書き間違いがあると `dotnet test` が失敗するので、公開
 | 公開先 | タイミング |
 |---|---|
 | https://dev.fara-labs.com/（確認用） | develop に push（PR のマージ含む）されるたびに自動 |
-| https://fara-labs.com/（本番） | master に push（develop → master の PR のマージ含む）されるたびに自動。手動で公開し直すときは **Actions → Deploy → Run workflow** |
+| https://fara-labs.com/（本番） | master に push（develop → master の PR のマージ含む）されるたびに自動。手動で公開し直すときは **Actions → Deploy (production) → Run workflow** |
 
 どちらもテストが通らなければ公開されません。初回の設定（API トークンの発行・GitHub への登録・DNS）は [docs/cloudflare-setup.md](docs/cloudflare-setup.md) を参照してください。
 

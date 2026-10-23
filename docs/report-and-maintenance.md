@@ -144,7 +144,7 @@ GitHub から自動で公開（デプロイ）しても、ダッシュボード�
 
 ### 2-7. Actions の画面（Run workflow）で切り替える
 
-ダッシュボードを開かなくても、GitHub の Actions →「Deploy (develop)」（dev）または「Deploy」（本番）→「Run workflow」で、次の入力を入れて実行すると、公開と同時に Worker の変数を設定できます（スマホの GitHub アプリからも可）。実行後は、ジョブの下部のサマリーに「設定した値」と「反映後の現在値」が出ます。
+ダッシュボードを開かなくても、GitHub の Actions →「Deploy (develop)」（dev）または「Deploy (production)」（本番）→「Run workflow」で、次の入力を入れて実行すると、公開と同時に Worker の変数を設定できます（スマホの GitHub アプリからも可）。実行後は、ジョブの下部のサマリーに「設定した値」と「反映後の現在値」が出ます。
 
 | 入力 | 意味 |
 | --- | --- |
