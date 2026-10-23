@@ -64,6 +64,12 @@ public sealed class PrerenderTests : IAsyncLifetime
     }
 
     [Fact]
+    public void Every_page_has_the_site_name_link_in_the_header()
+    {
+        Assert.All(production, p => Assert.Contains("<a class=\"brand\" href=\"/\">Fara Lab</a>", p.BodyHtml));
+    }
+
+    [Fact]
     public void Footer_has_the_agreed_parts_and_the_report_link_carries_the_page()
     {
         foreach (var page in production)
@@ -95,7 +101,10 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Home_has_the_hero_works_and_updates_from_the_data_files()
     {
         var html = Text(production[0]);
-        Assert.Contains("Portfolio", html);
+        // 大きな「Fara's / Portfolio」の見出しは出さず、h1 は読み上げ・検索向けに隠した 1 つだけ残す
+        Assert.DoesNotContain("hero-title", html);
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(html, "<h1[ >]"));
+        Assert.Contains("<h1 class=\"sr-only\">Fara's Portfolio</h1>", html);
         Assert.Contains("class=\"work-card", html);
         Assert.Contains("最近の更新", html);
         Assert.Contains("class=\"satellite", html);

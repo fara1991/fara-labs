@@ -52,6 +52,21 @@ public sealed class ComponentTests : BunitContext
     }
 
     [Fact]
+    public void Header_has_the_site_name_link_to_home_at_the_left()
+    {
+        NavigateTo("/works");
+        var cut = Render<SiteHeader>();
+
+        var brand = cut.Find("a.brand");
+        Assert.Equal("/", brand.GetAttribute("href"));
+        Assert.Equal("Fara Lab", brand.TextContent.Trim());
+        // ナビ・メニューボタンより前（左）に置く。ナビの aria-current の数は変わらない
+        var inner = cut.Find(".header-inner");
+        Assert.Equal("brand", inner.Children[0].ClassName);
+        Assert.Single(cut.FindAll("a[aria-current='page']"));
+    }
+
+    [Fact]
     public void Header_follows_navigation_and_closes_the_menu()
     {
         NavigateTo("/");
