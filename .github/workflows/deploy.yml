@@ -1,7 +1,7 @@
-name: Deploy
+name: Deploy (production)
 
 # 本番（https://fara-labs.com/）への公開。master に push（develop → master の PR のマージ含む）されるたびに実行。
-# 手動で公開し直したいときは Actions タブ →「Deploy」→「Run workflow」（master を選ぶ）。常に master の内容を公開する。
+# 手動で公開し直したいときは Actions タブ →「Deploy (production)」→「Run workflow」（master を選ぶ）。常に master の内容を公開する。
 on:
   push:
     branches: [master]
