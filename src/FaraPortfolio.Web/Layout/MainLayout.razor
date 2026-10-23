@@ -21,26 +21,30 @@
 @code {
     private static readonly MudTheme Theme = SiteTheme.Create();
 
-    // ページを移ったあと（と最初の描画のあと）は、新しい本文に対して js/site.js の pageChanged を呼ぶ（フェードイン・#付きの位置・戻る／進むの位置）
+    // ページを移ったあと（と最初の描画のあと）は、新しい本文に対して js/site.js の pageChanged を呼ぶ（フェードイン・#付きの位置・戻る／進むの位置）。
+    // Router の描画が LocationChanged の通知より先に終わることがあるので、通知を受けたあとに必ず描画し直し、
+    // 「通知を受けた URL が、いまの URL」のときだけ呼ぶ。戻る／進む（popstate）かどうかは、js/site.js が見る
     private bool pageChanged = true;
-    private bool back;
+    private string? changedUri;
 
-    protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
+    protected override void OnInitialized()
+    {
+        changedUri = Nav.Uri;
+        Nav.LocationChanged += OnLocationChanged;
+    }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         pageChanged = true;
-        // 戻る・進む（リンクのクリックではない移動）では、離れたときのスクロール位置へ戻す
-        back = !e.IsNavigationIntercepted;
+        changedUri = e.Location;
+        InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!pageChanged) return;
-        var wasBack = back;
+        if (!pageChanged || changedUri != Nav.Uri) return;
         pageChanged = false;
-        back = false;
-        try { await JS.InvokeVoidAsync("faraSite.pageChanged", wasBack); }
+        try { await JS.InvokeVoidAsync("faraSite.pageChanged"); }
         catch (JSException) { /* 演出が動かなくても、本文は読める */ }
     }
 

@@ -30,8 +30,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var host = builder.Build();
 
-// 「今日」はブラウザの日付（更新履歴の NEW）
-var today = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<string>("faraSite.today");
-if (DateOnly.TryParseExact(today, "yyyy-MM-dd", out var date)) host.Services.GetRequiredService<BrowserClock>().Today = date;
+// 「今日」はブラウザの日付（更新履歴の NEW）。js/site.js が読めなくても、アプリは起動する（NEW が出ないだけ）
+try
+{
+    var today = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<string>("faraSite.today");
+    if (DateOnly.TryParseExact(today, "yyyy-MM-dd", out var date)) host.Services.GetRequiredService<BrowserClock>().Today = date;
+}
+catch (JSException)
+{
+}
 
 await host.RunAsync();

@@ -2,8 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { run, toKitPages } from "./build-pages.mjs";
 
 const TEMPLATE = `<!DOCTYPE html><html lang="ja"><head><!-- SEO-HEAD:START --><title>x</title><!-- SEO-HEAD:END --></head>
@@ -15,7 +15,10 @@ const PAGES = [
 ];
 
 function setup(pages = PAGES) {
-  const root = mkdtempSync(join(tmpdir(), "pf-build-pages-"));
+  // 作業フォルダは artifacts/（Git に入れない）の中。システムの一時フォルダは使わない
+  const parent = join(dirname(fileURLToPath(import.meta.url)), "..", "artifacts", "test");
+  mkdirSync(parent, { recursive: true });
+  const root = mkdtempSync(join(parent, "pf-build-pages-"));
   const dir = join(root, "wwwroot");
   mkdirSync(dir);
   writeFileSync(join(dir, "index.html"), TEMPLATE);

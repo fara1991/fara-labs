@@ -7,7 +7,7 @@
 //  - 戻る・進むで、離れたときのスクロール位置に戻す（sessionStorage に一時保存する）
 //
 // ページ移動（Blazor のルーティング）: Layout/MainLayout.razor が、描画のあと（最初と、ページを移るたび）に
-// window.faraSite.pageChanged(戻る・進むか) を呼ぶ。新しい本文の .reveal を監視し、#付き・戻る・進む・通常の位置を決める。
+// window.faraSite.pageChanged() を呼ぶ。新しい本文の .reveal を監視し、#付き・戻る・進む・通常の位置を決める。
 // 更新履歴の絞り込みと NEW は Razor（Pages/Updates.razor・Components/UpdateItem.razor）で行う。
 (() => {
     'use strict';
@@ -146,8 +146,13 @@
 
     // ---- ページの表示（読み込みのあと、または拡張ナビゲーションで差し替えたあとに呼ぶ）
     //  #付きのときは、その場所へ。戻る・進むのときは、離れたときの位置へ。通常の移動は先頭へ
+    // 戻る・進む（popstate）の移動か。Blazor の通知（LocationChanged）では、リンクのクリックと区別できないので、ここで見る（Blazor より先に登録するので、先に呼ばれる）
+    let popped = false;
+    window.addEventListener('popstate', () => { popped = true; });
     let firstCall = true;
     const pageChanged = (backNavigation = false) => {
+        backNavigation = backNavigation || popped;
+        popped = false;
         if (firstCall) {
             // 最初の表示が、戻る・進むで来たとき（ほかのサイトからの戻りなど）も、離れたときの位置へ
             firstCall = false;
