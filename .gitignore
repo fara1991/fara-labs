@@ -426,9 +426,3 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
-
-# Cloudflare wrangler
-.wrangler/
-
-# 静的サイトの書き出し先（npm run publish:site）
-dist/
