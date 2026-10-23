@@ -5,6 +5,9 @@
 <header class="site-header">
     <div class="scroll-progress" aria-hidden="true"></div>
     <div class="container header-inner">
+        @* 左上のサイト名（ホームへ）。リンクの名前は見えている文字「Fara Lab」そのまま *@
+        <a class="brand" href="/">Fara Lab</a>
+
         @* スマホのメニューの開閉（aria-expanded と、CSS の .is-open）。外側のタップ・Esc で閉じるのは js/site.js（このボタンを押す）。ページを移ったら閉じる *@
         <button class="menu-toggle" type="button" aria-label="メニュー" aria-expanded="@(open ? "true" : "false")" aria-controls="site-nav" @onclick="Toggle">
             <span class="menu-icon-open"><Icon Name="menu" Size="22" /></span>
