@@ -1,8 +1,7 @@
 @page "/works"
 @inject SiteData Data
-@inject SiteOptions Site
 
-<PageMeta Title="@($"Works | {Data.Profile.Name}")" Description="作ったものの紹介です。Web アプリ、ツール、VRChat アバターの改変などを載せています。" Path="/works" />
+<PageTitle>@PageCatalog.Works(Data.Profile).Title</PageTitle>
 
 <section class="page container">
     <header class="page-head">
@@ -55,7 +54,7 @@
                     <div class="work-actions">
                         @foreach (var link in work.Links)
                         {
-                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@Site.Localize(link.Url)" target="_blank" rel="noopener noreferrer">
+                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@SiteLinks.Localize(link.Url)" target="_blank" rel="noopener noreferrer">
                                 @link.Label <Icon Name="external" Size="16" />
                             </a>
                         }

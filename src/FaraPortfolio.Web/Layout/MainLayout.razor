@@ -1,32 +1,48 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject MaintenanceInfo Maintenance
 
-@* 背景: 静止した星とグリッドの上で、ぼかした光だけがゆっくり浮かぶ（常時動く背景はこれだけ） *@
-<div class="bg-scene" aria-hidden="true">
-    <div class="bg-layer bg-stars"></div>
-    <div class="bg-layer bg-grid"></div>
-    <div class="bg-layer bg-blob blob-1"><span></span></div>
-    <div class="bg-layer bg-blob blob-2"><span></span></div>
-    <div class="bg-layer bg-blob blob-3"><span></span></div>
-    <div class="bg-noise"></div>
-</div>
+@* サイトは、紫のダーク配色だけ（ライト／ダークの切り替えは無い）。MudBlazor（報告フォームの部品）も、ダークで固定する。
+   .mud-layout は、kit の読み込み表示（boot-indicator.js）が「描画が終わった」の合図に使う *@
+<MudThemeProvider Theme="Theme" IsDarkMode="true" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-@* 画面の枠。ヘッダー・お知らせの帯・フッターは動かず、その間の .site-scroll（本文）だけがスクロールする。
-   ページ移動（将来の拡張ナビゲーション）では、.site-main の中身だけを差し替える想定。 *@
-<div class="app-shell">
-    @* キーボードの利用者向け: Tab の最初で「本文へ」を出し、本文（main）へ飛べる *@
-    <a class="skip-link" href="#main-content">本文へ</a>
+<MudLayout Class="app-layout">
+    <AppShell>
+        <Banner><MaintenanceBanner Info="Maintenance" /></Banner>
+        <ChildContent>@Body</ChildContent>
+    </AppShell>
+</MudLayout>
 
-    <SiteHeader />
+@code {
+    private static readonly MudTheme Theme = SiteTheme.Create();
 
-    @* お知らせの帯（MAINTENANCE=notice のとき、Worker がこの中に差し込む。worker/index.js）。ふだんは空 *@
-    <div class="maintenance-slot"></div>
+    // ページを移ったあと（と最初の描画のあと）は、新しい本文に対して js/site.js の pageChanged を呼ぶ（フェードイン・#付きの位置・戻る／進むの位置）
+    private bool pageChanged = true;
+    private bool back;
 
-    <div class="site-scroll" role="region" tabindex="0" aria-label="本文">
-        <main class="site-main" id="main-content" tabindex="-1">
-            @Body
-        </main>
-    </div>
+    protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
 
-    @* フッターは画面の下に固定（.app-shell の最後の段）。本文は、フッターの上までをスクロールする *@
-    <SiteFooter />
-</div>
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        pageChanged = true;
+        // 戻る・進む（リンクのクリックではない移動）では、離れたときのスクロール位置へ戻す
+        back = !e.IsNavigationIntercepted;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!pageChanged) return;
+        var wasBack = back;
+        pageChanged = false;
+        back = false;
+        try { await JS.InvokeVoidAsync("faraSite.pageChanged", wasBack); }
+        catch (JSException) { /* 演出が動かなくても、本文は読める */ }
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}

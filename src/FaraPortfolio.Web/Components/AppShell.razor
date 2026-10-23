@@ -1,0 +1,49 @@
+@* 画面の枠: 背景・ヘッダー・お知らせの帯・スクロールする本文・フッター。
+   ヘッダー・お知らせの帯・フッターは動かず、その間の .site-scroll（本文）だけがスクロールする。
+   ブラウザでは Layout/MainLayout が、静的な本文の書き出し（tools/PrerenderPages）では静的なホストが、この部品に本文を渡す。 *@
+@inject NavigationManager Nav
+
+@* 背景: 静止した星とグリッドの上で、ぼかした光だけがゆっくり浮かぶ（常時動く背景はこれだけ） *@
+<div class="bg-scene" aria-hidden="true">
+    <div class="bg-layer bg-stars"></div>
+    <div class="bg-layer bg-grid"></div>
+    <div class="bg-layer bg-blob blob-1"><span></span></div>
+    <div class="bg-layer bg-blob blob-2"><span></span></div>
+    <div class="bg-layer bg-blob blob-3"><span></span></div>
+    <div class="bg-noise"></div>
+</div>
+
+<div class="app-shell">
+    @* キーボードの利用者向け: Tab の最初で「本文へ」を出し、本文（main）へ飛べる。<base href="/"> の下で "#..." だけだとホームへ移ってしまうので、今のページの URL にする *@
+    <a class="skip-link" href="@SkipHref" @onclick="FocusMain" @onclick:preventDefault="true">本文へ</a>
+
+    <SiteHeader />
+
+    @* お知らせの帯（MAINTENANCE=notice のとき、kit の MaintenanceBanner）。ふだんは何も出ない *@
+    @Banner
+
+    <div class="site-scroll" role="region" tabindex="0" aria-label="本文">
+        <main class="site-main" id="main-content" tabindex="-1">
+            @ChildContent
+        </main>
+    </div>
+
+    @* フッターは画面の下に固定（.app-shell の最後の段）。本文は、フッターの上までをスクロールする *@
+    <SiteFooter />
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Banner { get; set; }
+    [Inject] private IServiceProvider Services { get; set; } = default!;
+
+    private string SkipHref => new Uri(Nav.Uri).GetLeftPart(UriPartial.Path) + "#main-content";
+
+    private async Task FocusMain()
+    {
+        if (Services.GetService(typeof(IJSRuntime)) is IJSRuntime js)
+        {
+            try { await js.InvokeVoidAsync("faraSite.focusMain"); } catch (JSException) { }
+        }
+    }
+}

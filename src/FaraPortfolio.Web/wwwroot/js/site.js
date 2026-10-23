@@ -1,15 +1,14 @@
-// サイト全体の演出（書き出した HTML に付く。フレームワークは使わない。JS が無い・途中で失敗しても本文は読める）
+// サイト全体の演出（Blazor WebAssembly のアプリの外側。Razor が描いた DOM に対して動く）
 //  - スクロール量を CSS 変数 --progress に流す（上部の進捗バー）。スクロールするのは .site-scroll（ヘッダーの下の領域）
 //  - .reveal 要素が画面に入ったら .is-visible を付ける（フェードイン）。js-ready を付けたあとだけ隠すので、失敗しても本文は見える
 //  - 軌道アイコン: タッチしている間は止める。説明（.satellite-tip）が画面からはみ出すときは内側に寄せる
-//  - スマホのメニュー: 開閉（aria-expanded）、最初のリンクへフォーカス、外側タップ・Esc で閉じる
+//  - スマホのメニュー: 開閉は Razor（Components/SiteHeader.razor）。外側タップ・Esc で閉じるのは、ここから開閉ボタンを押す
 //  - works#id で来たら該当の作品の枠を 1 回光らせる
 //  - 戻る・進むで、離れたときのスクロール位置に戻す（sessionStorage に一時保存する）
-//  - 更新履歴の絞り込みと、NEW の表示（今日の日付はブラウザで数える）
 //
-// ページ移動: いまは通常の読み込み（ページごとの HTML）。拡張ナビゲーション（faraNav）を入れて .site-main の中身を差し替えたら、
-// 差し替えのあとに window.faraSite.pageChanged(backNavigation) を呼ぶ。各機能は init… 関数にまとめてあり、
-// 差し替えたページに対して同じ関数を呼び直せば、そのページの初期化になる。
+// ページ移動（Blazor のルーティング）: Layout/MainLayout.razor が、描画のあと（最初と、ページを移るたび）に
+// window.faraSite.pageChanged(戻る・進むか) を呼ぶ。新しい本文の .reveal を監視し、#付き・戻る・進む・通常の位置を決める。
+// 更新履歴の絞り込みと NEW は Razor（Pages/Updates.razor・Components/UpdateItem.razor）で行う。
 (() => {
     'use strict';
     const root = document.documentElement;
@@ -36,7 +35,10 @@
         dirty = false;
         try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch (e) { /* 保存できないときは、メモリだけ */ }
     };
+    // いま位置を保存してよいページ（ページを移った直後、本文を差し替える途中のスクロールを、新しいページの位置として保存しない）
+    let activeKey = pageKey();
     const savePosition = (el) => {
+        if (activeKey !== pageKey()) return;
         positions[pageKey()] = el.scrollTop;
         dirty = true;
         if (!flushTimer) flushTimer = setTimeout(flush, 800);
@@ -125,94 +127,59 @@
         document.addEventListener('focusin', placeTip);
     };
 
-    // ---- スマホのメニュー
+    // ---- スマホのメニュー: 外側のタップ・Esc で閉じる（開閉の状態は Razor が持つので、開閉ボタンを押す）
     const initMenu = () => {
-        const toggle = document.querySelector('.menu-toggle');
-        const siteNav = document.getElementById('site-nav');
-        if (!toggle || !siteNav) return;
-        const menuOpen = () => toggle.getAttribute('aria-expanded') === 'true';
-        const setMenu = (open) => {
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            siteNav.classList.toggle('is-open', open);
-            if (open) requestAnimationFrame(() => siteNav.querySelector('.nav-link')?.focus());
-        };
-        toggle.addEventListener('click', () => setMenu(!menuOpen()));
+        const toggle = () => document.querySelector('.menu-toggle');
+        const menuOpen = () => toggle()?.getAttribute('aria-expanded') === 'true';
         document.addEventListener('click', (e) => {
             if (!menuOpen() || !(e.target instanceof Element)) return;
             if (e.target.closest('.site-nav, .menu-toggle')) return;
-            setMenu(false);
+            toggle().click();
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape' || !menuOpen()) return;
-            setMenu(false);
-            toggle.focus();
-        });
-    };
-
-    // ---- 更新履歴: 絞り込み（JS が無いときは、ボタンを出さずに全件を並べたままにする）
-    const initUpdateFilter = () => {
-        const filterBar = document.querySelector('[data-filter-bar]');
-        if (!filterBar) return;
-        filterBar.hidden = false;
-        const buttons = filterBar.querySelectorAll('[data-filter]');
-        const items = document.querySelectorAll('.update-item[data-category]');
-        const groups = document.querySelectorAll('[data-year-group]');
-        const empty = document.querySelector('[data-filter-empty]');
-        const apply = (key) => {
-            buttons.forEach((b) => {
-                const on = b.dataset.filter === key;
-                b.classList.toggle('is-active', on);
-                b.setAttribute('aria-pressed', on ? 'true' : 'false');
-            });
-            let shown = 0;
-            items.forEach((li) => {
-                const show = key === 'all' || li.dataset.category === key;
-                li.hidden = !show;
-                if (show) shown++;
-            });
-            groups.forEach((g) => { g.hidden = !g.querySelector('.update-item:not([hidden])'); });
-            if (empty) empty.hidden = shown > 0;
-        };
-        buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter)));
-    };
-
-    // ---- 更新履歴: 更新から 14 日以内なら NEW
-    const initNew = () => {
-        const dayNumber = (y, m, d) => Date.UTC(y, m - 1, d) / 86400000;
-        const now = new Date();
-        const today = dayNumber(now.getFullYear(), now.getMonth() + 1, now.getDate());
-        document.querySelectorAll('.update-item[data-date]').forEach((li) => {
-            const [y, m, d] = li.dataset.date.split('-').map(Number);
-            const diff = today - dayNumber(y, m, d);
-            const chip = li.querySelector('[data-new]');
-            if (chip && diff >= 0 && diff <= 14) chip.hidden = false;
+            const button = toggle();
+            button.click();
+            button.focus();
         });
     };
 
     // ---- ページの表示（読み込みのあと、または拡張ナビゲーションで差し替えたあとに呼ぶ）
     //  #付きのときは、その場所へ。戻る・進むのときは、離れたときの位置へ。通常の移動は先頭へ
+    let firstCall = true;
     const pageChanged = (backNavigation = false) => {
+        if (firstCall) {
+            // 最初の表示が、戻る・進むで来たとき（ほかのサイトからの戻りなど）も、離れたときの位置へ
+            firstCall = false;
+            const navEntry = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+            backNavigation = backNavigation || Boolean(navEntry && navEntry.type === 'back_forward');
+        }
         flush();
         initReveal();
         const el = scrollEl();
+        const target = backNavigation ? (positions[pageKey()] || 0) : 0;
+        activeKey = pageKey();
         if (!el) return;
         if (location.hash) {
             scrollToHash();
             return;
         }
-        el.scrollTo({ top: backNavigation ? (positions[pageKey()] || 0) : 0, behavior: 'instant' });
+        el.scrollTo({ top: target, behavior: 'instant' });
         update();
     };
-    window.faraSite = { pageChanged, scrollToHash };
+    // 「今日」（ブラウザの日付。更新履歴の NEW。Program.cs が起動のときに読む）と、スキップリンクの先
+    const today = () => {
+        const now = new Date();
+        const two = (n) => String(n).padStart(2, '0');
+        return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
+    };
+    const focusMain = () => document.getElementById('main-content')?.focus();
+    window.faraSite = { pageChanged, scrollToHash, today, focusMain };
 
     // 初回の読み込み。機能ごとに、失敗しても他の機能は動くようにする
     const safely = (fn) => { try { fn(); } catch (e) { /* その機能だけ止まる。本文は読める */ } };
     safely(initOrbit);
     safely(initTooltips);
     safely(initMenu);
-    safely(initUpdateFilter);
-    safely(initNew);
-    const navEntry = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
-    safely(() => pageChanged(Boolean(navEntry && navEntry.type === 'back_forward')));
     safely(update);
 })();
