@@ -8,8 +8,8 @@
     "preview": "npm run publish:site && wrangler dev",
     "check": "npm run publish:site && wrangler deploy --dry-run --env=\"\" && wrangler deploy --dry-run --env develop",
     "test:worker": "node --test worker/index.test.mjs",
-    "test:maintenance": "node --test worker/maintenance.test.mjs",
-    "test:report": "node --test worker/report.test.mjs",
+    "test:maintenance": "node --test external/fara-site-kit/worker/maintenance.test.mjs",
+    "test:report": "node --test external/fara-site-kit/worker/report.test.mjs",
     "test:js": "node --test tests/js/report.test.cjs",
     "test:gate": "node --test .github/scripts/require-maintenance.test.mjs"
   },
