@@ -1,8 +1,8 @@
 // ポートフォリオ（fara-labs.com）の Worker。Blazor WebAssembly の静的サイト（publish/wwwroot）を配信する。すべてのリクエストがここを通る（wrangler.jsonc の run_worker_first）。
 //   GET /api/report/config・POST /api/report → 作者への報告（external/fara-site-kit/worker/report.js。設定は docs/report-and-maintenance.md）
-//   GET /api/maintenance → いまの状態（アプリが起動時に読み、MAINTENANCE=notice のときは「更新予定」の帯を、kit の MaintenanceBanner で出す）
-//   MAINTENANCE=true   … すべて 503。ページはメンテナンス画面、/api/ は JSON（external/fara-site-kit/worker/maintenance.js）
-// メンテナンスの切り替えは、Worker の変数 MAINTENANCE / MAINTENANCE_MESSAGE（docs/report-and-maintenance.md）。
+//   GET /api/maintenance → いまの状態（アプリが起動時に読み、MAINTENANCE_MODE=notice のときは「更新予定」の帯を、kit の MaintenanceBanner で出す）
+//   MAINTENANCE_MODE=true   … すべて 503。ページはメンテナンス画面、/api/ は JSON（external/fara-site-kit/worker/maintenance.js）
+// メンテナンスの切り替えは、Worker の変数 MAINTENANCE_MODE / MAINTENANCE_MESSAGE（docs/report-and-maintenance.md）。
 import { getMaintenance, maintenanceResponse } from "../external/fara-site-kit/worker/maintenance.js";
 import { handleReport } from "../external/fara-site-kit/worker/report.js";
 

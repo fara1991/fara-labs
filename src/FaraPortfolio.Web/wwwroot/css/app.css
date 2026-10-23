@@ -767,7 +767,7 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
     .js-ready .reveal { opacity: 1; }
 }
 
-/* メンテナンスのお知らせ（MAINTENANCE=notice）は、kit の MaintenanceBanner（.fsk-notice。fara-site-kit.css）。
+/* メンテナンスのお知らせ（MAINTENANCE_MODE=notice）は、kit の MaintenanceBanner（.fsk-notice。fara-site-kit.css）。
    帯はヘッダーと .site-scroll の間に置く（.app-shell の 2 段目）。スクロールの外なので、動かずに残る */
 .fsk-notice { position: static; overflow-wrap: anywhere; }
 
