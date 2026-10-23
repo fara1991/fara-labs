@@ -35,6 +35,8 @@ jobs:
 
       # 実行のきっかけになったコミット（github.sha）を公開する。master のみなのは上の Require master で保証
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: actions/setup-dotnet@v4
         with:

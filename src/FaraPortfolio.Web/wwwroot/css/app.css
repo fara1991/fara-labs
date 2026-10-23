@@ -75,7 +75,7 @@ body {
 }
 /* 印刷: 画面の枠（高さ・スクロール）を解き、本文とフッターを、ページを続けて出す */
 @media print {
-    .bg-scene, .site-header, .maintenance-notice { display: none !important; }
+    .bg-scene, .site-header, .fsk-notice { display: none !important; }
     html, body, .app-shell, .site-scroll {
         height: auto !important;
         min-height: 0 !important;
@@ -786,7 +786,7 @@ img { max-width: 100%; display: block; }
 
 /* メンテナンスのお知らせ（MAINTENANCE=notice）と、メンテナンス画面（MAINTENANCE=true） */
 /* 帯はヘッダーと .site-scroll の間に置く（.app-shell の 2 段目）。スクロールの外なので、動かずに残る */
-.maintenance-notice {
+.fsk-notice {
     flex: none;
     padding: 0.5rem 1rem;
     background: #f59e0b;
@@ -796,8 +796,8 @@ img { max-width: 100%; display: block; }
     text-align: center;
     overflow-wrap: anywhere;
 }
-/* 見出し（【お知らせ】）は 1 行目に出し、本文はその次の行から。どちらも太字（.maintenance-notice から継承） */
-.maintenance-notice-title, .maintenance-notice-text { display: block; }
+/* 見出し（【お知らせ】）は 1 行目に出し、本文はその次の行から。どちらも太字（.fsk-notice から継承） */
+.fsk-notice-title, .fsk-notice-text { display: block; }
 .maintenance-screen { min-height: 100vh; display: grid; place-content: center; justify-items: center; padding: 24px; box-sizing: border-box; background: #0c0616; color: #f3edff; text-align: center; line-height: 1.8; }
 .maintenance-screen h1 { font-size: 1.5rem; color: #b39ddb; }
 .maintenance-screen p { color: #b4a7d1; margin: 0 0 0.5rem; }

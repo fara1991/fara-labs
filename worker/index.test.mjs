@@ -75,20 +75,29 @@ test("通常のとき、ページはそのままアセットから返す（お�
   const res = await run("/", {}, {}, HTML_PAGE);
   assert.equal(res.status, 200);
   const html = await res.text();
-  assert.ok(!html.includes("maintenance-notice"));
+  assert.ok(!html.includes("fsk-notice"));
 });
 
 test("お知らせ（MAINTENANCE=notice）のとき、帯は .maintenance-slot の中に入る（本文の中には入らない）", async () => {
   const res = await run("/", {}, { MAINTENANCE: "notice", MAINTENANCE_MESSAGE: "10月25日（土）20:00〜21:00 ごろ、サイトを更新します" }, HTML_PAGE);
   const html = await res.text();
   assert.equal(res.headers.get("Cache-Control"), "no-store");
-  assert.match(html, /<div class="maintenance-slot"><div class="maintenance-notice" role="status">/);
+  assert.match(html, /<div class="maintenance-slot"><div class="fsk-notice" role="status">/);
   assert.match(html, /10月25日（土）20:00〜21:00 ごろ、サイトを更新します/);
-  assert.ok(html.indexOf("maintenance-notice") < html.indexOf('class="site-scroll"'));
+  assert.ok(html.indexOf("fsk-notice") < html.indexOf('class="site-scroll"'));
 });
 
 test("お知らせは、HTML 以外（画像など）には付けない", async () => {
   const image = { fetch: async () => new Response("png", { headers: { "Content-Type": "image/png" } }) };
   const res = await run("/images/logo.png", {}, { MAINTENANCE: "notice" }, image);
   assert.equal(await res.text(), "png");
+});
+
+test("/api/maintenance は、いまの状態（kit の MaintenanceInfo が読む形）を返す", async () => {
+  for (const [env, state] of [[{}, "off"], [{ MAINTENANCE: "notice", MAINTENANCE_MESSAGE: "10月25日に更新します" }, "notice"], [{ MAINTENANCE: "true" }, "on"]]) {
+    const res = await run("/api/maintenance", {}, env);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("Cache-Control"), "no-store");
+    assert.equal((await res.json()).state, state);
+  }
 });
