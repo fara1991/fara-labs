@@ -24,7 +24,7 @@ builder.Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
 builder.Services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Profile));
 SiteLinks.CurrentHost = new Uri(baseAddress).Host;
 
-// メンテナンスの状態（Worker の変数 MAINTENANCE。external/fara-site-kit/worker/maintenance.js）。読めなければ通常
+// メンテナンスの状態（Worker の変数 MAINTENANCE_MODE。external/fara-site-kit/worker/maintenance.js）。読めなければ通常
 builder.Services.AddSingleton(maintenanceTask.Result);
 
 builder.Services.AddSingleton(http);

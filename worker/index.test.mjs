@@ -30,19 +30,19 @@ test("報告の設定（config）は、サイトキーだけを返す", async ()
   assert.ok(!JSON.stringify(body).includes("secret-value"));
 });
 
-test("メンテナンス中（MAINTENANCE=true）は、報告の受け口も 503", async () => {
-  const res = await run("/api/report", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }, { MAINTENANCE: "true" });
+test("メンテナンス中（MAINTENANCE_MODE=true）は、報告の受け口も 503", async () => {
+  const res = await run("/api/report", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }, { MAINTENANCE_MODE: "true" });
   assert.equal(res.status, 503);
   assert.equal(res.headers.get("Cache-Control"), "no-store");
 });
 
 test("メンテナンス中でも、報告の設定（config）は 503（API はまとめて止まる）", async () => {
-  const res = await run("/api/report/config", {}, { MAINTENANCE: "true" });
+  const res = await run("/api/report/config", {}, { MAINTENANCE_MODE: "true" });
   assert.equal(res.status, 503);
 });
 
 test("メンテナンス中のページは、HTML のメンテナンス画面を 503 で返す（アセットには流さない）", async () => {
-  const res = await run("/works", { headers: { Accept: "text/html" } }, { MAINTENANCE: "true" }, HTML_PAGE);
+  const res = await run("/works", { headers: { Accept: "text/html" } }, { MAINTENANCE_MODE: "true" }, HTML_PAGE);
   assert.equal(res.status, 503);
   assert.equal(res.headers.get("X-Robots-Tag"), "noindex");
   assert.match(await res.text(), /ただいまメンテナンス中です/);
@@ -59,14 +59,14 @@ test("通常のとき、ページはそのままアセットから返す", async
   assert.ok(!(await res.text()).includes("fsk-notice"));
 });
 
-test("お知らせ（MAINTENANCE=notice）のときも、ページの HTML には帯を入れない（アプリが /api/maintenance を読んで出す）", async () => {
-  const res = await run("/", {}, { MAINTENANCE: "notice", MAINTENANCE_MESSAGE: "10月25日（土）20:00〜21:00 ごろ、サイトを更新します" }, HTML_PAGE);
+test("お知らせ（MAINTENANCE_MODE=notice）のときも、ページの HTML には帯を入れない（アプリが /api/maintenance を読んで出す）", async () => {
+  const res = await run("/", {}, { MAINTENANCE_MODE: "notice", MAINTENANCE_MESSAGE: "10月25日（土）20:00〜21:00 ごろ、サイトを更新します" }, HTML_PAGE);
   assert.equal(res.status, 200);
   assert.ok(!(await res.text()).includes("fsk-notice"));
 });
 
 test("/api/maintenance は、いまの状態（kit の MaintenanceInfo が読む形）を返す", async () => {
-  for (const [env, state] of [[{}, "off"], [{ MAINTENANCE: "notice", MAINTENANCE_MESSAGE: "10月25日に更新します" }, "notice"], [{ MAINTENANCE: "true" }, "on"]]) {
+  for (const [env, state] of [[{}, "off"], [{ MAINTENANCE_MODE: "notice", MAINTENANCE_MESSAGE: "10月25日に更新します" }, "notice"], [{ MAINTENANCE_MODE: "true" }, "on"]]) {
     const res = await run("/api/maintenance", {}, env);
     assert.equal(res.status, 200);
     assert.equal(res.headers.get("Cache-Control"), "no-store");

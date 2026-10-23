@@ -47,7 +47,7 @@ Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker �
 | `TURNSTILE_SECRET` | Turnstile のシークレットキー |
 | `DISCORD_WEBHOOK_URL` | 1-1 でコピーした Webhook の URL |
 
-> **注意（種類は「シークレット」）**: この 3 つは、中身を画面に表示しない「シークレット」にします（Webhook の URL とシークレットキーは、他人に見えてはいけない値です。サイトキーは公開してよい値ですが、そろえておきます）。メンテナンスの変数（`MAINTENANCE` など）は、あとから値を見て書き換えるので「テキスト」にします。どちらも、公開（`wrangler deploy`）では消えません。
+> **注意（種類は「シークレット」）**: この 3 つは、中身を画面に表示しない「シークレット」にします（Webhook の URL とシークレットキーは、他人に見えてはいけない値です。サイトキーは公開してよい値ですが、そろえておきます）。メンテナンスの変数（`MAINTENANCE_MODE` など）は、あとから値を見て書き換えるので「テキスト」にします。どちらも、公開（`wrangler deploy`）では消えません。
 
 ### 1-4. 動作を確かめる
 
@@ -82,28 +82,28 @@ Cloudflare のダッシュボードで **変数を書き換えるだけ**で、�
 
 | 変数 | 値 | 意味 |
 | --- | --- | --- |
-| `MAINTENANCE` | `false`（または未設定） | 通常どおり表示（お知らせも出ない） |
+| `MAINTENANCE_MODE` | `false`（または未設定） | 通常どおり表示（お知らせも出ない） |
 | | `notice` | **通常のページの上に、「更新予定」のお知らせ**を出す |
 | | `true` | **メンテナンス画面**（503）だけを出す |
 | `MAINTENANCE_MESSAGE` | 文（200 文字まで） | お知らせに出す文。メンテナンス画面には「予定」として同じ文が出る（例: `10月25日（土）20:00〜21:00 ごろ、サイトを更新します`） |
 
-- お知らせの文は、`MAINTENANCE` が `notice` または `true` のときだけ出ます。**`false` に戻せば、お知らせも一緒に消えます**（`MAINTENANCE_MESSAGE` を消す必要はありません）。
+- お知らせの文は、`MAINTENANCE_MODE` が `notice` または `true` のときだけ出ます。**`false` に戻せば、お知らせも一緒に消えます**（`MAINTENANCE_MESSAGE` を消す必要はありません）。
 - `MAINTENANCE_MESSAGE` が空のときのお知らせは「まもなくメンテナンスを行います。」です。
-- `MAINTENANCE` の値は、`true`・`on`・`1`（大文字小文字は区別しません）がメンテナンス、`notice` がお知らせです。**変数が無い・それ以外の値のときは、通常として扱います**（書き間違いでサイトが止まることはありません）。
+- `MAINTENANCE_MODE` の値は、`true`・`on`・`1`（大文字小文字は区別しません）がメンテナンス、`notice` がお知らせです。**変数が無い・それ以外の値のときは、通常として扱います**（書き間違いでサイトが止まることはありません）。
 
 ### 2-2. 変数の登録（最初の 1 回）
 
 1. Cloudflare のダッシュボード →「Workers & Pages」→ 対象の Worker（`fara-pokemon` / `fara-avatar` / `fara-twitch-bot` / `fara-portfolio` と、それぞれの `-dev`。本番はデプロイ後）→「設定」→「変数とシークレット」→「追加」。
 2. 種類は「**テキスト**」（あとから値を見て、書き換えるため）。環境は「プロダクション」だけにチェックを付けます（プレビューは使っていません）。
-3. `MAINTENANCE` = `false`、`MAINTENANCE_MESSAGE` = 空でもよい（例: 文を書いておく）。「デプロイ」。
+3. `MAINTENANCE_MODE` = `false`、`MAINTENANCE_MESSAGE` = 空でもよい（例: 文を書いておく）。「デプロイ」。
 
 GitHub から自動で公開（デプロイ）しても、ダッシュボードで足した変数は**消えません**（各サイトの設定に `keep_vars = true` を入れてあるため）。
 
 ### 2-3. 使い方の流れ
 
-1. **事前のお知らせ**: `MAINTENANCE_MESSAGE` に日時を書き、`MAINTENANCE` を `notice` にして「デプロイ」→ 各ページの上に、橙色の帯で「お知らせ 〇月〇日 ... ごろ、サイトを更新します」が出ます。
-2. **作業の開始**: `MAINTENANCE` を `true` にして「デプロイ」→ すべてのページがメンテナンス画面（503）になります。この間に、GitHub からの公開や、Cloudflare の手動の設定をします。
-3. **完了**: `MAINTENANCE` を `false` にして「デプロイ」→ サイトが元に戻り、お知らせも消えます。
+1. **事前のお知らせ**: `MAINTENANCE_MESSAGE` に日時を書き、`MAINTENANCE_MODE` を `notice` にして「デプロイ」→ 各ページの上に、橙色の帯で「お知らせ 〇月〇日 ... ごろ、サイトを更新します」が出ます。
+2. **作業の開始**: `MAINTENANCE_MODE` を `true` にして「デプロイ」→ すべてのページがメンテナンス画面（503）になります。この間に、GitHub からの公開や、Cloudflare の手動の設定をします。
+3. **完了**: `MAINTENANCE_MODE` を `false` にして「デプロイ」→ サイトが元に戻り、お知らせも消えます。
 
 ### 2-4. 反映と確認
 
@@ -122,22 +122,35 @@ GitHub から自動で公開（デプロイ）しても、ダッシュボード�
 - 画面の文面・見た目を変えるときは、共通部品 fara-site-kit の `worker/maintenance.js` を変更します（このリポジトリでは `external/fara-site-kit` のサブモジュール。kit で直してタグを付け、各サイトで上げます）。
 - 以前に、Cloudflare の WAF にメンテナンス用のカスタムルール（`production-maintenance` など）を作っていた場合は、削除してください（このしくみとは別のものです）。
 - `worker/maintenance.js` と `worker/report.js` は、fara-site-kit のものを import しています（このリポジトリにコピーは置きません）。
-- ポートフォリオの `/api/maintenance` は、`MAINTENANCE=true` でも 200 を返します（アプリが状態を読むための入口なので、503 にしない。ページ・報告の API は 503）。
+- ポートフォリオの `/api/maintenance` は、`MAINTENANCE_MODE=true` でも 200 を返します（アプリが状態を読むための入口なので、503 にしない。ページ・報告の API は 503）。
 - ポートフォリオの帯は、kit の `MaintenanceBanner` がヘッダーと本文の間に出します（ページを切り替えても動きません）。Worker は HTML に帯を入れません（Blazor が画面を描き直すため）。
 
 ### 2-6. 本番の公開（GitHub Actions）との連動
 
 本番（master）の公開（デプロイ）は、次のように動きます（4 サイトとも同じ）。
 
-1. **公開の前に確認**: Cloudflare の Worker の変数 `MAINTENANCE` が **`notice`** になっているかを確かめます（すでに `true` のときも通します）。`false`・未設定のとき、または確認できなかったときは、**公開を止めます**（Actions に「先に MAINTENANCE を notice にしてください」と出ます）。
-2. **公開と同時にメンテナンス画面**: 確認が通ったら、`MAINTENANCE=true` を付けて公開します（公開した瞬間から、メンテナンス画面になります）。`MAINTENANCE_MESSAGE` は、ダッシュボードの値のままです。
-3. **作業が終わったら**: ダッシュボードで `MAINTENANCE` を `false` に戻します（お知らせも消えます）。**自動では戻しません**（作業の完了を確認してから、人が戻します）。
+1. **公開の前に確認**: Cloudflare の Worker の変数 `MAINTENANCE_MODE` が **`notice`** になっているかを確かめます（すでに `true` のときも通します）。`false`・未設定のとき、または確認できなかったときは、**公開を止めます**（Actions に「先に MAINTENANCE_MODE を notice にしてください」と出ます）。
+2. **公開と同時にメンテナンス画面**: 確認が通ったら、`MAINTENANCE_MODE=true` を付けて公開します（公開した瞬間から、メンテナンス画面になります）。`MAINTENANCE_MESSAGE` は、ダッシュボードの値のままです。
+3. **作業が終わったら**: ダッシュボードで `MAINTENANCE_MODE` を `false` に戻します（お知らせも消えます）。**自動では戻しません**（作業の完了を確認してから、人が戻します）。
 
 - 確認用（develop）の公開は、確認もメンテナンス化もしません（いつもどおり公開されます）。
-- **緊急の修正を、お知らせなしで公開したいとき**: GitHub の Actions →（対象のワークフロー）→「Run workflow」で、`skip_maintenance_check` にチェックを付けて実行します（確認を飛ばし、`MAINTENANCE=true` も付けません）。**ダッシュボードの `MAINTENANCE` の値は変わらない**ので、次の点に注意してください。
+- **緊急の修正を、お知らせなしで公開したいとき**: GitHub の Actions →（対象のワークフロー）→「Run workflow」で、`skip_maintenance_check` にチェックを付けて実行します（確認を飛ばし、`MAINTENANCE_MODE=true` も付けません）。**ダッシュボードの `MAINTENANCE_MODE` の値は変わらない**ので、次の点に注意してください。
   - すでに `true`（メンテナンス中）なら、公開後もメンテナンス画面のままです（公開した内容を見るには、`false` に戻します）。
   - `notice` が残っていれば、お知らせも出たままです（消すには `false` に戻します）。
 - **初めての公開**（Worker がまだ無いとき）は、確認を飛ばして公開します。
 - この確認は、Cloudflare の API で変数を読みます。**GitHub の `CLOUDFLARE_API_TOKEN` に、Workers の設定を読める権限**（公開に使っている「Workers Scripts: Edit」で足ります）が必要です。変数は「**テキスト**」にしておいてください（「シークレット」は値を読めないため、確認が止まります）。
-- 公開に失敗してもメンテナンス画面のままになることがあります。そのときは、ダッシュボードで `MAINTENANCE` を確かめて、必要なら `false` に戻してください。
+- 公開に失敗してもメンテナンス画面のままになることがあります。そのときは、ダッシュボードで `MAINTENANCE_MODE` を確かめて、必要なら `false` に戻してください。
 - **初めて本番を公開したあとに、一度だけ確かめてください**: ダッシュボードの Worker の「変数とシークレット」に、`MAINTENANCE_MESSAGE` などの変数が**残っているか**。残っていなければ、公開のたびに消える設定になっている可能性があるので、お知らせください。
+
+### 2-7. Actions の画面（Run workflow）で切り替える
+
+ダッシュボードを開かなくても、GitHub の Actions →「Deploy (develop)」（dev）または「Deploy」（本番）→「Run workflow」で、次の入力を入れて実行すると、公開と同時に Worker の変数を設定できます（スマホの GitHub アプリからも可）。実行後は、ジョブの下部のサマリーに「設定した値」と「反映後の現在値」が出ます。
+
+| 入力 | 意味 |
+| --- | --- |
+| `maintenance_mode` | `true`（メンテナンス画面）・`notice`（お知らせ帯）・`false`（通常）。空 = 変更しない |
+| `maintenance_message` | お知らせ・メンテナンス画面の文（200 文字まで・改行なし）。空 = 変更しない |
+
+- 公開されるのは、選んだブランチ（dev = `develop`、本番 = `master`）の最新のコードです。
+- 本番: `maintenance_mode` を指定した実行は、公開前の確認（2-6 の 1.）を飛ばします。push と、何も指定しない実行だけが、従来どおり確認して `MAINTENANCE_MODE=true` を付けます。`maintenance_message` だけの実行は、`MAINTENANCE_MODE` を変えません（メンテナンス画面にはなりません）。
+- 旧変数 `MAINTENANCE` は、もう読みません。ダッシュボードに残っていても無害なので、不要なら削除してください。

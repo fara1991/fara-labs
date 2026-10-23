@@ -7,7 +7,7 @@
   "name": "fara-portfolio",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
-  // ダッシュボードで足した変数（MAINTENANCE・MAINTENANCE_MESSAGE など）を、公開（wrangler deploy）のたびに消さない（トップレベルだけが有効）
+  // ダッシュボードで足した変数（MAINTENANCE_MODE・MAINTENANCE_MESSAGE など）を、公開（wrangler deploy）のたびに消さない（トップレベルだけが有効）
   "keep_vars": true,
   "assets": {
     "directory": "./publish/wwwroot",
