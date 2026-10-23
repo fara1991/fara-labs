@@ -1,9 +1,9 @@
-// ポートフォリオ（fara-labs.com）の Worker。書き出した静的サイト（dist/）を配信する。すべてのリクエストがここを通る（wrangler.jsonc の run_worker_first）。
+// ポートフォリオ（fara-labs.com）の Worker。Blazor WebAssembly の静的サイト（publish/wwwroot）を配信する。すべてのリクエストがここを通る（wrangler.jsonc の run_worker_first）。
 //   GET /api/report/config・POST /api/report → 作者への報告（external/fara-site-kit/worker/report.js。設定は docs/report-and-maintenance.md）
-//   MAINTENANCE=notice … 通常のページの上部（.maintenance-slot）に「更新予定」の帯を入れる（external/fara-site-kit/worker/maintenance.js）
+//   GET /api/maintenance → いまの状態（アプリが起動時に読み、MAINTENANCE=notice のときは「更新予定」の帯を、kit の MaintenanceBanner で出す）
 //   MAINTENANCE=true   … すべて 503。ページはメンテナンス画面、/api/ は JSON（external/fara-site-kit/worker/maintenance.js）
 // メンテナンスの切り替えは、Worker の変数 MAINTENANCE / MAINTENANCE_MESSAGE（docs/report-and-maintenance.md）。
-import { getMaintenance, maintenanceResponse, withNotice } from "../external/fara-site-kit/worker/maintenance.js";
+import { getMaintenance, maintenanceResponse } from "../external/fara-site-kit/worker/maintenance.js";
 import { handleReport } from "../external/fara-site-kit/worker/report.js";
 
 export default {
@@ -32,13 +32,7 @@ export default {
     }
     if (url.pathname.startsWith("/api/")) return new Response("not found", { status: 404 });
 
-    // ページ・画像などは静的アセット。お知らせ（notice）のときは、HTML の .maintenance-slot に帯を入れる
-    return withNotice(await env.ASSETS.fetch(request), maintenance, insertIntoSlot);
+    // ページ・画像などは静的アセット。お知らせ（notice）の帯は、アプリが /api/maintenance を読んで出す（HTML には入れない。Blazor が #app の中身を描き直すため）
+    return env.ASSETS.fetch(request);
   },
 };
-
-/** 帯は、ヘッダーとスクロールする本文の間（.maintenance-slot）に置く。ヘッダー・本文と同じく、スクロールしても動かない。 */
-function insertIntoSlot(response, html) {
-  // eslint-disable-next-line no-undef
-  return new HTMLRewriter().on(".maintenance-slot", { element(el) { el.append(html, { html: true }); } }).transform(response);
-}

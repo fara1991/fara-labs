@@ -11,26 +11,63 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6164B183
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaraPortfolio.Tests", "tests\FaraPortfolio.Tests\FaraPortfolio.Tests.csproj", "{5159E681-5FBB-44CB-8CB7-8E034E7F144C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrerenderPages", "tools\PrerenderPages\PrerenderPages.csproj", "{0930F369-FAA6-4314-BB6E-84978CEB5EC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Debug|x86.Build.0 = Debug|Any CPU
 		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|x64.Build.0 = Release|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5F52177-4B32-461C-AD16-1D08406D12D2}.Release|x86.Build.0 = Release|Any CPU
 		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|x64.Build.0 = Debug|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Debug|x86.Build.0 = Debug|Any CPU
 		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|x64.ActiveCfg = Release|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|x64.Build.0 = Release|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|x86.ActiveCfg = Release|Any CPU
+		{5159E681-5FBB-44CB-8CB7-8E034E7F144C}.Release|x86.Build.0 = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|x64.Build.0 = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Debug|x86.Build.0 = Debug|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|x64.ActiveCfg = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|x64.Build.0 = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|x86.ActiveCfg = Release|Any CPU
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5F52177-4B32-461C-AD16-1D08406D12D2} = {37E6FBD5-EFC1-4D85-8937-28828D29BD8C}
 		{5159E681-5FBB-44CB-8CB7-8E034E7F144C} = {6164B183-86BE-41C4-B88F-31B5DDC1EA36}
+		{0930F369-FAA6-4314-BB6E-84978CEB5EC0} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,8 @@
 @page "/updates"
 @inject SiteData Data
+@inject RenderEnvironment Env
 
-<PageMeta Title="@($"Updates | {Data.Profile.Name}")" Description="サイトや作品の更新履歴です。" Path="/updates" />
+<PageTitle>@PageCatalog.Updates(Data.Profile).Title</PageTitle>
 
 <section class="page container narrow">
     <header class="page-head">
@@ -9,25 +10,25 @@
         <p class="muted">サイトや作品の更新情報です。</p>
     </header>
 
-    @* 絞り込みは js/site.js が付ける（JS が無いときは、すべての更新を並べたままにする） *@
-    @if (Categories.Count >= 2)
+    @* 絞り込み（カテゴリが 2 種類以上あるときだけ）。静的な本文の書き出し（JS も Blazor も無い）では、押せないので出さない *@
+    @if (Interactive && Categories.Count >= 2)
     {
-        <div class="filter-bar" role="group" aria-label="カテゴリで絞り込み" data-filter-bar hidden>
-            <button type="button" class="filter-chip is-active" data-filter="all" aria-pressed="true">
+        <div class="filter-bar" role="group" aria-label="カテゴリで絞り込み">
+            <button type="button" class="filter-chip @(selected == "all" ? "is-active" : "")" aria-pressed="@(selected == "all" ? "true" : "false")" @onclick='() => selected = "all"'>
                 すべて <span class="count">@Data.Updates.Count</span>
             </button>
             @foreach (var (key, label, count) in Categories)
             {
-                <button type="button" class="filter-chip" data-filter="@key" aria-pressed="false">
+                <button type="button" class="filter-chip @(selected == key ? "is-active" : "")" aria-pressed="@(selected == key ? "true" : "false")" @onclick="() => selected = key">
                     @label <span class="count">@count</span>
                 </button>
             }
         </div>
     }
 
-    @foreach (var year in Data.Updates.GroupBy(u => u.Date.Year))
+    @foreach (var year in Shown.GroupBy(u => u.Date.Year))
     {
-        <div class="year-group" data-year-group>
+        <div class="year-group">
             <h2 class="year-heading">@year.Key</h2>
             <ol class="update-list">
                 @foreach (var entry in year)
@@ -38,10 +39,20 @@
         </div>
     }
 
-    <p class="muted" data-filter-empty hidden>該当する更新はありません。</p>
+    @if (Shown.Count == 0)
+    {
+        <p class="muted">該当する更新はありません。</p>
+    }
 </section>
 
 @code {
+    /// <summary>ブラウザで動いているか（静的な本文の書き出しでは false。絞り込みのボタンを出さない）。</summary>
+    private bool Interactive => Env.IsInteractive;
+
+    private string selected = "all";
+
+    private List<UpdateEntry> Shown => Data.Updates.Where(u => selected == "all" || u.Category == selected).ToList();
+
     /// <summary>更新が 1 件以上あるカテゴリ（絞り込みは 2 種類以上あるときだけ出す）。</summary>
     private List<(string Key, string Label, int Count)> Categories =>
         UpdateCategories.All

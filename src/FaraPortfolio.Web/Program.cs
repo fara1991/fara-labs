@@ -1,56 +1,48 @@
 using FaraPortfolio.Web;
-using FaraPortfolio.Web.Models;
-using FaraPortfolio.Web.Publishing;
 using FaraPortfolio.Web.Services;
+using FaraSiteKit.Core;
+using FaraSiteKit.Razor;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+var baseAddress = builder.HostEnvironment.BaseAddress;
+var http = new HttpClient { BaseAddress = new Uri(baseAddress) };
 
-// 静的 SSR: ページごとの完全な HTML を書き出す（dotnet run -- --export dist）。ブラウザ側の .NET 実行環境は使わない。
-builder.Services.AddRazorComponents();
+// サイトの中身（wwwroot/data/*.json）は起動のときに 1 回だけ読む。最初の描画の前に必要（静的な本文を、空の画面に置き換えないため）
+// メンテナンスの状態（/api/maintenance）も同時に取る（起動を待たせない）
+var dataTask = SiteData.LoadAsync(http);
+var maintenanceTask = MaintenanceInfo.LoadAsync(http);
+await Task.WhenAll(dataTask, maintenanceTask);
+var data = dataTask.Result;
+builder.Services.AddSingleton(data);
+builder.Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
 
-// 公開するホスト名。確認用（dev.fara-labs.com）の書き出しは --site-host dev.fara-labs.com で行う（リンクの -dev 置き換え・canonical・sitemap に使う）
-builder.Services.AddSingleton(new SiteOptions(builder.Configuration["site-host"] ?? SiteOptions.ProductionHost));
+// 共通部品（fara-site-kit の Razor。フッター・報告フォームなど）の設定。値は Services/SiteInfo.cs。
+// 確認用のホストで開いているときの、fara-labs.com 配下のリンクの切り替えは、開いているホスト名で決める
+builder.Services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Profile));
+SiteLinks.CurrentHost = new Uri(baseAddress).Host;
 
-// サイトの中身（wwwroot/data/*.json）は起動時に 1 回だけ読む。壊れていれば起動（書き出し）が失敗する
-builder.Services.AddSingleton(_ => SiteData.Load(Path.Combine(builder.Environment.WebRootPath, "data")));
+// メンテナンスの状態（Worker の変数 MAINTENANCE。external/fara-site-kit/worker/maintenance.js）。読めなければ通常
+builder.Services.AddSingleton(maintenanceTask.Result);
 
-// dotnet run -- --export <dir> で静的サイトとして書き出す（Cloudflare へのデプロイ用）
-var exportDir = builder.Configuration["export"];
-var exporting = !string.IsNullOrEmpty(exportDir);
-if (exporting)
+builder.Services.AddSingleton(http);
+builder.Services.AddSingleton<BrowserClock>();
+
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+var host = builder.Build();
+
+// 「今日」はブラウザの日付（更新履歴の NEW）。js/site.js が読めなくても、アプリは起動する（NEW が出ないだけ）
+try
 {
-    // 書き出し中は自分自身に HTTP でアクセスするので、空いているポートで HTTP のみ待ち受ける
-    builder.WebHost.UseUrls("http://127.0.0.1:0");
+    var today = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<string>("faraSite.today");
+    if (DateOnly.TryParseExact(today, "yyyy-MM-dd", out var date)) host.Services.GetRequiredService<BrowserClock>().Today = date;
+}
+catch (JSException)
+{
 }
 
-var app = builder.Build();
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/not-found", createScopeForErrors: true);
-}
-
-// 未定義の URL は空の 404 ではなく /not-found ページを 404 ステータスで返す（書き出し時は 404.html になる）
-app.UseStatusCodePagesWithReExecute("/not-found");
-
-if (!exporting)
-{
-    app.UseHttpsRedirection();
-}
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>();
-
-if (exporting)
-{
-    await app.StartAsync();
-    await StaticSiteExporter.ExportAsync(app, exportDir!);
-    await app.StopAsync();
-    return;
-}
-
-app.Run();
-
-// テストから参照できるように（WebApplicationFactory など）
-public partial class Program;
+await host.RunAsync();

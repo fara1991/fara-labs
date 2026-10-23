@@ -41,15 +41,15 @@ jobs:
       - name: Worker API test
         run: npm run test:worker
 
+      - name: Build pages test
+        run: npm run test:pages
+
       - name: Deploy gate test
         run: npm run test:gate
 
-      - name: Report form script test
-        run: npm run test:js
-
-      # 静的 SSR の書き出し（dist/。ページごとの HTML）。書き出しに失敗したら、ここで止まる
-      - name: Export static site
-        run: dotnet run --project src/FaraPortfolio.Web --configuration Release --no-launch-profile -- --export dist
+      # 公開する静的サイトの作成（dotnet publish → 本文入りの入口ページ → _headers・robots・sitemap）。失敗したら、ここで止まる
+      - name: Publish static site
+        run: npm run publish:site
 
       # Cloudflare にはつながずに wrangler.jsonc と公開ファイルを検証する
       - name: Check Cloudflare config (dry run)

@@ -1,12 +1,18 @@
-using FaraPortfolio.Web.Publishing;
+using FaraPortfolio.Web.Models;
 using FaraPortfolio.Web.Services;
-using Xunit;
+using FaraSiteKit.Core;
 
 namespace FaraPortfolio.Tests;
 
-/// <summary>リンクの置き換え（確認用の書き出しだけ）・フッターの問い合わせのリンク・robots.txt / sitemap.xml の中身。</summary>
+/// <summary>
+/// 確認用ホストでのリンクの置き換え（kit の SiteLinks）・フッターの SNS・「今日」から NEW の判定・ページの題名。
+/// kit の SiteLinks は静的な値（DevelopHost・CurrentHost）を持つので、触るテストは同じコレクションにして、並列に動かさない。
+/// </summary>
+[Collection("SiteLinks")]
 public class SiteLinksTests
 {
+    public SiteLinksTests() => SiteLinks.DevelopHost = SiteInfo.DevelopHost;
+
     [Theory]
     [InlineData("https://pokemon.fara-labs.com/", "https://pokemon-dev.fara-labs.com/")]
     [InlineData("https://avatar.fara-labs.com/guide", "https://avatar-dev.fara-labs.com/guide")]
@@ -29,46 +35,70 @@ public class SiteLinksTests
         Assert.Equal(url, SiteLinks.Localize(url, "fara-labs.com"));
 
     [Fact]
-    public void Site_options_localize_follows_the_host() =>
-        Assert.Equal("https://dev.fara-labs.com/", new SiteOptions("dev.fara-labs.com").Localize("https://fara-labs.com/"));
+    public void Localize_follows_the_current_host()
+    {
+        SiteLinks.CurrentHost = "dev.fara-labs.com";
+        Assert.Equal("https://dev.fara-labs.com/", SiteLinks.Localize("https://fara-labs.com/"));
+        SiteLinks.CurrentHost = "fara-labs.com";
+        Assert.Equal("https://fara-labs.com/", SiteLinks.Localize("https://fara-labs.com/"));
+    }
+
+    [Fact]
+    public void Footer_socials_come_from_the_profile_and_skip_empty_urls_and_unknown_services()
+    {
+        var profile = new Profile
+        {
+            Name = "Fara",
+            Socials =
+            [
+                new SocialLink { Service = "github", Label = "GitHub", Url = "https://github.com/fara1991" },
+                new SocialLink { Service = "youtube", Label = "YouTube", Url = "https://youtube.com/@x" },
+                new SocialLink { Service = "twitch", Label = "Twitch", Url = "" },
+                new SocialLink { Service = "Discord", Label = "Discord", Url = "https://discord.com/invite/x" },
+            ],
+        };
+        var options = new SiteOptions();
+        SiteInfo.Configure(options, profile);
+
+        Assert.Equal(["github", "discord"], options.Social.Select(s => s.Service));
+        Assert.Equal("Fara Portfolio", options.Name);
+        Assert.Equal(SiteInfo.DevelopHost, options.DevelopHost);
+    }
+
+    [Fact]
+    public void Profile_json_socials_are_all_supported_by_the_footer()
+    {
+        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "data", "profile.json"));
+        var profile = System.Text.Json.JsonSerializer.Deserialize<Profile>(json, SiteJson.Options)!;
+        var options = new SiteOptions();
+        SiteInfo.Configure(options, profile);
+
+        // フッターは kit が絵柄を持つサービスだけ。profile.json の SNS（URL が入っているもの）が消えていたら、kit に絵柄を足す
+        Assert.Equal(profile.VisibleSocials.Select(s => s.Service), options.Social.Select(s => s.Service));
+    }
 
     [Theory]
-    [InlineData("/works", "/report?from=%2Fworks")]
-    [InlineData("/", "/report?from=%2F")]
-    [InlineData("/a/b_c-d.e", "/report?from=%2Fa%2Fb_c-d.e")]
-    [InlineData("/report", "/report")]
-    [InlineData("/privacy", "/report")]
-    [InlineData("/not-found", "/report")]
-    [InlineData("/x y", "/report")]
-    [InlineData("//evil.example", "/report")]
-    [InlineData("/<script>", "/report")]
-    [InlineData("", "/report")]
-    public void Report_link_carries_the_current_page_only_when_it_is_safe(string path, string expected) =>
-        Assert.Equal(expected, SiteFooterLinks.ReportHref(path));
-
-    [Fact]
-    public void A_too_long_path_is_not_carried() =>
-        Assert.Equal("/report", SiteFooterLinks.ReportHref("/" + new string('a', 300)));
-
-    [Fact]
-    public void Production_robots_points_to_the_sitemap()
+    [InlineData("2026-10-23", "2026-10-23", true)]
+    [InlineData("2026-10-23", "2026-10-09", true)]
+    [InlineData("2026-10-23", "2026-10-08", false)]
+    [InlineData("2026-10-23", "2026-10-24", false)]
+    public void New_chip_is_for_updates_within_14_days_of_the_browsers_today(string today, string date, bool expected)
     {
-        var robots = StaticSiteExporter.BuildRobots(new SiteOptions(SiteOptions.ProductionHost));
-        Assert.Contains("Sitemap: https://fara-labs.com/sitemap.xml", robots);
+        var clock = new BrowserClock { Today = DateOnly.Parse(today) };
+        Assert.Equal(expected, clock.IsNew(DateOnly.Parse(date)));
     }
 
     [Fact]
-    public void Develop_robots_has_no_sitemap()
-    {
-        var robots = StaticSiteExporter.BuildRobots(new SiteOptions("dev.fara-labs.com"));
-        Assert.DoesNotContain("Sitemap:", robots);
-    }
+    public void New_chip_is_never_shown_without_a_browser_date() =>
+        Assert.False(new BrowserClock().IsNew(new DateOnly(2026, 10, 23)));
 
     [Fact]
-    public void Sitemap_lists_each_page_on_the_production_origin()
+    public void Page_titles_follow_the_profile_name()
     {
-        var sitemap = StaticSiteExporter.BuildSitemap(new SiteOptions(SiteOptions.ProductionHost), ["/", "/works"]);
-        Assert.Contains("<loc>https://fara-labs.com/</loc>", sitemap);
-        Assert.Contains("<loc>https://fara-labs.com/works</loc>", sitemap);
+        var profile = new Profile { Name = "Fara", Tagline = "t", Bio = "b" };
+        Assert.Equal("Fara | Portfolio", PageCatalog.Home(profile).Title);
+        Assert.Equal("Profile | Fara", PageCatalog.ProfilePage(profile).Title);
+        Assert.Equal("問い合わせ | Fara Portfolio", PageCatalog.Report().Title);
+        Assert.All(PageCatalog.All(profile), p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 }

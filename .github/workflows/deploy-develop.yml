@@ -41,24 +41,9 @@ jobs:
       - name: Test (data files)
         run: dotnet test --configuration Release
 
-      - name: Report form script test
-        run: npm run test:js
-
-      # 確認用（dev.fara-labs.com）の書き出し。fara-labs.com 配下のリンクは確認用の URL に置き換える（--site-host）
-      - name: Export static site (develop)
-        run: >
-          dotnet run --project src/FaraPortfolio.Web
-          --configuration Release
-          --no-launch-profile
-          -- --export dist --site-host dev.fara-labs.com
-
-      # 確認用サイトが検索結果に載らないようにする（dist/_headers に付ける）
-      - name: Add noindex header
-        run: |
-          cat >> dist/_headers <<'HEADERS'
-          /*
-            X-Robots-Tag: noindex, nofollow
-          HEADERS
+      # 確認用（dev.fara-labs.com）の公開用サイトの作成。fara-labs.com 配下のリンクは確認用の URL にし、検索結果に載らない（noindex）_headers を付ける
+      - name: Publish static site (develop)
+        run: npm run publish:site:develop
 
       - name: Deploy to Cloudflare Workers (develop)
         run: npx wrangler deploy --env develop

@@ -1,13 +1,13 @@
 # fara-portfolio-site
 
-自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 10 の静的 SSR（Razor コンポーネントを、ページごとの HTML に書き出す）で作り、Cloudflare Workers に公開します。
+自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit）で作った静的サイトを、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
 - 更新履歴（何月何日に何を更新したか）
 - SNS リンク
 
-サーバー・データベースは使っていません（Worker は、お知らせ・メンテナンス・問い合わせの受け口だけ）。サイトの中身は `wwwroot/data/` の JSON を編集して更新します。JSON は書き出すときに HTML へ埋め込まれ、ブラウザは JSON を読みません。
+サーバー・データベースは使っていません（Worker は、メンテナンスの状態・問い合わせの受け口だけ）。サイトの中身は `wwwroot/data/` の JSON を編集して更新します。ブラウザは起動のときに JSON を 1 回だけ読み、検索エンジン・JavaScript の無い環境向けの本文入りの HTML は、公開用の作成（`npm run publish:site`）のときに JSON から作ります。
 
 ## フォルダ構成
 
@@ -16,28 +16,28 @@ fara-portfolio-site/
 ├── FaraPortfolio.sln
 ├── global.json                       使用する .NET SDK（10.0）
 ├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）
-├── package.json                      wrangler（Cloudflare の CLI）のバージョン固定
+├── package.json                      wrangler のバージョン固定と、公開用の作成・テストのスクリプト
+├── external/fara-site-kit/           共通部品（サブモジュール。Razor・Core・Worker の JS・build-pages・CSP）
 ├── docs/cloudflare-setup.md          Cloudflare・GitHub の初期設定手順
-├── src/FaraPortfolio.Web/            静的 SSR のサイト本体（dotnet run -- --export dist で HTML を書き出す）
-│   ├── App.razor / Routes.razor      HTML の土台（head・ルーティング）
-│   ├── Components/                   ヘッダー・フッター・アイコン・カード・ページごとの title / OGP（PageMeta）
-│   ├── Publishing/                   HTML の書き出し（StaticSiteExporter.cs）
-│   ├── Layout/MainLayout.razor       全ページ共通の枠（パララックス背景）
-│   ├── Pages/                        Home / Profile / Works / Updates / Links / Report / Privacy / NotFound
-│   ├── Models/ Services/             データの型と読み込み
+├── src/FaraPortfolio.Web/            サイト本体（Blazor WebAssembly）
+│   ├── App.razor                     ルーティング（見つからない URL は kit の 404）
+│   ├── Components/                   AppShell（背景・ヘッダー・フッターの枠）・ヘッダー・アイコン・カード
+│   ├── Layout/MainLayout.razor       全ページ共通の枠（MudBlazor の土台・お知らせの帯）
+│   ├── Pages/                        Home / Profile / Works / Updates / Links / Report / Privacy
+│   ├── Models/ Services/             データの型と読み込み・ページの題名（PageCatalog）・サイト設定（SiteInfo）
 │   └── wwwroot/
+│       ├── index.html                起動の土台（読み込み表示・CSS/JS の読み込み順。ダーク固定）
 │       ├── data/                     ★ サイトの中身（ここを編集する）
 │       │   ├── profile.json          名前・自己紹介・SNS リンク
 │       │   ├── works.json            作品一覧
 │       │   └── updates.json          更新履歴
 │       ├── css/app.css               デザイン（紫ベース）
-│       ├── js/site.js                スクロール演出・メニュー・更新履歴の絞り込み
-│       ├── js/report.js              問い合わせフォームの送信（Turnstile・POST /api/report）
+│       ├── js/site.js                スクロール演出・メニューの外側タップ／Esc・今日の日付
 │       └── .assetsignore             Cloudflare にアップロードしないファイル
-├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック、書き出しと同じページの検証（StaticPageTests）
-├── tests/js/                         問い合わせフォームの純粋な関数（node --test）
-├── worker/                           Worker（お知らせ・メンテナンス・問い合わせの受け口）と、そのテスト
-├── dist/                             書き出した静的サイト（Git に入れない。公開するのはこの中身）
+├── tools/                            公開用の作成: PrerenderPages（本文の HTML を作る）・build-pages.mjs（kit の build-pages）・site.json
+├── tests/FaraPortfolio.Tests/        data/*.json の書式チェック、入口ページの本文の検証（PrerenderTests）、リンク・SNS・NEW のテスト
+├── worker/                           Worker（メンテナンスの状態・問い合わせの受け口）と、そのテスト
+├── publish/                          公開する静的サイト（Git に入れない。publish/wwwroot が公開する中身）
 └── .github/workflows/
     ├── build.yml                     PR・master への push でビルド・テスト・公開設定チェック（公開しない）
     ├── deploy-develop.yml            develop への push で確認用サイト（dev.fara-labs.com）に公開
@@ -97,13 +97,14 @@ feature/xxx ──PR──▶ develop ──PR──▶ master ──(自動)─
 ## ローカルで動かす
 
 ```bash
-dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（普段の確認はこれ。お知らせ・問い合わせの送信は Worker が無いので動かない）
-dotnet test                                  # data/*.json と、ページの中身のチェック
+git submodule update --init                  # 初回のみ（external/fara-site-kit）
+dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（画面の確認。メンテナンスの状態・問い合わせの送信は Worker が無いので動かない）
+dotnet test                                  # data/*.json と、入口ページの本文のチェック
 
 # Cloudflare と同じ動き（/works などの直接アクセス含む）で確認したいとき（Node.js が必要）
 npm ci                                       # 初回のみ
-npm run preview                              # dist/ を書き出してから wrangler dev → http://localhost:8787（Worker も動く）
+npm run preview                              # dotnet publish → 入口ページの作成 → wrangler dev → http://localhost:8787（Worker も動く）
 
-# 静的サイトを書き出すだけ（dist/ に HTML と静的ファイルが出る）
-dotnet run --project src/FaraPortfolio.Web -c Release --no-launch-profile -- --export dist
+# 公開する静的サイトを作るだけ（publish/wwwroot に出る。確認用のリンクにするときは publish:site:develop）
+npm run publish:site
 ```

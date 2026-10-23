@@ -1,8 +1,7 @@
 @page "/"
 @inject SiteData Data
-@inject SiteOptions Site
 
-<PageMeta Title="@($"{Data.Profile.Name} | Portfolio")" Description="@Data.Profile.Tagline" Path="/" />
+<PageTitle>@PageCatalog.Home(Data.Profile).Title</PageTitle>
 
 <section class="hero">
     <div class="container hero-inner">
@@ -86,7 +85,7 @@
         <div class="cta-socials">
             @foreach (var s in Data.Profile.VisibleSocials)
             {
-                <a class="social-pill service-@s.Service" href="@Site.Localize(s.Url)" target="_blank" rel="noopener noreferrer">
+                <a class="social-pill service-@s.Service" href="@SiteLinks.Localize(s.Url)" target="_blank" rel="noopener noreferrer">
                     <span class="pill-icon"><Icon Name="@Icon.ForService(s.Service)" Size="16" /></span> @s.Label
                 </a>
             }
