@@ -17,6 +17,32 @@ const ENVIRONMENTS = ["production", "develop"];
 /** 共有したときに出す画像（これまでの og:image と同じ） */
 const OG_IMAGE = "/images/logo.png";
 
+/** 404.html の本文（Razor の 404 の画面。tools/PrerenderPages が作る not-found.json）。JavaScript が無くても読める。 */
+export function toNotFoundPage(file) {
+    if (typeof file?.title !== "string" || typeof file?.bodyHtml !== "string" || file.bodyHtml === "") {
+        throw new Error("not-found.json に title と bodyHtml が要ります（tools/PrerenderPages を先に実行してください）");
+    }
+    return { title: file.title, bodyHtml: file.bodyHtml };
+}
+
+/**
+ * kit の出力に、サイト側の調整を足す（kit は触らない）。
+ *  - 共有カード: og:image は 256×256 の logo.png（正方形）なので、twitter:card は summary に固定する（kit は og:image があると summary_large_image にする）
+ *  - /data/*.json（サイトの中身）は、検索に出さない（X-Robots-Tag: noindex）
+ */
+export function adjustFiles(files) {
+    for (const [name, content] of files) {
+        if (name.endsWith(".html") && typeof content === "string") {
+            files.set(name, content.replace('<meta name="twitter:card" content="summary_large_image" />', '<meta name="twitter:card" content="summary" />'));
+        }
+    }
+    const headers = files.get("_headers");
+    if (typeof headers === "string") {
+        files.set("_headers", headers.replace(/\n*$/, "\n") + "\n/data/*\n  X-Robots-Tag: noindex\n");
+    }
+    return files;
+}
+
 /** pages.json（Razor のページから作った path・title・description・bodyHtml の配列）を、kit の入力にする。 */
 export function toKitPages(pages) {
     if (!Array.isArray(pages) || pages.length === 0) throw new Error("pages.json が空です（tools/PrerenderPages を先に実行してください）");
@@ -24,7 +50,7 @@ export function toKitPages(pages) {
 }
 
 /** dir（dotnet publish の wwwroot）に、入口ページ・404.html・robots.txt・sitemap.xml・_headers を書き出す。書いたファイル名を返す。 */
-export function run({ dir, env, pagesFile, siteFile = SITE_FILE }) {
+export function run({ dir, env, pagesFile, notFoundFile, siteFile = SITE_FILE }) {
     if (!ENVIRONMENTS.includes(env)) throw new Error(`--env は ${ENVIRONMENTS.join(" か ")} を指定してください`);
     const indexPath = join(dir, "index.html");
     if (!existsSync(indexPath)) throw new Error(`${indexPath} がありません（先に dotnet publish してください）`);
@@ -34,18 +60,20 @@ export function run({ dir, env, pagesFile, siteFile = SITE_FILE }) {
     copyFileSync(indexPath, templatePath);
     const pages = toKitPages(JSON.parse(readFileSync(pagesFile, "utf8")));
     const site = JSON.parse(readFileSync(siteFile, "utf8"));
+    if (notFoundFile) site.notFoundPage = toNotFoundPage(JSON.parse(readFileSync(notFoundFile, "utf8")));
     const template = readFileSync(templatePath, "utf8");
-    const files = buildPages({ site, pages, template, env });
+    const files = adjustFiles(buildPages({ site, pages, template, env }));
     assertTemplateNotOverwritten(templatePath, dir, files);
     return writeFiles(resolve(dir), files);
 }
 
 function parseArgs(argv) {
-    const args = { env: "production", dir: join(root, "publish", "wwwroot"), pagesFile: join(root, "artifacts", "pages.json") };
+    const args = { env: "production", dir: join(root, "publish", "wwwroot"), pagesFile: join(root, "artifacts", "pages.json"), notFoundFile: join(root, "artifacts", "not-found.json") };
     for (let i = 0; i < argv.length; i++) {
         if (argv[i] === "--env") args.env = argv[++i];
         else if (argv[i] === "--dir") args.dir = resolve(argv[++i]);
         else if (argv[i] === "--pages") args.pagesFile = resolve(argv[++i]);
+        else if (argv[i] === "--not-found") args.notFoundFile = resolve(argv[++i]);
         else throw new Error(`知らない引数: ${argv[i]}`);
     }
     return args;

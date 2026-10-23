@@ -11,8 +11,13 @@ var baseAddress = builder.HostEnvironment.BaseAddress;
 var http = new HttpClient { BaseAddress = new Uri(baseAddress) };
 
 // サイトの中身（wwwroot/data/*.json）は起動のときに 1 回だけ読む。最初の描画の前に必要（静的な本文を、空の画面に置き換えないため）
-var data = await SiteData.LoadAsync(http);
+// メンテナンスの状態（/api/maintenance）も同時に取る（起動を待たせない）
+var dataTask = SiteData.LoadAsync(http);
+var maintenanceTask = MaintenanceInfo.LoadAsync(http);
+await Task.WhenAll(dataTask, maintenanceTask);
+var data = dataTask.Result;
 builder.Services.AddSingleton(data);
+builder.Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
 
 // 共通部品（fara-site-kit の Razor。フッター・報告フォームなど）の設定。値は Services/SiteInfo.cs。
 // 確認用のホストで開いているときの、fara-labs.com 配下のリンクの切り替えは、開いているホスト名で決める
@@ -20,7 +25,7 @@ builder.Services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Prof
 SiteLinks.CurrentHost = new Uri(baseAddress).Host;
 
 // メンテナンスの状態（Worker の変数 MAINTENANCE。external/fara-site-kit/worker/maintenance.js）。読めなければ通常
-builder.Services.AddSingleton(await MaintenanceInfo.LoadAsync(http));
+builder.Services.AddSingleton(maintenanceTask.Result);
 
 builder.Services.AddSingleton(http);
 builder.Services.AddSingleton<BrowserClock>();

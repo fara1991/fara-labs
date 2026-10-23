@@ -2,7 +2,7 @@
 //  - スクロール量を CSS 変数 --progress に流す（上部の進捗バー）。スクロールするのは .site-scroll（ヘッダーの下の領域）
 //  - .reveal 要素が画面に入ったら .is-visible を付ける（フェードイン）。js-ready を付けたあとだけ隠すので、失敗しても本文は見える
 //  - 軌道アイコン: タッチしている間は止める。説明（.satellite-tip）が画面からはみ出すときは内側に寄せる
-//  - スマホのメニュー: 開閉は Razor（Components/SiteHeader.razor）。外側タップ・Esc で閉じるのは、ここから開閉ボタンを押す
+//  - スマホのメニュー: 開閉は Razor（Components/SiteHeader.razor。開いたら最初のリンクへフォーカス = focusMenu）。外側タップ・Esc で閉じるのは、ここから開閉ボタンを押す
 //  - works#id で来たら該当の作品の枠を 1 回光らせる
 //  - 戻る・進むで、離れたときのスクロール位置に戻す（sessionStorage に一時保存する）
 //
@@ -153,6 +153,7 @@
     const pageChanged = (backNavigation = false) => {
         backNavigation = backNavigation || popped;
         popped = false;
+        const moved = !firstCall;
         if (firstCall) {
             // 最初の表示が、戻る・進むで来たとき（ほかのサイトからの戻りなど）も、離れたときの位置へ
             firstCall = false;
@@ -164,6 +165,8 @@
         const el = scrollEl();
         const target = backNavigation ? (positions[pageKey()] || 0) : 0;
         activeKey = pageKey();
+        // アプリ内でページを移ったときは、本文（main）へフォーカスを移す（読み上げ・キーボードの利用者が、新しいページの先頭から読めるように）。最初の表示では動かさない
+        if (moved) focusMain();
         if (!el) return;
         if (location.hash) {
             scrollToHash();
@@ -178,8 +181,10 @@
         const two = (n) => String(n).padStart(2, '0');
         return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
     };
-    const focusMain = () => document.getElementById('main-content')?.focus();
-    window.faraSite = { pageChanged, scrollToHash, today, focusMain };
+    const focusMain = () => document.getElementById('main-content')?.focus({ preventScroll: true });
+    // スマホのメニューを開いたとき、最初のリンクへフォーカスを移す
+    const focusMenu = () => document.querySelector('#site-nav .nav-link')?.focus();
+    window.faraSite = { pageChanged, scrollToHash, today, focusMain, focusMenu };
 
     // 初回の読み込み。機能ごとに、失敗しても他の機能は動くようにする
     const safely = (fn) => { try { fn(); } catch (e) { /* その機能だけ止まる。本文は読める */ } };

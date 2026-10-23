@@ -13,12 +13,15 @@ public sealed class PrerenderTests : IAsyncLifetime
 {
     private IReadOnlyList<PrerenderedPage> production = [];
     private IReadOnlyList<PrerenderedPage> develop = [];
+    private PrerenderedPage notFound = default!;
 
     public async Task InitializeAsync()
     {
         var data = SiteData.Load(Path.Combine(AppContext.BaseDirectory, "data"));
-        production = await PagePrerenderer.RenderAllAsync(data, SiteInfo.ProductionHost);
-        develop = await PagePrerenderer.RenderAllAsync(data, SiteInfo.DevelopHost);
+        var prod = await PagePrerenderer.RenderAllAsync(data, SiteInfo.ProductionHost);
+        production = prod.Pages;
+        notFound = prod.NotFound;
+        develop = (await PagePrerenderer.RenderAllAsync(data, SiteInfo.DevelopHost)).Pages;
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -121,12 +124,67 @@ public sealed class PrerenderTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Report_page_is_readable_without_javascript()
+    public void Report_page_is_the_same_form_the_browser_renders_so_the_heading_does_not_change_on_boot()
     {
         var html = Text(production[5]);
-        Assert.Contains("問い合わせ", html);
-        Assert.Contains("JavaScript", html);
-        Assert.Contains("href=\"/links\"", html);
+        Assert.Contains("<h3>問い合わせ</h3>", html);
+        Assert.DoesNotContain("<h1>問い合わせ</h1>", html);
+        Assert.Contains("id=\"report-message\"", html);
+        Assert.Contains("id=\"report-category\"", html);
+        Assert.Contains("fsk-page-header fsk-page-column", html);
+    }
+
+    [Fact]
+    public void Aria_current_marks_the_page_in_the_static_header()
+    {
+        Assert.Contains("href=\"/works\" aria-current=\"page\"", Text(production[2]));
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(Text(production[2]), "aria-current=\"page\""));
+    }
+
+    [Fact]
+    public void Skip_link_is_in_the_static_body()
+    {
+        Assert.All(production, p => Assert.Contains("class=\"skip-link\" href=\"https://fara-labs.com" + p.Path + "#main-content\"", Text(p)));
+    }
+
+    [Fact]
+    public void Not_found_body_is_readable_without_javascript_and_has_no_report_origin_page()
+    {
+        var html = Text(notFound);
+        Assert.StartsWith("<div class=\"entry-static\">", notFound.BodyHtml);
+        Assert.Equal("ページが見つかりません | Fara", notFound.Title);
+        Assert.Contains("class=\"fsk-not-found-code\"", html);
+        Assert.Contains("ページが見つかりません", html);
+        Assert.Contains("href=\"/\"", html);
+        // どのページでもない URL なので、問い合わせに ?from= を付けず、ヘッダーの現在地も無い
+        Assert.DoesNotContain("?from=", html);
+        Assert.DoesNotContain("aria-current", html);
+    }
+
+    [Fact]
+    public void Privacy_policy_matches_what_the_site_stores_in_the_browser()
+    {
+        // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
+        var policy = Text(production[6]);
+        Assert.Contains("localStorage・Cookie などに保存しません", policy);
+        Assert.Contains("sessionStorage", policy);
+        var siteJs = File.ReadAllText(FindUp("src/FaraPortfolio.Web/wwwroot/js/site.js"));
+        Assert.Contains("sessionStorage", siteJs);
+        Assert.DoesNotContain("localStorage", siteJs);
+        Assert.DoesNotContain("document.cookie", siteJs);
+        var webSources = Directory.EnumerateFiles(Path.GetDirectoryName(FindUp("src/FaraPortfolio.Web/Program.cs"))!, "*.*", SearchOption.AllDirectories)
+            .Where(f => (f.EndsWith(".cs") || f.EndsWith(".razor")) && !f.EndsWith("Privacy.razor") && !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"));
+        Assert.All(webSources, f => Assert.DoesNotContain("localStorage", File.ReadAllText(f)));
+    }
+
+    private static string FindUp(string relative)
+    {
+        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
+        {
+            var candidate = Path.Combine(dir.FullName, relative);
+            if (File.Exists(candidate)) return candidate;
+        }
+        throw new FileNotFoundException(relative);
     }
 
     [Fact]

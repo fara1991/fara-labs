@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { run, toKitPages } from "./build-pages.mjs";
+import { run, toKitPages, toNotFoundPage } from "./build-pages.mjs";
 
 const TEMPLATE = `<!DOCTYPE html><html lang="ja"><head><!-- SEO-HEAD:START --><title>x</title><!-- SEO-HEAD:END --></head>
 <body><div id="boot-indicator"></div><div id="app"><!-- SEO-BODY:START --><!-- SEO-BODY:END --></div></body></html>`;
@@ -52,7 +52,7 @@ test("production: 入口ページ（ホームは index.html）・404.html・robo
     assert.match(headers, /static\.cloudflareinsights\.com/);
     assert.match(headers, /challenges\.cloudflare\.com/);
     assert.match(headers, /'wasm-unsafe-eval'/);
-    assert.ok(!/X-Robots-Tag/.test(headers));
+    assert.ok(!/X-Robots-Tag/.test(headers.split("/data/*")[0]), "production の全体は noindex にしない");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -87,4 +87,52 @@ test("--env が不正なときはエラー", () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("共有カードは summary に固定する（og:image は正方形のロゴ。kit は summary_large_image にする）", () => {
+  const { root, dir, pagesFile } = setup();
+  try {
+    run({ dir, env: "production", pagesFile });
+    const html = readFileSync(join(dir, "index.html"), "utf8");
+    assert.match(html, /property="og:image" content="https:\/\/fara-labs\.com\/images\/logo\.png"/);
+    assert.match(html, /name="twitter:card" content="summary" \/>/);
+    assert.ok(!/summary_large_image/.test(html));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("_headers: _framework の指紋付きファイルだけ長期キャッシュ（immutable）、/data/* は noindex", () => {
+  const { root, dir, pagesFile } = setup();
+  try {
+    run({ dir, env: "production", pagesFile });
+    const headers = readFileSync(join(dir, "_headers"), "utf8");
+    for (const path of ["/_framework/*.wasm", "/_framework/dotnet.native.*.js", "/_framework/dotnet.runtime.*.js"]) {
+      assert.ok(headers.includes(`${path}\n  Cache-Control: public, max-age=31536000, immutable`), path);
+    }
+    // 指紋の無い blazor.webassembly.js・dotnet.js は、長期キャッシュにしない（デプロイ後に古いファイルが残るため）
+    assert.ok(!/_framework\/\*(?!\.wasm)/.test(headers.replace(/_framework\/(dotnet\.native|dotnet\.runtime)\.\*\.js/g, "")));
+    assert.match(headers, /\/data\/\*\n {2}X-Robots-Tag: noindex\n$/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("404.html: Razor の 404 の本文と題名を入れる（JavaScript が無くても読める）", () => {
+  const { root, dir, pagesFile } = setup();
+  try {
+    const notFoundFile = join(root, "not-found.json");
+    writeFileSync(notFoundFile, JSON.stringify({ title: "ページが見つかりません | Fara", bodyHtml: '<div class="entry-static"><p>ページが見つかりません</p></div>' }));
+    run({ dir, env: "production", pagesFile, notFoundFile });
+    const html = readFileSync(join(dir, "404.html"), "utf8");
+    assert.match(html, /<title>ページが見つかりません \| Fara<\/title>/);
+    assert.match(html, /<p>ページが見つかりません<\/p>/);
+    assert.match(html, /name="robots" content="noindex"/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("toNotFoundPage: title か bodyHtml が無ければエラー", () => {
+  assert.throws(() => toNotFoundPage({ title: "x" }), /not-found\.json/);
 });

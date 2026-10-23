@@ -29,10 +29,12 @@ public sealed class SiteData
     /// <summary>ブラウザから、同じオリジンの data/*.json を読む。</summary>
     public static async Task<SiteData> LoadAsync(HttpClient http)
     {
-        var profile = await ReadAsync<Profile>(http, ProfileFile);
-        var works = await ReadAsync<List<Work>>(http, WorksFile);
-        var updates = await ReadAsync<List<UpdateEntry>>(http, UpdatesFile);
-        return Create(profile, works, updates);
+        // 3 つを同時に取る
+        var profile = ReadAsync<Profile>(http, ProfileFile);
+        var works = ReadAsync<List<Work>>(http, WorksFile);
+        var updates = ReadAsync<List<UpdateEntry>>(http, UpdatesFile);
+        await Task.WhenAll(profile, works, updates);
+        return Create(profile.Result, works.Result, updates.Result);
     }
 
     private static SiteData Create(Profile profile, List<Work> works, List<UpdateEntry> updates) => new()

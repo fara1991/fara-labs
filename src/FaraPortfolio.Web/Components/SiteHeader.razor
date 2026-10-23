@@ -1,5 +1,6 @@
 @implements IDisposable
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <header class="site-header">
     <div class="scroll-progress" aria-hidden="true"></div>
@@ -24,6 +25,7 @@
 
 @code {
     private bool open;
+    private bool focusMenu;
 
     /// <summary>いま表示しているページのパス（末尾の / は外す。トップは空）。</summary>
     private string Path => new Uri(Nav.Uri).AbsolutePath.TrimEnd('/');
@@ -34,7 +36,20 @@
 
     private string? Current(string href) => IsCurrent(href) ? "page" : null;
 
-    private void Toggle() => open = !open;
+    private void Toggle()
+    {
+        open = !open;
+        focusMenu = open;
+    }
+
+    // 開いたとき、最初のリンクへフォーカスを移す（キーボード・読み上げの利用者向け）
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!focusMenu) return;
+        focusMenu = false;
+        try { await JS.InvokeVoidAsync("faraSite.focusMenu"); }
+        catch (JSException) { }
+    }
 
     protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
 

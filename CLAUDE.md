@@ -23,6 +23,7 @@
   - `.reveal` を付けた要素は画面に入るとフェードイン（`style="--d:N"` で遅延）。`js-ready` が付いたときだけ隠す。ページを移るたびに `MainLayout` が `faraSite.pageChanged` を呼び、新しい本文を監視し直す
   - フェードインは `translate` プロパティで動かしているので、ホバー演出には `transform` を使う
 - 公開するのは `publish/wwwroot`（Git に入れない）。Worker（`worker/index.js`）は、報告（`/api/report`）・メンテナンスの状態（`/api/maintenance`）・メンテナンス中の 503 を担当する。お知らせの帯は、アプリが `/api/maintenance` を読んで出す
+- 静的ファイルのキャッシュ: `tools/site.json` の `csp.cacheRules` で、`_framework` の指紋付き（`*.wasm`・`dotnet.native.*.js`・`dotnet.runtime.*.js`）だけを `immutable` の長期キャッシュにする（`blazor.webassembly.js`・`dotnet.js` は指紋が無いので、毎回の再検証のまま）。`tools/build-pages.mjs` が、`/data/*` の noindex と共有カード（`twitter:card` = `summary`）も足す
 - 公開設定は `wrangler.jsonc`（本番はトップレベル、確認用は `env.develop`）。wrangler のバージョンは `package.json` で固定。`run_worker_first: true`（すべての経路を Worker に通す。`_headers` の CSP は、Worker 経由の静的アセットにも付く）
 - `npm run publish:site`（確認用は `publish:site:develop`。`preview` / `check` も）は publish 前に `publish` / `artifacts` / `bin` / `obj` を削除する（`npm run clean`）
 - ローカル（WSL）では `dotnet publish` の ILLink が `IL1012` や終了コード 139 でたまに落ちる。`bin` / `obj` を消した状態でも起き、再実行すると通る。コードの問題ではないので、まず再実行する

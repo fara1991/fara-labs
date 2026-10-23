@@ -1,5 +1,6 @@
 @page "/updates"
 @inject SiteData Data
+@inject RenderEnvironment Env
 
 <PageTitle>@PageCatalog.Updates(Data.Profile).Title</PageTitle>
 
@@ -46,7 +47,7 @@
 
 @code {
     /// <summary>ブラウザで動いているか（静的な本文の書き出しでは false。絞り込みのボタンを出さない）。</summary>
-    private static bool Interactive => OperatingSystem.IsBrowser();
+    private bool Interactive => Env.IsInteractive;
 
     private string selected = "all";
 

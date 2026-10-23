@@ -1,12 +1,6 @@
 @page "/report"
 
-@* 問い合わせフォームは、kit の ReportFormView（MudBlazor。送信は /api/report、ボット判定は Turnstile）。
-   これまでどおり検索に出す（noindex にしない）。報告のきっかけになったページは ?from= で受ける（フッターの「問い合わせ」が付ける） *@
-<section class="page container">
-    <ReportFormView From="@From" NoIndex="false"
-                    UnavailableNote="お急ぎの場合は、SNS・リンクから連絡してください。"
-                    MessagePlaceholder="例: 〇〇のページで、画像が表示されません（使っている環境・操作の手順も書いてもらえると助かります）" />
-</section>
+<ReportContent From="@From" />
 
 @code {
     [SupplyParameterFromQuery(Name = "from")] public string? From { get; set; }
