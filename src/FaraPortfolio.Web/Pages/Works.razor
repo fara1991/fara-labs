@@ -1,0 +1,66 @@
+@page "/works"
+@inject SiteData Data
+
+<PageTitle>@PageCatalog.Works(Data.Profile).Title</PageTitle>
+
+<section class="page container">
+    <header class="page-head">
+        <h1>作ったもの</h1>
+        <p class="muted">これまでに作ったものの紹介です。</p>
+    </header>
+
+    <div class="work-detail-list">
+        @foreach (var work in Data.Works)
+        {
+            <article id="@work.Id" class="work-detail glass accent-@work.Accent">
+                <div class="work-detail-visual" aria-hidden="true">
+                    <span class="work-icon big"><Icon Name="@work.Icon" Size="56" /></span>
+                </div>
+                <div class="work-detail-body">
+                    <div class="work-detail-head">
+                        <div class="work-detail-meta">
+                            <span class="chip">@work.Category</span>
+                            @if (!string.IsNullOrWhiteSpace(work.Status))
+                            {
+                                <span class="chip chip-status">@work.Status</span>
+                            }
+                        </div>
+                        <h2>@work.Title</h2>
+                        <p class="work-subtitle">@work.Subtitle</p>
+                    </div>
+                    <p>@(string.IsNullOrWhiteSpace(work.Description) ? work.Summary : work.Description)</p>
+
+                    @if (work.Features.Length > 0)
+                    {
+                        <h3 class="mini-heading">できること</h3>
+                        <ul class="feature-list">
+                            @foreach (var f in work.Features)
+                            {
+                                <li>@f</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (work.Tech.Length > 0)
+                    {
+                        <div class="chip-row tech">
+                            @foreach (var t in work.Tech)
+                            {
+                                <span class="chip chip-outline">@t</span>
+                            }
+                        </div>
+                    }
+
+                    <div class="work-actions">
+                        @foreach (var link in work.Links)
+                        {
+                            <a class="btn @(link.Primary ? "btn-primary" : "btn-ghost")" href="@SiteLinks.Localize(link.Url)" target="_blank" rel="noopener noreferrer">
+                                @link.Label <Icon Name="external" Size="16" />
+                            </a>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+</section>

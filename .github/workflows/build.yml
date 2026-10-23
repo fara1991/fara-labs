@@ -1,0 +1,61 @@
+name: Build
+
+# PR と master への push ではビルド・テストと公開設定のチェックだけ行う（公開はしない）。
+# develop への push は Deploy (develop) が同じチェックをしたうえで確認用サイトに公開する。
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test
+        run: dotnet test --configuration Release
+
+      - name: Maintenance test
+        run: npm run test:maintenance
+
+      - name: Report endpoint test
+        run: npm run test:report
+
+      - name: Worker API test
+        run: npm run test:worker
+
+      - name: Build pages test
+        run: npm run test:pages
+
+      - name: Deploy gate test
+        run: npm run test:gate
+
+      - name: Deploy workflow test
+        run: npm run test:workflow
+
+      # 公開する静的サイトの作成（dotnet publish → 本文入りの入口ページ → _headers・robots・sitemap）。失敗したら、ここで止まる
+      - name: Publish static site
+        run: npm run publish:site
+
+      # Cloudflare にはつながずに wrangler.jsonc と公開ファイルを検証する
+      - name: Check Cloudflare config (dry run)
+        run: |
+          npx wrangler deploy --dry-run --env=""
+          npx wrangler deploy --dry-run --env develop

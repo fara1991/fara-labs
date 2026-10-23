@@ -1,0 +1,176 @@
+[
+  {
+    "id": "pokemon-assistance",
+    "title": "Pokémon Battle Assistant",
+    "subtitle": "ポケモン対戦アシスタント（ダメージ計算サイト）",
+    "category": "Web アプリ",
+    "status": "公開中",
+    "icon": "pokeball",
+    "accent": "pink",
+    "summary": "ダメージ計算・素早さ比較・タイプ相性をブラウザで。Twitch チャットのコマンドからも使えます。",
+    "description": "ポケモン対戦のダメージ計算をはじめ、素早さ比較・育成済みポケモンとチームの管理・タイプ相性の確認ができる Web アプリです。計算はすべてブラウザ内で行うのでサーバー不要・登録不要。同じ計算ロジックを Twitch ボットにも組み込んでいて、配信のチャットから「!dmg」などのコマンドで計算結果を返せます。",
+    "features": [
+      "ダメージ計算（ポケモンチャンピオンズ / スカーレット・バイオレット / ソード・シールド対応）",
+      "素早さ比較・タイプ相性の確認",
+      "育成済みポケモン・チームの登録（ブラウザに保存）",
+      "Twitch チャットのコマンドからも計算可能",
+      "ポケモン・技・使用率データは毎週自動で更新"
+    ],
+    "tech": ["C#", "Blazor WebAssembly", "Cloudflare Workers", "GitHub Actions", "Python"],
+    "links": [
+      { "label": "サイトを開く", "url": "https://pokemon.fara-labs.com/", "primary": true },
+      { "label": "GitHub", "url": "https://github.com/fara1991/fara-pokemon-battle-assistant" }
+    ]
+  },
+  {
+    "id": "bot-moderator",
+    "title": "FaraBotModerator",
+    "subtitle": "Twitch 配信者向けの多機能 BOT ツール",
+    "category": "デスクトップアプリ",
+    "status": "",
+    "icon": "shield",
+    "accent": "violet",
+    "summary": "チャット管理・イベント通知・翻訳・読み上げをまとめてこなす、Twitch 配信向けの BOT ツール。",
+    "description": "Twitch のチャットの取得・送信に加え、Follow / Raid / Sub / Bits / チャンネルポイントなどのイベントを受け取ってチャットで自動応答します。DeepL によるリアルタイム翻訳と棒読みちゃんでの読み上げ、定期メッセージを送るタイマー機能、ポケモンのダメージ計算コマンドも備えています。",
+    "features": [
+      "チャット連携とイベント検知時の自動応答（EventSub）",
+      "DeepL によるリアルタイム翻訳",
+      "棒読みちゃんでの読み上げ",
+      "タイマーでの定期・日時指定チャット",
+      "ポケモンのダメージ計算などのコマンド"
+    ],
+    "tech": [
+      "C#",
+      ".NET 8",
+      "WPF",
+      "TwitchLib",
+      "DeepL API"
+    ],
+    "links": [
+      { "label": "サイトを開く", "url": "https://twitch-bot.fara-labs.com/", "primary": true },
+      { "label": "GitHub", "url": "https://github.com/fara1991/fara-bot-moderator" }
+    ]
+  },
+  {
+    "id": "beat-saber-mods",
+    "title": "BeatSaber Mod一覧",
+    "subtitle": "GitHub で公開している Beat Saber の Mod",
+    "category": "Beat Saber Mod",
+    "status": "",
+    "icon": "saber",
+    "accent": "pink",
+    "summary": "GitHub で公開している Beat Saber の Mod をまとめて見られます。",
+    "description": "",
+    "features": [],
+    "tech": [
+      "C#",
+      "Unity",
+      "BSIPA"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/stars/fara1991/lists/beatsaber-mod",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "music-beat-adjuster",
+    "title": "FaraMusicBeatAdjuster",
+    "subtitle": "音楽ファイルの BPM 分析と開始・終了位置の調整ツール",
+    "category": "デスクトップアプリ",
+    "status": "",
+    "icon": "wave",
+    "accent": "violet",
+    "summary": "音楽ファイルの BPM と拍の位置を検出し、曲の開始・終了位置を調整するアプリ。",
+    "description": "WAV・MP3・M4A などを読み込み、BPM と拍の位置を自動で検出して、冒頭と末尾の空白を調整します。音ズレ補正・音量調整・コンプレッサー・リミッターを備え、BSMG Wiki の基準で音量や準備時間をチェックできます。",
+    "features": [
+      "BPM の自動検出（複数候補・可変 BPM の警告）",
+      "拍の位置の検出と冒頭・末尾の空白の自動調整",
+      "音ズレ補正・音量調整・コンプレッサー・リミッター",
+      "BSMG Wiki 基準での音量・準備時間チェック",
+      "OGG での書き出し"
+    ],
+    "tech": [
+      "C#",
+      ".NET 9",
+      "WPF",
+      "NAudio",
+      "ffmpeg"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-music-beat-adjuster",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "multi-vrm-converter",
+    "title": "FaraMultiVRMConverter",
+    "subtitle": "VRChat アバターを VRM へ一括変換する Unity エディタ拡張",
+    "category": "Unity ツール",
+    "status": "",
+    "icon": "cube",
+    "accent": "indigo",
+    "summary": "複数の VRChat アバターを一度に VRM 形式へ変換できる Unity エディタ拡張です。",
+    "description": "VRChat アバターの Prefab をまとめて VRM に変換します。既存の VRM から BlendShapeProxy や Meta 情報などのコンポーネントをコピーしたり、サムネイルを自動生成して VRM Meta に設定したりできます。VRChat 専用のオブジェクトなど、不要なものを変換時に自動で削除する設定も可能です。",
+    "features": [
+      "複数のアバター Prefab を一括で VRM に変換",
+      "既存の VRM からコンポーネント（BlendShapeProxy・Meta 情報など）をコピー",
+      "サムネイルを自動生成して VRM Meta に設定",
+      "不要なオブジェクトを変換時に自動削除",
+      "日本語・英語の表示切り替え"
+    ],
+    "tech": [
+      "C#",
+      "Unity",
+      "UniVRM",
+      "NDMF",
+      "VRChat SDK"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-multi-vrm-converter",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "avatar-guide",
+    "title": "Avatar Modding Guide",
+    "subtitle": "VRChat アバター改変のための Blender・Unity・VRChat 操作ガイド",
+    "category": "Web アプリ",
+    "status": "",
+    "icon": "book",
+    "accent": "cyan",
+    "summary": "Blender と Unity の基本操作から衣装の着せ替え・改変までを、ブラウザで操作を試しながら確認できるサイト。",
+    "description": "VRChat などで使うアバターの改変に向けて、Blender と Unity の操作方法、ショートカット、おすすめのアドオンやツール、衣装の作り方・着せ替えの手順をまとめています。記事の中で Blender や Unity に似た画面を実際に操作して手順を試せるほか、URL を共有して複数人で同じ画面を操作することもできます。改変でよくある質問・TIPS・用語集・リンク集も載せています。",
+    "features": [
+      "Blender・Unity の操作方法と衣装の作成・着せ替え手順",
+      "ブラウザ上で Blender・Unity と同じキー操作を試せる練習画面",
+      "URL を共有して複数人で同じ画面を操作できる練習部屋",
+      "改変 Q&A・TIPS・用語集・何て名前？・リンク集",
+      "全ページ横断の検索（Ctrl+K）"
+    ],
+    "tech": [
+      "C#",
+      ".NET 9",
+      "Blazor（静的 SSR）",
+      "Markdown",
+      "Three.js",
+      "Cloudflare Workers",
+      "Durable Objects"
+    ],
+    "links": [
+      { "label": "サイトを開く", "url": "https://avatar.fara-labs.com/", "primary": true },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/fara1991/fara-avatar-modding-guide"
+      }
+    ]
+  }
+]
