@@ -37,18 +37,6 @@
             {
                 "path": "/_framework/dotnet.runtime.*.js",
                 "value": "public, max-age=31536000, immutable"
-            },
-            {
-                "path": "/og-v*",
-                "value": "public, max-age=31536000, immutable"
-            },
-            {
-                "path": "/favicon-v*",
-                "value": "public, max-age=31536000, immutable"
-            },
-            {
-                "path": "/apple-touch-icon-v*",
-                "value": "public, max-age=31536000, immutable"
             }
         ]
     }
