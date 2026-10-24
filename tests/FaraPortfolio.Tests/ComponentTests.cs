@@ -59,7 +59,7 @@ public sealed class ComponentTests : BunitContext
 
         var brand = cut.Find("a.brand");
         Assert.Equal("/", brand.GetAttribute("href"));
-        Assert.Equal("Fara Lab", brand.TextContent.Trim());
+        Assert.Equal("Fara Labs", brand.TextContent.Trim());
         // ナビ・メニューボタンより前（左）に置く。ナビの aria-current の数は変わらない
         var inner = cut.Find(".header-inner");
         Assert.Equal("brand", inner.Children[0].ClassName);
