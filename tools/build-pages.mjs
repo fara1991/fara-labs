@@ -14,8 +14,11 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_FILE = join(root, "tools", "site.json");
 const TEMPLATE_DIR = join(root, "artifacts", "entry-template");
 const ENVIRONMENTS = ["production", "develop"];
-/** 共有したときに出す画像（これまでの og:image と同じ） */
-const OG_IMAGE = "/images/logo.png";
+/** 共有したときに出す画像（1200×630 のダーク版。ライト版は og-v1-light.png に保存してある。絵を変えたら -v2 にする） */
+const OG_IMAGE = "/og-v1.png";
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 630;
+const OG_IMAGE_ALT = "Fara Labs。中央の「F」から、作品のアイコンが星座のように線でつながっている";
 
 /** 404.html の本文（Razor の 404 の画面。tools/PrerenderPages が作る not-found.json）。JavaScript が無くても読める。 */
 export function toNotFoundPage(file) {
@@ -27,13 +30,20 @@ export function toNotFoundPage(file) {
 
 /**
  * kit の出力に、サイト側の調整を足す（kit は触らない）。
- *  - 共有カード: og:image は 256×256 の logo.png（正方形）なので、twitter:card は summary に固定する（kit は og:image があると summary_large_image にする）
+ *  - 共有カード: kit は og:image と twitter:card（summary_large_image）だけを出すので、画像の大きさ・説明（og:image:width / height / alt）と twitter:image を足す
  *  - /data/*.json（サイトの中身）は、検索に出さない（X-Robots-Tag: noindex）
  */
 export function adjustFiles(files) {
+    const ogImage = /^( *)(<meta property="og:image" content="([^"]*)" \/>)/m;
     for (const [name, content] of files) {
         if (name.endsWith(".html") && typeof content === "string") {
-            files.set(name, content.replace('<meta name="twitter:card" content="summary_large_image" />', '<meta name="twitter:card" content="summary" />'));
+            files.set(name, content.replace(ogImage, (_all, indent, tag, url) => [
+                `${indent}${tag}`,
+                `<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />`,
+                `<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />`,
+                `<meta property="og:image:alt" content="${OG_IMAGE_ALT}" />`,
+                `<meta name="twitter:image" content="${url}" />`,
+            ].join(`\n${indent}`)));
         }
     }
     const headers = files.get("_headers");

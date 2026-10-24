@@ -27,8 +27,8 @@ function setup(pages = PAGES) {
   return { root, dir, pagesFile };
 }
 
-test("toKitPages: すべてのページに og:image（これまでと同じ logo.png）を付ける", () => {
-  assert.ok(toKitPages(PAGES).every((p) => p.ogImage === "/images/logo.png"));
+test("toKitPages: すべてのページに og:image（版付きの 1200×630 の画像）を付ける", () => {
+  assert.ok(toKitPages(PAGES).every((p) => p.ogImage === "/og-v1.png"));
 });
 
 test("toKitPages: 空の一覧はエラー（PrerenderPages を先に実行していない）", () => {
@@ -89,14 +89,30 @@ test("--env が不正なときはエラー", () => {
   }
 });
 
-test("共有カードは summary に固定する（og:image は正方形のロゴ。kit は summary_large_image にする）", () => {
+test("共有カード: summary_large_image + og:image（絶対 URL）・大きさ・説明・twitter:image", () => {
   const { root, dir, pagesFile } = setup();
   try {
     run({ dir, env: "production", pagesFile });
     const html = readFileSync(join(dir, "index.html"), "utf8");
-    assert.match(html, /property="og:image" content="https:\/\/fara-labs\.com\/images\/logo\.png"/);
-    assert.match(html, /name="twitter:card" content="summary" \/>/);
-    assert.ok(!/summary_large_image/.test(html));
+    assert.match(html, /property="og:image" content="https:\/\/fara-labs\.com\/og-v1\.png"/);
+    assert.match(html, /property="og:image:width" content="1200"/);
+    assert.match(html, /property="og:image:height" content="630"/);
+    assert.match(html, /property="og:image:alt" content="[^"]+"/);
+    assert.match(html, /name="twitter:image" content="https:\/\/fara-labs\.com\/og-v1\.png"/);
+    assert.match(html, /name="twitter:card" content="summary_large_image" \/>/);
+    assert.ok(!/content="summary"/.test(html));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("共有カード（develop）: og:image は確認用の URL", () => {
+  const { root, dir, pagesFile } = setup();
+  try {
+    run({ dir, env: "develop", pagesFile });
+    const html = readFileSync(join(dir, "works.html"), "utf8");
+    assert.match(html, /property="og:image" content="https:\/\/dev\.fara-labs\.com\/og-v1\.png"/);
+    assert.match(html, /name="twitter:image" content="https:\/\/dev\.fara-labs\.com\/og-v1\.png"/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -110,6 +126,12 @@ test("_headers: _framework の指紋付きファイルだけ長期キャッシ�
     for (const path of ["/_framework/*.wasm", "/_framework/dotnet.native.*.js", "/_framework/dotnet.runtime.*.js"]) {
       assert.ok(headers.includes(`${path}\n  Cache-Control: public, max-age=31536000, immutable`), path);
     }
+    // 版付きの画像（og-v1・favicon-v1・apple-touch-icon-v1）も長期キャッシュ。favicon.ico（固定名）は付けない
+    for (const path of ["/og-v*", "/favicon-v*", "/apple-touch-icon-v*"]) {
+      assert.ok(headers.includes(`${path}
+  Cache-Control: public, max-age=31536000, immutable`), path);
+    }
+    assert.ok(!/favicon\.ico/.test(headers));
     // 指紋の無い blazor.webassembly.js・dotnet.js は、長期キャッシュにしない（デプロイ後に古いファイルが残るため）
     assert.ok(!/_framework\/\*(?!\.wasm)/.test(headers.replace(/_framework\/(dotnet\.native|dotnet\.runtime)\.\*\.js/g, "")));
     assert.match(headers, /\/data\/\*\n {2}X-Robots-Tag: noindex\n$/);
