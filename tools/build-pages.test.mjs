@@ -126,7 +126,7 @@ test("_headers: _framework の指紋付きファイルだけ長期キャッシ�
     for (const path of ["/_framework/*.wasm", "/_framework/dotnet.native.*.js", "/_framework/dotnet.runtime.*.js"]) {
       assert.ok(headers.includes(`${path}\n  Cache-Control: public, max-age=31536000, immutable`), path);
     }
-    // 版付きの画像（og-v1・favicon-v1・apple-touch-icon-v1）も長期キャッシュ。favicon.ico（固定名）は付けない
+    // 版付きの画像（og-v1・favicon-v2・apple-touch-icon-v2）も長期キャッシュ。favicon.ico（固定名）は付けない
     for (const path of ["/og-v*", "/favicon-v*", "/apple-touch-icon-v*"]) {
       assert.ok(headers.includes(`${path}
   Cache-Control: public, max-age=31536000, immutable`), path);
