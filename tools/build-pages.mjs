@@ -14,8 +14,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_FILE = join(root, "tools", "site.json");
 const TEMPLATE_DIR = join(root, "artifacts", "entry-template");
 const ENVIRONMENTS = ["production", "develop"];
-/** 共有したときに出す画像（1200×630 のダーク版。ライト版は og-v1-light.png に保存してある。絵を変えたら -v2 にする） */
-const OG_IMAGE = "/og-v1.png";
+/** 共有したときに出す画像（1200×630 のダーク版。ライト版は og-light.png に保存してある。絵を変えたら ?v を上げる） */
+const OG_IMAGE = "/og.png?v=1";
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_IMAGE_ALT = "Fara Labs。中央の「F」から、作品のアイコンが星座のように線でつながっている";
