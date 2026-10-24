@@ -126,7 +126,7 @@ Worker は `workers_dev` / `preview_urls` を無効にしてあるので、`*.wo
 | 項目 | 値 |
 |---|---|
 | 組織名 | `Fara Labs` |
-| ロゴ | `https://fara-labs.com/images/logo.png`（favicon と同じ「F」の 256px PNG。本番に公開されてから設定する） |
+| ロゴ | `https://fara-labs.com/images/logo.png`（旧ファビコンの「F」の 256px PNG（ファビコンは分子モデルに変更済み。ロゴは当面そのまま）。本番に公開されてから設定する） |
 | 背景色 | `#0c0616`（サイトの背景色） |
 | ヘッダーテキスト | `Fara Labs 確認用サイト` |
 | フッターテキスト | `関係者のみ閲覧できます。登録済みのメールアドレスに届くコードでログインしてください。` |
