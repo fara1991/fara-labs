@@ -6,12 +6,12 @@
 <section class="hero">
     <div class="container hero-inner">
         <div class="hero-text">
-            @* ページの見出し（h1）は、画面には出さず読み上げ・検索向けに残す *@
-            <h1 class="sr-only">@(Data.Profile.Name)'s Portfolio</h1>
+            @* ページの見出し（h1）。誰のサイトかが最初に分かるよう、画面にも出す（以前の 2 行の大きな見出しより控えめな大きさ） *@
+            <h1 class="hero-heading reveal" style="--d:1">@(Data.Profile.Name)'s Portfolio</h1>
             <p class="hero-tagline reveal" style="--d:2">@Data.Profile.Tagline</p>
             <div class="hero-actions reveal" style="--d:3">
                 <a class="btn btn-primary" href="/works">作ったものを見る <Icon Name="arrow-right" Size="18" /></a>
-                <a class="btn btn-ghost" href="/profile">Profile</a>
+                <a class="btn btn-ghost" href="/profile">プロフィール</a>
             </div>
         </div>
 
@@ -37,6 +37,11 @@
             </div>
             <div class="orbit orbit-inner" aria-hidden="true"></div>
             <div class="core" aria-hidden="true"><span>F</span></div>
+            @* 周りのアイコンが作品へのリンクだと分かるように、軌道の下に一言そえる（マウスの端末とタッチの端末で文言を変える。CSS の hover メディア特性） *@
+            <p class="orbit-hint" aria-hidden="true">
+                <span class="hint-hover">アイコンにカーソルを合わせると作品名、押すと紹介へ</span>
+                <span class="hint-touch">アイコンを押すと、作品の紹介へ移動します</span>
+            </p>
         </div>
     </div>
 </section>
