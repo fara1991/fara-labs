@@ -46,7 +46,7 @@ public sealed class ComponentTests : BunitContext
 
         var current = cut.FindAll("a.nav-link[aria-current='page']");
         Assert.Single(current);
-        Assert.Equal("Works", current[0].TextContent.Trim());
+        Assert.Equal("作ったもの", current[0].TextContent.Trim());
         Assert.Contains("active", current[0].ClassName);
         Assert.Equal(6, cut.FindAll("a.nav-link:not([aria-current])").Count);
     }
@@ -79,7 +79,7 @@ public sealed class ComponentTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal("false", cut.Find("button.menu-toggle").GetAttribute("aria-expanded"));
-            Assert.Equal("Links", cut.Find("a.nav-link[aria-current='page']").TextContent.Trim());
+            Assert.Equal("リンク", cut.Find("a.nav-link[aria-current='page']").TextContent.Trim());
         });
     }
 
