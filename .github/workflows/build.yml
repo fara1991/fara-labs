@@ -1,11 +1,13 @@
 name: Build
 
-# PR と master への push ではビルド・テストと公開設定のチェックだけ行う（公開はしない）。
-# develop への push は Deploy (develop) が同じチェックをしたうえで確認用サイトに公開する。
+# PR と、develop・master への push で、ビルド・テストと公開設定のチェックだけ行う（公開はしない）。
+# 公開は Deploy (develop)・Deploy (production) が行う。動くときはほかのリポジトリの build.yml とそろえている。
 on:
-  pull_request:
+  # PR の間は pull_request の 1 回だけ動かす（作業ブランチへの push では動かさない）。develop・master に入ったときは push で動く
   push:
-    branches: [master]
+    branches: [develop, master]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
