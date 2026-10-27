@@ -15,10 +15,10 @@ const SITE_FILE = join(root, "tools", "site.json");
 const TEMPLATE_DIR = join(root, "artifacts", "entry-template");
 const ENVIRONMENTS = ["production", "develop"];
 /** 共有したときに出す画像（1200×630 のダーク版。ライト版は og-light.png に保存してある。絵を変えたら ?v を上げる） */
-const OG_IMAGE = "/og.png?v=1";
+const OG_IMAGE = "/og.png?v=2";
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
-const OG_IMAGE_ALT = "Fara Labs。中央の「F」から、作品のアイコンが星座のように線でつながっている";
+const OG_IMAGE_ALT = "Fara Labs。中央のサイトアイコンから、作品のアイコンが星座のように線でつながっている";
 
 /** 404.html の本文（Razor の 404 の画面。tools/PrerenderPages が作る not-found.json）。JavaScript が無くても読める。 */
 export function toNotFoundPage(file) {

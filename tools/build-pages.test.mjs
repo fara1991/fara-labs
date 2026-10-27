@@ -28,7 +28,7 @@ function setup(pages = PAGES) {
 }
 
 test("toKitPages: すべてのページに og:image（?v 付きの 1200×630 の画像）を付ける", () => {
-  assert.ok(toKitPages(PAGES).every((p) => p.ogImage === "/og.png?v=1"));
+  assert.ok(toKitPages(PAGES).every((p) => p.ogImage === "/og.png?v=2"));
 });
 
 test("toKitPages: 空の一覧はエラー（PrerenderPages を先に実行していない）", () => {
@@ -94,11 +94,11 @@ test("共有カード: summary_large_image + og:image（絶対 URL）・大き�
   try {
     run({ dir, env: "production", pagesFile });
     const html = readFileSync(join(dir, "index.html"), "utf8");
-    assert.match(html, /property="og:image" content="https:\/\/fara-labs\.com\/og\.png\?v=1"/);
+    assert.match(html, /property="og:image" content="https:\/\/fara-labs\.com\/og\.png\?v=2"/);
     assert.match(html, /property="og:image:width" content="1200"/);
     assert.match(html, /property="og:image:height" content="630"/);
     assert.match(html, /property="og:image:alt" content="[^"]+"/);
-    assert.match(html, /name="twitter:image" content="https:\/\/fara-labs\.com\/og\.png\?v=1"/);
+    assert.match(html, /name="twitter:image" content="https:\/\/fara-labs\.com\/og\.png\?v=2"/);
     assert.match(html, /name="twitter:card" content="summary_large_image" \/>/);
     assert.ok(!/content="summary"/.test(html));
   } finally {
@@ -111,8 +111,8 @@ test("共有カード（develop）: og:image は確認用の URL", () => {
   try {
     run({ dir, env: "develop", pagesFile });
     const html = readFileSync(join(dir, "works.html"), "utf8");
-    assert.match(html, /property="og:image" content="https:\/\/dev\.fara-labs\.com\/og\.png\?v=1"/);
-    assert.match(html, /name="twitter:image" content="https:\/\/dev\.fara-labs\.com\/og\.png\?v=1"/);
+    assert.match(html, /property="og:image" content="https:\/\/dev\.fara-labs\.com\/og\.png\?v=2"/);
+    assert.match(html, /name="twitter:image" content="https:\/\/dev\.fara-labs\.com\/og\.png\?v=2"/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
