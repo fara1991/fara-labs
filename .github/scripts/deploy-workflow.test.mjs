@@ -3,7 +3,9 @@
 // 公開のステップの run を、実際に bash で動かす（npx は引数を出すだけの関数に差し替える）。
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { checkMessage, MAX_MESSAGE_LENGTH } from "./maintenance-message.mjs";
@@ -121,8 +123,33 @@ test("メンテナンス表示の文: 空は通す。200 文字まで（文字�
   assert.match(checkMessage("a".repeat(MAX_MESSAGE_LENGTH + 1)), /200 文字までです（いま 201 文字）/);
   // 絵文字（サロゲートの組）は 1 文字と数える
   assert.equal(checkMessage("😀".repeat(MAX_MESSAGE_LENGTH)), null);
-  assert.match(checkMessage("1行目\n2行目"), /制御文字/);
-  assert.match(checkMessage("タブ\tあり"), /制御文字/);
+  assert.match(checkMessage("1行目\n2行目"), /改行/);
+});
+
+test("メンテナンス表示の文: 改行は pokemon と同じ集合（CR・LF・NEL・U+2028・U+2029）を止める。タブなどの他の文字は通す", () => {
+  for (const cp of [0x0d, 0x0a, 0x85, 0x2028, 0x2029]) {
+    assert.match(checkMessage(`a${String.fromCodePoint(cp)}b`), /改行/, cp.toString(16));
+  }
+  assert.equal(checkMessage("タブ\tあり"), null);
+});
+
+test("サマリー（メンテナンス表示）: 文面の Markdown の特殊文字（バッククォート・< >・改行）を落として書く", () => {
+  const summary = runScript(stepBlock(prod, "Summary (maintenance)"));
+  const dir = mkdtempSync(join(tmpdir(), "maint-summary-"));
+  try {
+    const file = join(dir, "summary.md");
+    // node（概要の取得）は関数に差し替える。書き先は GITHUB_STEP_SUMMARY（一時ファイル）
+    const r = spawnSync("bash", ["-e", "-o", "pipefail", "-c", `node() { echo "- 反映後の現在値: 確認"; }\n${summary}`], {
+      env: { PATH: process.env.PATH, GITHUB_STEP_SUMMARY: file, WORKER_NAME: "fara-portfolio", MAINTENANCE_MESSAGE_INPUT: "a`b<c>d\ne", MAINTENANCE_MODE_INPUT: "notice" },
+      encoding: "utf8",
+    });
+    assert.equal(r.status, 0, r.stderr);
+    const out = readFileSync(file, "utf8");
+    assert.match(out, /MAINTENANCE_MESSAGE=`a"bcde`/);
+    assert.doesNotMatch(out, /[<>]/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("メンテナンス表示の文: スクリプトを実行したとき、問題があれば終了コード 1 と ::error::", () => {
@@ -143,6 +170,8 @@ test("反映後の現在値: 変数の値を JSON の文字列で出し、バッ
   assert.equal(line, "- 反映後の現在値: MAINTENANCE_MODE=`\"notice\"` / MAINTENANCE_MESSAGE=`\"は'x'\"`");
   assert.equal(describeBindings([{ name: "MAINTENANCE_MODE", type: "secret_text" }]), "- 反映後の現在値: MAINTENANCE_MODE=`(secret_text)` / MAINTENANCE_MESSAGE=`(未設定)`");
   assert.equal(describeBindings(undefined), "- 反映後の現在値: MAINTENANCE_MODE=`(未設定)` / MAINTENANCE_MESSAGE=`(未設定)`");
+  // plain_text なのに text が無いときも例外にせず「不明」
+  assert.equal(describeBindings([{ name: "MAINTENANCE_MODE", type: "plain_text" }]), "- 反映後の現在値: MAINTENANCE_MODE=`(不明)` / MAINTENANCE_MESSAGE=`(未設定)`");
 });
 
 test("ワークフロー: 概要は共通のスクリプトを使い（node -e の重複なし）、develop は取り消さない（本番と同じ）", () => {

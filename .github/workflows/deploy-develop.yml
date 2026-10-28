@@ -83,7 +83,8 @@ jobs:
         if: ${{ always() && steps.message.outcome == 'success' }}
         shell: bash
         run: |
-          msg="$(printf '%s' "$MAINTENANCE_MESSAGE_INPUT" | tr '`' '"')"
+          # Markdown の特殊文字を落とす（改行・< >・バッククォートは、コードの囲みを壊すので外す）
+          msg="$(printf '%s' "$MAINTENANCE_MESSAGE_INPUT" | tr -d '\r\n<>' | tr '`' '"')"
           {
             echo "### メンテナンス表示 (${WORKER_NAME})"
             echo "- 設定した値: MAINTENANCE_MODE=\`${MAINTENANCE_MODE_INPUT:-(変更なし)}\` / MAINTENANCE_MESSAGE=\`${msg:-(変更なし)}\`"
