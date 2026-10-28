@@ -178,6 +178,9 @@ public sealed class PrerenderTests : IAsyncLifetime
         // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
         var policy = Text(production[6]);
         Assert.Contains("localStorage・Cookie などに保存しません", policy);
+        // 送信回数の制限（送信元の識別子を、その日の間だけ保存する）の記載
+        Assert.Contains("1 日に 3 回までに制限しています", policy);
+        Assert.Contains("IP アドレスそのものは保存しません", policy);
         Assert.Contains("sessionStorage", policy);
         var siteJs = File.ReadAllText(FindUp("src/FaraPortfolio.Web/wwwroot/js/site.js"));
         Assert.Contains("sessionStorage", siteJs);

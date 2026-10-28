@@ -7,6 +7,13 @@
   "name": "fara-portfolio",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
+  // 報告の 1 日の送信回数の制限（送信元ごと 3 回）。Durable Object（SQLite）。環境は継承しないので、env.develop にも書く
+  "durable_objects": {
+    "bindings": [{ "name": "REPORT_LIMITER", "class_name": "ReportRateLimiter" }]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["ReportRateLimiter"] }
+  ],
   // ダッシュボードで足した変数（MAINTENANCE_MODE・MAINTENANCE_MESSAGE など）を、公開（wrangler deploy）のたびに消さない（トップレベルだけが有効）
   "keep_vars": true,
   "assets": {
@@ -26,6 +33,12 @@
     "develop": {
       // Worker 名（ダッシュボードで変更した名前に合わせる）
       "name": "fara-portfolio-dev",
+      "durable_objects": {
+        "bindings": [{ "name": "REPORT_LIMITER", "class_name": "ReportRateLimiter" }]
+      },
+      "migrations": [
+        { "tag": "v1", "new_sqlite_classes": ["ReportRateLimiter"] }
+      ],
       "assets": {
         "directory": "./publish/wwwroot",
         "binding": "ASSETS",
