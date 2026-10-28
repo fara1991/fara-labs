@@ -1,6 +1,6 @@
 # fara-labs
 
-自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit）で作った静的サイトを、Cloudflare Workers に公開します。
+作ったもの一覧のサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit）で作った静的サイトを、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
