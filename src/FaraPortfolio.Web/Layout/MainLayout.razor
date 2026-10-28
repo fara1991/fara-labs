@@ -45,7 +45,7 @@
         if (!pageChanged || changedUri != Nav.Uri) return;
         pageChanged = false;
         try { await JS.InvokeVoidAsync("faraSite.pageChanged"); }
-        catch (JSException) { /* 演出が動かなくても、本文は読める */ }
+        catch (JSException) { /* 意図的に握る: 演出（フェードイン・位置合わせ）が動かなくても、本文は読める。JS 以外の例外は握らない */ }
     }
 
     public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
