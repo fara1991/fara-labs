@@ -240,7 +240,7 @@ html a:focus-visible, html button:focus-visible {
 .site-nav { display: flex; gap: 4px; margin-left: auto; }
 .nav-link {
     position: relative;
-    padding: 8px 16px;
+    padding: 8.5px 16px;   /* 1 行の高さ（27px）と合わせて 44px。タップの領域の最小に届かせる */
     border-radius: 999px;
     color: var(--muted);
     font-family: var(--font-display);
@@ -782,8 +782,6 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
 .policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
 .policy ul { padding-left: 1.4em; }
 .policy a { color: var(--lavender); }
-/* 報告フォームの補足（内容の文字数など）。kit の fsk-muted の small は既定で 11px 台になるので、12px 以上にそろえる */
-.site-main small.fsk-muted { font-size: 12px; }
 /* 報告フォームの選択欄（MudSelect の入力部。既定の高さは 40px）: タップの領域を 44px 以上に */
 .site-main .fsk-select .mud-input,
 .site-main .fsk-select .mud-input-control-input-container { height: 44px; }

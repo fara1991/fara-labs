@@ -52,6 +52,9 @@ jobs:
       - name: Deploy workflow test
         run: npm run test:workflow
 
+      - name: Maintenance summary test
+        run: npm run test:summary
+
       # 公開する静的サイトの作成（dotnet publish → 本文入りの入口ページ → _headers・robots・sitemap）。失敗したら、ここで止まる
       - name: Publish static site
         run: npm run publish:site

@@ -1,5 +1,5 @@
 // require-maintenance.mjs のテスト。  node --test .github/scripts/require-maintenance.test.mjs
-// 4 つのリポジトリで同じファイルなので、このテストも同じ内容にしている。
+// 内容は各リポジトリで別々に管理する（このリポジトリの require-maintenance.mjs に合わせている）。
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { evaluate, readMaintenanceValue, fetchSettings, run } from "./require-maintenance.mjs";

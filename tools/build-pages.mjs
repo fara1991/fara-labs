@@ -9,11 +9,11 @@ import { readFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildPages, writeFiles, assertTemplateNotOverwritten } from "../external/fara-site-kit/build/build-pages.mjs";
+import { assertEnvironment } from "./environments.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_FILE = join(root, "tools", "site.json");
 const TEMPLATE_DIR = join(root, "artifacts", "entry-template");
-const ENVIRONMENTS = ["production", "develop"];
 /** 共有したときに出す画像（1200×630 のダーク版。ライト版は og-light.png に保存してある。絵を変えたら ?v を上げる） */
 const OG_IMAGE = "/og.png?v=2";
 const OG_IMAGE_WIDTH = 1200;
@@ -22,10 +22,10 @@ const OG_IMAGE_ALT = "Fara Labs。中央のサイトアイコンから、作品�
 
 /** 404.html の本文（Razor の 404 の画面。tools/PrerenderPages が作る not-found.json）。JavaScript が無くても読める。 */
 export function toNotFoundPage(file) {
-    if (typeof file?.title !== "string" || typeof file?.bodyHtml !== "string" || file.bodyHtml === "") {
-        throw new Error("not-found.json に title と bodyHtml が要ります（tools/PrerenderPages を先に実行してください）");
-    }
-    return { title: file.title, bodyHtml: file.bodyHtml };
+  if (typeof file?.title !== "string" || typeof file?.bodyHtml !== "string" || file.bodyHtml === "") {
+    throw new Error("not-found.json に title と bodyHtml が要ります（tools/PrerenderPages を先に実行してください）");
+  }
+  return { title: file.title, bodyHtml: file.bodyHtml };
 }
 
 /**
@@ -34,73 +34,73 @@ export function toNotFoundPage(file) {
  *  - /data/*.json（サイトの中身）は、検索に出さない（X-Robots-Tag: noindex）
  */
 export function adjustFiles(files) {
-    const ogImage = /^( *)(<meta property="og:image" content="([^"]*)" \/>)/m;
-    for (const [name, content] of files) {
-        if (name.endsWith(".html") && typeof content === "string") {
-            // og:image の行が見つからないのは、kit の出力の形が変わったとき。黙って抜けると共有カードの説明が消えるので、ビルドを失敗させる
-            // （404.html は、共有カードの画像を持たないページなので対象外）
-            if (!ogImage.test(content)) {
-                if (name === "404.html") continue;
-                throw new Error(`${name} に og:image の行が見つかりません（kit の build-pages の出力の形が変わったかもしれません。tools/build-pages.mjs の正規表現を確かめてください）`);
-            }
-            files.set(name, content.replace(ogImage, (_all, indent, tag, url) => [
-                `${indent}${tag}`,
-                `<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />`,
-                `<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />`,
-                `<meta property="og:image:alt" content="${OG_IMAGE_ALT}" />`,
-                `<meta name="twitter:image" content="${url}" />`,
-            ].join(`\n${indent}`)));
-        }
+  const ogImage = /^( *)(<meta property="og:image" content="([^"]*)" \/>)/m;
+  for (const [name, content] of files) {
+    if (name.endsWith(".html") && typeof content === "string") {
+      // og:image の行が見つからないのは、kit の出力の形が変わったとき。黙って抜けると共有カードの説明が消えるので、ビルドを失敗させる
+      // （404.html は、共有カードの画像を持たないページなので対象外）
+      if (!ogImage.test(content)) {
+        if (name === "404.html") continue;
+        throw new Error(`${name} に og:image の行が見つかりません（kit の build-pages の出力の形が変わったかもしれません。tools/build-pages.mjs の正規表現を確かめてください）`);
+      }
+      files.set(name, content.replace(ogImage, (_all, indent, tag, url) => [
+        `${indent}${tag}`,
+        `<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />`,
+        `<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />`,
+        `<meta property="og:image:alt" content="${OG_IMAGE_ALT}" />`,
+        `<meta name="twitter:image" content="${url}" />`,
+      ].join(`\n${indent}`)));
     }
-    const headers = files.get("_headers");
-    if (typeof headers === "string") {
-        files.set("_headers", headers.replace(/\n*$/, "\n") + "\n/data/*\n  X-Robots-Tag: noindex\n");
-    }
-    return files;
+  }
+  const headers = files.get("_headers");
+  if (typeof headers === "string") {
+    files.set("_headers", headers.replace(/\n*$/, "\n") + "\n/data/*\n  X-Robots-Tag: noindex\n");
+  }
+  return files;
 }
 
 /** pages.json（Razor のページから作った path・title・description・bodyHtml の配列）を、kit の入力にする。 */
 export function toKitPages(pages) {
-    if (!Array.isArray(pages) || pages.length === 0) throw new Error("pages.json が空です（tools/PrerenderPages を先に実行してください）");
-    return pages.map((page) => ({ ...page, ogImage: OG_IMAGE }));
+  if (!Array.isArray(pages) || pages.length === 0) throw new Error("pages.json が空です（tools/PrerenderPages を先に実行してください）");
+  return pages.map((page) => ({ ...page, ogImage: OG_IMAGE }));
 }
 
 /** dir（dotnet publish の wwwroot）に、入口ページ・404.html・robots.txt・sitemap.xml・_headers を書き出す。書いたファイル名を返す。 */
 export function run({ dir, env, pagesFile, notFoundFile, siteFile = SITE_FILE }) {
-    if (!ENVIRONMENTS.includes(env)) throw new Error(`--env は ${ENVIRONMENTS.join(" か ")} を指定してください`);
-    const indexPath = join(dir, "index.html");
-    if (!existsSync(indexPath)) throw new Error(`${indexPath} がありません（先に dotnet publish してください）`);
-    // テンプレートは出力先の外に写してから読む（同じフォルダの index.html は書き換えられるため）
-    mkdirSync(TEMPLATE_DIR, { recursive: true });
-    const templatePath = join(TEMPLATE_DIR, "index.html");
-    copyFileSync(indexPath, templatePath);
-    const pages = toKitPages(JSON.parse(readFileSync(pagesFile, "utf8")));
-    const site = JSON.parse(readFileSync(siteFile, "utf8"));
-    if (notFoundFile) site.notFoundPage = toNotFoundPage(JSON.parse(readFileSync(notFoundFile, "utf8")));
-    const template = readFileSync(templatePath, "utf8");
-    const files = adjustFiles(buildPages({ site, pages, template, env }));
-    assertTemplateNotOverwritten(templatePath, dir, files);
-    return writeFiles(resolve(dir), files);
+  assertEnvironment(env);
+  const indexPath = join(dir, "index.html");
+  if (!existsSync(indexPath)) throw new Error(`${indexPath} がありません（先に dotnet publish してください）`);
+  // テンプレートは出力先の外に写してから読む（同じフォルダの index.html は書き換えられるため）
+  mkdirSync(TEMPLATE_DIR, { recursive: true });
+  const templatePath = join(TEMPLATE_DIR, "index.html");
+  copyFileSync(indexPath, templatePath);
+  const pages = toKitPages(JSON.parse(readFileSync(pagesFile, "utf8")));
+  const site = JSON.parse(readFileSync(siteFile, "utf8"));
+  if (notFoundFile) site.notFoundPage = toNotFoundPage(JSON.parse(readFileSync(notFoundFile, "utf8")));
+  const template = readFileSync(templatePath, "utf8");
+  const files = adjustFiles(buildPages({ site, pages, template, env }));
+  assertTemplateNotOverwritten(templatePath, dir, files);
+  return writeFiles(resolve(dir), files);
 }
 
 function parseArgs(argv) {
-    const args = { env: "production", dir: join(root, "publish", "wwwroot"), pagesFile: join(root, "artifacts", "pages.json"), notFoundFile: join(root, "artifacts", "not-found.json") };
-    for (let i = 0; i < argv.length; i++) {
-        if (argv[i] === "--env") args.env = argv[++i];
-        else if (argv[i] === "--dir") args.dir = resolve(argv[++i]);
-        else if (argv[i] === "--pages") args.pagesFile = resolve(argv[++i]);
-        else if (argv[i] === "--not-found") args.notFoundFile = resolve(argv[++i]);
-        else throw new Error(`知らない引数: ${argv[i]}`);
-    }
-    return args;
+  const args = { env: "production", dir: join(root, "publish", "wwwroot"), pagesFile: join(root, "artifacts", "pages.json"), notFoundFile: join(root, "artifacts", "not-found.json") };
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--env") args.env = argv[++i];
+    else if (argv[i] === "--dir") args.dir = resolve(argv[++i]);
+    else if (argv[i] === "--pages") args.pagesFile = resolve(argv[++i]);
+    else if (argv[i] === "--not-found") args.notFoundFile = resolve(argv[++i]);
+    else throw new Error(`知らない引数: ${argv[i]}`);
+  }
+  return args;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-    try {
-        const written = run(parseArgs(process.argv.slice(2)));
-        console.log(`入口ページを書き出しました: ${written.join(", ")}`);
-    } catch (error) {
-        console.error(error.message);
-        process.exitCode = 1;
-    }
+  try {
+    const written = run(parseArgs(process.argv.slice(2)));
+    console.log(`入口ページを書き出しました: ${written.join(", ")}`);
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+  }
 }

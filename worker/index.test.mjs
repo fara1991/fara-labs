@@ -53,8 +53,21 @@ test("errorSummary: 例外の名前とメッセージを出し、URL（Webhook �
   const s = errorSummary(new Error("failed to fetch https://discord.example/api/webhooks/123/secret-token now"));
   assert.equal(s, "Error: failed to fetch [url] now");
   assert.ok(!s.includes("secret-token"));
-  assert.ok(errorSummary(new Error("x".repeat(1000))).length < 320);
+  assert.ok(errorSummary(new Error("x y ".repeat(500))).length <= "Error: ".length + 200);
   assert.equal(errorSummary("plain"), "Error: plain");
+});
+
+test("errorSummary: URL 以外の秘密（Bearer・token=・token:・長い英数字）も取り除く", () => {
+  assert.equal(errorSummary(new Error("auth failed Bearer abc.def-123 for user")), "Error: auth failed Bearer [redacted] for user");
+  assert.equal(errorSummary(new Error("bad request token=sk_live_xyz9 in body")), "Error: bad request token=[redacted] in body");
+  assert.equal(errorSummary(new Error("TOKEN: hunter2 rejected")), "Error: token=[redacted] rejected");
+  // Webhook の token のような、長い英数字の連続（ハイフン・アンダースコアを含む）
+  const webhookToken = "AbCdEf123456_ghijkLMNOP-qrstuvWXYZ0123";
+  const s = errorSummary(new Error(`sent to ${webhookToken} failed`));
+  assert.equal(s, "Error: sent to [redacted] failed");
+  assert.ok(!s.includes(webhookToken));
+  // 短い語（TypeError など）は残す
+  assert.equal(errorSummary(new TypeError("cannot read properties of undefined")), "TypeError: cannot read properties of undefined");
 });
 
 test("報告の受け口で例外が起きたら、500 を返し、ログに例外の名前とメッセージ（URL は外す）を残す。応答には詳細を出さない", async () => {
