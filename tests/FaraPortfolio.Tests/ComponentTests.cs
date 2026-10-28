@@ -67,14 +67,14 @@ public sealed class ComponentTests : BunitContext
     }
 
     [Fact]
-    public void Header_follows_navigation_and_closes_the_menu()
+    public async Task Header_follows_navigation_and_closes_the_menu()
     {
         NavigateTo("/");
         var cut = Render<SiteHeader>();
         cut.Find("button.menu-toggle").Click();
         Assert.Equal("true", cut.Find("button.menu-toggle").GetAttribute("aria-expanded"));
 
-        cut.InvokeAsync(() => NavigateTo("/links"));
+        await cut.InvokeAsync(() => NavigateTo("/links"));
 
         cut.WaitForAssertion(() =>
         {
