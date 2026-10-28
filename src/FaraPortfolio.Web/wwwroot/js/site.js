@@ -22,7 +22,7 @@
     try {
         const parsed = JSON.parse(sessionStorage.getItem(STORE) || '{}');
         positions = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-    } catch (e) {
+    } catch {
         positions = {};
     }
     // 書き込みは間引く（ページの非表示・離脱のときにまとめて書く）
@@ -33,7 +33,7 @@
         flushTimer = 0;
         if (!dirty) return;
         dirty = false;
-        try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch (e) { /* 保存できないときは、メモリだけ */ }
+        try { sessionStorage.setItem(STORE, JSON.stringify(positions)); } catch { /* 保存できないときは、メモリだけ */ }
     };
     // いま位置を保存してよいページ（ページを移った直後、本文を差し替える途中のスクロールを、新しいページの位置として保存しない）
     let activeKey = pageKey();
@@ -187,7 +187,7 @@
     window.faraSite = { pageChanged, scrollToHash, today, focusMain, focusMenu };
 
     // 初回の読み込み。機能ごとに、失敗しても他の機能は動くようにする
-    const safely = (fn) => { try { fn(); } catch (e) { /* その機能だけ止まる。本文は読める */ } };
+    const safely = (fn) => { try { fn(); } catch { /* その機能だけ止まる。本文は読める */ } };
     safely(initOrbit);
     safely(initTooltips);
     safely(initMenu);

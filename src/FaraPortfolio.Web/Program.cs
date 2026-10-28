@@ -43,6 +43,7 @@ try
 }
 catch (JSException)
 {
+    // 意図的に握る: js/site.js が読めないときは日付が空のまま（NEW の表示が出ないだけ）。JS 以外の例外は握らない
 }
 
 await host.RunAsync();

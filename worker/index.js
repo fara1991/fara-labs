@@ -6,6 +6,16 @@
 import { getMaintenance, maintenanceResponse } from "../external/fara-site-kit/worker/maintenance.js";
 import { handleReport } from "../external/fara-site-kit/worker/report.js";
 
+/**
+ * ログに出す例外の要約（名前とメッセージ。URL は外し、長さを切る）。
+ * メッセージに含まれる URL（Discord の Webhook の URL など）は、秘密を含むので残さない。
+ */
+export function errorSummary(error) {
+  const name = typeof error?.name === "string" ? error.name : "Error";
+  const message = String(error?.message ?? error ?? "").replace(/https?:\/\/\S+/g, "[url]").replace(/[\u0000-\u001f\u007f]/g, " ");
+  return `${name}: ${message.slice(0, 300)}`;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -22,8 +32,10 @@ export default {
     if (url.pathname === "/api/report" || url.pathname === "/api/report/config") {
       try {
         return await handleReport(request, env, "Fara Portfolio");
-      } catch {
-        // 詳細（シークレットを含む可能性がある）は返さない
+      } catch (error) {
+        // 原因はログに残す（Cloudflare の Logs で見られる）。例外の名前とメッセージだけで、リクエストの本文・シークレットは出さない
+        console.error(`報告の受け口で例外: ${errorSummary(error)}`);
+        // 応答には詳細を返さない（シークレットを含む可能性がある）
         return new Response(JSON.stringify({ error: "internal_error", message: "サーバーでエラーが発生しました" }), {
           status: 500,
           headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },

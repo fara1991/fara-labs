@@ -4,7 +4,40 @@ import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { run, toKitPages, toNotFoundPage } from "./build-pages.mjs";
+import { run, toKitPages, toNotFoundPage, adjustFiles } from "./build-pages.mjs";
+import { prerenderArgs } from "./prerender-pages.mjs";
+
+const SITE = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "site.json"), "utf8"));
+
+test("prerender-pages: ホスト名は tools/site.json から（本番は origin、確認用は devOrigin）", () => {
+  const prod = prerenderArgs({ env: "production", site: SITE });
+  assert.equal(prod[prod.indexOf("--host") + 1], "fara-labs.com");
+  const dev = prerenderArgs({ env: "develop", site: SITE });
+  assert.equal(dev[dev.indexOf("--host") + 1], "dev.fara-labs.com");
+  assert.equal(prod[prod.indexOf("--out") + 1], "artifacts/pages.json");
+});
+
+test("prerender-pages: --env が不正なとき、設定の値が無いときはエラー", () => {
+  assert.throws(() => prerenderArgs({ env: "staging", site: SITE }), /--env は/);
+  assert.throws(() => prerenderArgs({ env: "develop", site: { origin: "https://fara-labs.com" } }), /devOrigin/);
+});
+
+test("og:image: 行が見つからない HTML（kit の出力の形が変わった）は、ビルドを失敗させる（黙って抜けない）", () => {
+  const files = new Map([["works.html", "<html><head><title>x</title></head></html>"]]);
+  assert.throws(() => adjustFiles(files), /works\.html に og:image の行が見つかりません/);
+});
+
+test("og:image: 404.html は共有カードの画像を持たないので、行が無くても失敗しない", () => {
+  const files = new Map([["404.html", "<html><head></head></html>"]]);
+  assert.doesNotThrow(() => adjustFiles(files));
+});
+
+test("og:image: 行があれば、大きさ・説明・twitter:image を足す", () => {
+  const html = '<head>\n  <meta property="og:image" content="https://fara-labs.com/og.png?v=2" />\n</head>';
+  const out = adjustFiles(new Map([["index.html", html]])).get("index.html");
+  assert.match(out, /og:image:width" content="1200"/);
+  assert.match(out, /twitter:image" content="https:\/\/fara-labs\.com\/og\.png\?v=2"/);
+});
 
 const TEMPLATE = `<!DOCTYPE html><html lang="ja"><head><!-- SEO-HEAD:START --><title>x</title><!-- SEO-HEAD:END --></head>
 <body><div id="boot-indicator"></div><div id="app"><!-- SEO-BODY:START --><!-- SEO-BODY:END --></div></body></html>`;

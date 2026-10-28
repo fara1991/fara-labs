@@ -51,7 +51,7 @@
         if (!focusMenu) return;
         focusMenu = false;
         try { await JS.InvokeVoidAsync("faraSite.focusMenu"); }
-        catch (JSException) { }
+        catch (JSException) { } // 意図的に握る: フォーカスを移せないだけ（メニューは開いたまま使える）。JS 以外の例外は握らない
     }
 
     protected override void OnInitialized() => Nav.LocationChanged += OnLocationChanged;
