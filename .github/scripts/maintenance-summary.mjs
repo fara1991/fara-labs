@@ -14,7 +14,10 @@ export function describeBindings(bindings) {
   const value = (name) => {
     const binding = list.find((b) => b?.name === name);
     if (!binding) return "(未設定)";
-    return binding.type === "plain_text" ? JSON.stringify(binding.text).replaceAll("`", "'") : `(${binding.type})`;
+    if (binding.type !== "plain_text") return `(${binding.type})`;
+    // 文字列でない値（text が無い）は、JSON にできず例外になるので「不明」と出す
+    if (typeof binding.text !== "string") return "(不明)";
+    return JSON.stringify(binding.text).replaceAll("`", "'");
   };
   return `- 反映後の現在値: MAINTENANCE_MODE=\`${value("MAINTENANCE_MODE")}\` / MAINTENANCE_MESSAGE=\`${value("MAINTENANCE_MESSAGE")}\``;
 }

@@ -761,8 +761,6 @@ html a:focus-visible, html button:focus-visible {
     line-height: 1.8;
 }
 .fsk-footer a:hover { color: var(--lavender); }
-/* タップの領域は 44px 以上（文字の大きさは変えず、リンクの箱の高さを広げる。SNS のアイコンは下の ::after で広げる） */
-.fsk-footer a:not(.fsk-footer-social) { display: inline-flex; align-items: center; min-height: 44px; }
 .fsk-footer-line { gap: 4px 10px; }
 .fsk-footer-line > * { white-space: nowrap; }
 .fsk-footer-name { color: var(--text); font-weight: 600; }
@@ -773,6 +771,10 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
 /* 狭い画面: 折り返したときに区切りの | が行頭・行末に残らないよう、区切りは出さず、項目の間を gap で空ける（PC は区切りを残す） */
 @media (max-width: 767.98px) {
     .fsk-footer-line { gap: 6px 16px; }
+}
+/* タブレットまで（1024px 以下）のタップの領域は 44px 以上（文字の大きさは変えず、リンクの箱の高さを広げる。SNS のアイコンは上の ::after で広げる）。PC は行の高さを変えない */
+@media (max-width: 1024px) {
+    .fsk-footer a:not(.fsk-footer-social) { display: inline-flex; align-items: center; min-height: 44px; }
 }
 
 /* ---------- 作者へ報告・プライバシーポリシー ---------- */
