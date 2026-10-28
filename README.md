@@ -1,4 +1,4 @@
-# fara-portfolio-site
+# fara-labs
 
 自分用のポートフォリオサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit）で作った静的サイトを、Cloudflare Workers に公開します。
 
@@ -12,7 +12,7 @@
 ## フォルダ構成
 
 ```
-fara-portfolio-site/
+fara-labs/
 ├── FaraPortfolio.sln
 ├── global.json                       使用する .NET SDK（10.0）
 ├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）

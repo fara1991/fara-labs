@@ -1,5 +1,5 @@
 {
-  "name": "fara-portfolio-site",
+  "name": "fara-labs",
   "private": true,
   "description": "Cloudflare Workers への公開用（wrangler のバージョン固定）。サイト本体は src/FaraPortfolio.Web（Blazor WebAssembly。公開する静的サイトは publish/wwwroot）",
   "scripts": {
