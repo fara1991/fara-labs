@@ -758,24 +758,19 @@ html a:focus-visible, html button:focus-visible {
     background: rgba(10, 5, 20, .6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
     color: var(--muted);
     font-size: 13px;
-    line-height: 1.8;
 }
 .fsk-footer a:hover { color: var(--lavender); }
-.fsk-footer-line { gap: 4px 10px; }
+/* 行の余白・行間は kit（fara-site-kit.css）の値を使う（スマホは行の高さ 22px。PC の行間も kit に任せる）。列の間隔だけこのサイトで決める */
+.fsk-footer-line { column-gap: 10px; }
 .fsk-footer-line > * { white-space: nowrap; }
 .fsk-footer-name { color: var(--text); font-weight: 600; }
 a.fsk-footer-social { position: relative; width: 28px; height: 28px; border-radius: 8px; }
 a.fsk-footer-social svg { width: 16px; height: 16px; }
-/* 狭い画面: 折り返したときに区切りの | が行頭・行末に残らないよう、区切りは出さず、項目の間を gap で空ける（PC は区切りを残す） */
-@media (max-width: 767.98px) {
-    .fsk-footer-line { gap: 6px 16px; }
-}
-/* タブレットまで（1024px 以下）のタップの領域は 44px 以上（文字の大きさは変えず、リンクの箱の高さを広げる。SNS のアイコンは上の ::after で広げる）。PC は行の高さを変えない */
+/* タブレットまで（1024px 以下）のタップの領域は 44px 以上になるよう、文字リンクの左右の箱を広げる（kit の上下の当たり判定に加える。SNS のアイコンは kit の ::after で広げる）。PC は行の高さを変えない */
 @media (max-width: 1024px) {
-    .fsk-footer a:not(.fsk-footer-social) { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; margin-inline: -8px; }
+    .fsk-footer a:not(.fsk-footer-social) { padding-inline: 8px; margin-inline: -8px; }
     /* SNS の当たり判定（kit の ::after の 44px）が隣と重ならないよう、中心の間隔を 48px にする（28px のアイコン + 20px）。
        44px ちょうどだと境目の画素で隣に当たり、layout-check の tap-target が出る */
     .fsk-footer-socials { gap: 20px; }
