@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-ポートフォリオサイト（https://fara-labs.com/）。.NET 10 / Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit。`external/fara-site-kit` のサブモジュール）の静的サイトを、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
+ポートフォリオサイト（https://fara-labs.com/）。.NET 10 / Blazor WebAssembly + MudBlazor（共通部品は fara-blazor-component。`external/fara-blazor-component` のサブモジュール）の静的サイトを、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
 
 ## ブランチ運用（必ず守る）
 
@@ -17,9 +17,9 @@
 - データの型は `Models/SiteModels.cs`。JSON の項目を増やしたら `tests/FaraPortfolio.Tests/DataFileTests.cs` のチェックも更新する
 - ページは `Pages/`（`@page`）、共通の枠は `Layout/MainLayout.razor`（背景・ヘッダー・お知らせの帯・フッターは `Components/AppShell.razor`。ヘッダー・お知らせの帯・フッターは画面に固定し、その間の `.site-scroll`（`.site-main`）だけがスクロールする）。ページの title・description は `Services/PageCatalog.cs`（ページの `PageTitle` と、入口ページの head が同じ値を使う）
 - サイトはダーク配色だけ（ライト／ダークの切り替えは無い。`index.html` の `data-bs-theme="dark"` 固定、`MainLayout` の MudBlazor もダーク固定）。localStorage・Cookie は使わない（プライバシーポリシーの記載どおり。sessionStorage にスクロール位置だけ一時保存）
-- 共通部品（kit）: フッター（`SiteFooter`）・問い合わせ（`ReportFormView`。`Pages/Report.razor`）・404（`NotFoundView`。`App.razor`）・お知らせの帯（`MaintenanceBanner`）・`SiteLinks`（確認用ホストでのリンク切り替え。開いているホスト名で決める）・`SiteOptions`（値は `Services/SiteInfo.cs`。フッターの SNS は `profile.json` から）。kit は `external/fara-site-kit` を、タグ（いまは v0.8.0。`git submodule status` で確かめられる）に固定。上げるときは kit でタグ → ここでサブモジュールを上げる PR（develop 向け）
+- 共通部品（kit）: フッター（`SiteFooter`）・問い合わせ（`ReportFormView`。`Pages/Report.razor`）・404（`NotFoundView`。`App.razor`）・お知らせの帯（`MaintenanceBanner`）・`SiteLinks`（確認用ホストでのリンク切り替え。開いているホスト名で決める）・`SiteOptions`（値は `Services/SiteInfo.cs`。フッターの SNS は `profile.json` から）。kit は `external/fara-blazor-component` を、タグ（いまは v1.0.0。`git submodule status` で確かめられる）に固定。上げるときは kit でタグ → ここでサブモジュールを上げる PR（develop 向け）
 - 静的な入口ページ（SEO・JS 無しでも読める）: `dotnet publish` の出力の `index.html`（`<!-- SEO-BODY -->` の区切りつき）をテンプレートに、`tools/prerender-pages.mjs`（ホスト名を `tools/site.json` の origin・devOrigin から渡して、`tools/PrerenderPages` を起動。Razor のページを HtmlRenderer で本文の HTML にして `artifacts/pages.json`）→ `tools/build-pages.mjs`（kit の build-pages。`tools/site.json` の設定。`<path>.html`・`404.html`・`robots.txt`・`sitemap.xml`・`_headers`（CSP。確認用は noindex）を `publish/wwwroot` に作る。og:image の行が見つからなければ失敗する）。公開先（production・develop）と --env の検査は `tools/environments.mjs` に 1 つだけ持つ
-- スタイルは `wwwroot/css/app.css` 1 ファイル（色は `:root` の CSS 変数。kit の `fara-site-kit.css` の後に読む）。演出・メニューの外側タップ／Esc・今日の日付は `wwwroot/js/site.js`。更新履歴の絞り込みと NEW、メニューの開閉は Razor（`Pages/Updates.razor`・`Components/UpdateItem.razor`・`Components/SiteHeader.razor`）
+- スタイルは `wwwroot/css/app.css` 1 ファイル（色は `:root` の CSS 変数。kit の `fara-blazor-component.css` の後に読む）。演出・メニューの外側タップ／Esc・今日の日付は `wwwroot/js/site.js`。更新履歴の絞り込みと NEW、メニューの開閉は Razor（`Pages/Updates.razor`・`Components/UpdateItem.razor`・`Components/SiteHeader.razor`）
   - `.reveal` を付けた要素は画面に入るとフェードイン（`style="--d:N"` で遅延）。`js-ready` が付いたときだけ隠す。ページを移るたびに `MainLayout` が `faraSite.pageChanged` を呼び、新しい本文を監視し直す
   - フェードインは `translate` プロパティで動かしているので、ホバー演出には `transform` を使う
 - 公開するのは `publish/wwwroot`（Git に入れない）。Worker（`worker/index.js`）は、報告（`/api/report`）・メンテナンスの状態（`/api/maintenance`）・メンテナンス中の 503 を担当する。お知らせの帯は、アプリが `/api/maintenance` を読んで出す

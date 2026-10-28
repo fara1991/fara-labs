@@ -1,6 +1,6 @@
 # fara-labs
 
-作ったもの一覧のサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-site-kit）で作った静的サイトを、Cloudflare Workers に公開します。
+作ったもの一覧のサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-blazor-component）で作った静的サイトを、Cloudflare Workers に公開します。
 
 - プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
@@ -17,7 +17,7 @@ fara-labs/
 ├── global.json                       使用する .NET SDK（10.0）
 ├── wrangler.jsonc                    Cloudflare Workers の公開設定（本番 / develop）
 ├── package.json                      wrangler のバージョン固定と、公開用の作成・テストのスクリプト
-├── external/fara-site-kit/           共通部品（サブモジュール。Razor・Core・Worker の JS・build-pages・CSP）
+├── external/fara-blazor-component/           共通部品（サブモジュール。Razor・Core・Worker の JS・build-pages・CSP）
 ├── docs/cloudflare-setup.md          Cloudflare・GitHub の初期設定手順
 ├── src/FaraPortfolio.Web/            サイト本体（Blazor WebAssembly）
 │   ├── App.razor                     ルーティング（見つからない URL は kit の 404）
@@ -97,7 +97,7 @@ feature/xxx ──PR──▶ develop ──PR──▶ master ──(自動)─
 ## ローカルで動かす
 
 ```bash
-git submodule update --init                  # 初回のみ（external/fara-site-kit）
+git submodule update --init                  # 初回のみ（external/fara-blazor-component）
 dotnet run --project src/FaraPortfolio.Web   # http://localhost:5072（画面の確認。メンテナンスの状態・問い合わせの送信は Worker が無いので動かない）
 dotnet test                                  # data/*.json と、入口ページの本文のチェック
 

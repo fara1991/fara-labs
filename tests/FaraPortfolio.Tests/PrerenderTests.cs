@@ -55,7 +55,7 @@ public sealed class PrerenderTests : IAsyncLifetime
             var scroll = html.IndexOf("<div class=\"site-scroll\"", StringComparison.Ordinal);
             var main = html.IndexOf("<main class=\"site-main\" id=\"main-content\" tabindex=\"-1\">", StringComparison.Ordinal);
             var mainEnd = html.IndexOf("</main>", main < 0 ? 0 : main, StringComparison.Ordinal);
-            var footer = html.IndexOf("<footer class=\"fsk-footer\"", StringComparison.Ordinal);
+            var footer = html.IndexOf("<footer class=\"fbc-footer\"", StringComparison.Ordinal);
             Assert.True(header >= 0 && scroll > header && main > scroll && mainEnd > main && footer > mainEnd,
                 $"{p.Path}: ヘッダー → スクロールする領域（本文）→ フッター の順になっていません");
             // フッターは、スクロールする領域（.site-scroll）を閉じたあとに置く（画面の下に固定するため）
@@ -75,7 +75,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         foreach (var page in production)
         {
             var html = Text(page);
-            Assert.Contains("<span class=\"fsk-footer-name\">Fara Portfolio</span>", html);
+            Assert.Contains("<span class=\"fbc-footer-name\">Fara Portfolio</span>", html);
             Assert.Contains("プライバシーポリシー", html);
             Assert.Contains("© 2026 ", html);
             Assert.Contains("href=\"https://github.com/fara1991\"", html);
@@ -138,11 +138,11 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Report_page_is_the_same_form_the_browser_renders_so_the_heading_does_not_change_on_boot()
     {
         var html = Text(production[5]);
-        Assert.Contains("<h1 class=\"fsk-page-title\">問い合わせ</h1>", html);   // kit v0.5.0 から、題名はページの h1
+        Assert.Contains("<h1 class=\"fbc-page-title\">問い合わせ</h1>", html);   // kit v0.5.0 から、題名はページの h1
         Assert.DoesNotContain("<h3>問い合わせ</h3>", html);
         Assert.Contains("id=\"report-message\"", html);
         Assert.Contains("id=\"report-category\"", html);
-        Assert.Contains("fsk-page-header fsk-page-column", html);
+        Assert.Contains("fbc-page-header fbc-page-column", html);
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         var html = Text(notFound);
         Assert.StartsWith("<div class=\"entry-static\">", notFound.BodyHtml);
         Assert.Equal("ページが見つかりません | Fara", notFound.Title);
-        Assert.Contains("class=\"fsk-not-found-code\"", html);
+        Assert.Contains("class=\"fbc-not-found-code\"", html);
         Assert.Contains("ページが見つかりません", html);
         Assert.Contains("href=\"/\"", html);
         // どのページでもない URL なので、問い合わせに ?from= を付けず、ヘッダーの現在地も無い
@@ -205,7 +205,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Privacy_page_has_the_policy_in_the_wide_column()
     {
         var html = Text(production[6]);
-        Assert.Contains("class=\"page container wide fsk-page-column fsk-page-column--wide\"", html);
+        Assert.Contains("class=\"page container wide fbc-page-column fbc-page-column--wide\"", html);
         Assert.Contains("ブラウザに保存する情報", html);
         Assert.Contains("Cloudflare Turnstile", html);
     }

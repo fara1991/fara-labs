@@ -1,10 +1,10 @@
 using FaraPortfolio.Web.Models;
-using FaraSiteKit.Core;
+using FaraBlazorComponent.Core;
 
 namespace FaraPortfolio.Web.Services;
 
 /// <summary>
-/// このサイトの名前・公開年・作者・確認用ホスト。共通部品（fara-site-kit。フッター・報告フォームなど）が読む SiteOptions に、起動時に入れる（Program.cs）。
+/// このサイトの名前・公開年・作者・確認用ホスト。共通部品（fara-blazor-component。フッター・報告フォームなど）が読む SiteOptions に、起動時に入れる（Program.cs）。
 /// 4 サイト（pokemon・avatar・bot・portfolio）で、フッターの形を同じにする。
 /// </summary>
 public static class SiteInfo

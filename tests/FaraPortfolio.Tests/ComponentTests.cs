@@ -3,7 +3,7 @@ using FaraPortfolio.Web.Components;
 using FaraPortfolio.Web.Models;
 using FaraPortfolio.Web.Pages;
 using FaraPortfolio.Web.Services;
-using FaraSiteKit.Razor;
+using FaraBlazorComponent.Razor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +20,7 @@ public sealed class ComponentTests : BunitContext
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         var profile = new FaraPortfolio.Web.Models.Profile { Name = "Fara", Tagline = "t", Bio = "b" };
-        Services.AddFaraSiteKit(options => SiteInfo.Configure(options, profile));
+        Services.AddFaraBlazorComponent(options => SiteInfo.Configure(options, profile));
         Services.AddSingleton(new BrowserClock { Today = new DateOnly(2026, 10, 23) });
         Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
         Services.AddSingleton(new SiteData

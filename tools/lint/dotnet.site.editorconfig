@@ -1,5 +1,5 @@
 # このサイトの C# の静的解析（ラチェット。global analyzer config）。Directory.Build.props（ルート）が読む。
-# 内容は kit の external/fara-site-kit/tools/lint/dotnet.editorconfig と同じ（違いは CA1031 だけ）。
+# 内容は kit の external/fara-blazor-component/tools/lint/dotnet.editorconfig と同じ（違いは CA1031 だけ）。
 # kit の設定を同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（CS MultipleGlobalAnalyzerKeys）ため、
 # kit のファイルは読まず、このファイルに全部書く。kit の設定が変わったら、ここも合わせる（docs/lint.md（2））。
 is_global = true
