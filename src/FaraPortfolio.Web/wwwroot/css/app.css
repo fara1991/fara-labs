@@ -65,16 +65,14 @@ body {
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
     /* ページ内ジャンプ（#id）の止まる位置: 領域の上端から少し下 */
     scroll-padding-top: 16px;
 }
 /* キーボードで操作できるように、フォーカスの枠は細く、本文の内側に出す */
 .site-scroll:focus { outline: none; }
 .site-scroll:focus-visible { outline: 2px solid var(--border-strong); outline-offset: -4px; }
-@media (prefers-reduced-motion: reduce) {
-    .site-scroll { scroll-behavior: auto; }
-}
+/* 注: scroll-behavior を付けない（Tab で移ったフォーカスの位置へのスクロールを、即座にする。
+   スムーズにすると、移動の途中の位置を計測してしまう（layout-check の no-offscreen-focus）。ページ内ジャンプの滑らかさは site.js（scrollIntoView の behavior）で付ける */
 /* 印刷: 画面の枠（高さ・スクロール）を解き、本文とフッターを、ページを続けて出す */
 @media print {
     .bg-scene, .site-header, .fsk-notice { display: none !important; }
@@ -764,7 +762,6 @@ html a:focus-visible, html button:focus-visible {
 .fsk-footer-line { gap: 4px 10px; }
 .fsk-footer-line > * { white-space: nowrap; }
 .fsk-footer-name { color: var(--text); font-weight: 600; }
-.fsk-footer-socials { gap: 6px; margin-left: 2px; }
 a.fsk-footer-social { position: relative; width: 28px; height: 28px; border-radius: 8px; }
 a.fsk-footer-social svg { width: 16px; height: 16px; }
 /* 狭い画面: 折り返したときに区切りの | が行頭・行末に残らないよう、区切りは出さず、項目の間を gap で空ける（PC は区切りを残す） */
@@ -774,8 +771,9 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
 /* タブレットまで（1024px 以下）のタップの領域は 44px 以上（文字の大きさは変えず、リンクの箱の高さを広げる。SNS のアイコンは上の ::after で広げる）。PC は行の高さを変えない */
 @media (max-width: 1024px) {
     .fsk-footer a:not(.fsk-footer-social) { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; margin-inline: -8px; }
-    /* SNS の当たり判定（28px + 両側 8px = 44px）が隣と重ならないよう、中心の間隔を 44px にする（28px + 16px） */
-    .fsk-footer-socials { gap: 16px; }
+    /* SNS の当たり判定（kit の ::after の 44px）が隣と重ならないよう、中心の間隔を 48px にする（28px のアイコン + 20px）。
+       44px ちょうどだと境目の画素で隣に当たり、layout-check の tap-target が出る */
+    .fsk-footer-socials { gap: 20px; }
 }
 
 /* ---------- 作者へ報告・プライバシーポリシー ---------- */
@@ -788,6 +786,9 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
 /* 報告フォームの選択欄（MudSelect の入力部。既定の高さは 40px）: タップの領域を 44px 以上に */
 .site-main .fsk-select .mud-input,
 .site-main .fsk-select .mud-input-control-input-container { height: 44px; }
+/* 報告フォームの入力欄（MudBlazor）は、フォーカスの線を枠の側に出し、入力欄そのものの outline を消している。
+   キーボードで今どこにいるかを入力欄の上でも分かるように、見える枠を足す（layout-check の focus-visible は入力欄そのものを見る） */
+.site-main .mud-input-slot.mud-input-root:focus-visible { outline: 2px solid var(--lavender); outline-offset: 2px; }
 
 /* ---------- 日本語の改行（本文の中。語の途中で折り返さない） ----------
    word-break: auto-phrase は Chromium 系だけ。対応しない環境は normal（既定）のまま。日付の塊は .nowrap で分けない */

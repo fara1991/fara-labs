@@ -1,0 +1,19 @@
+# このサイトの C# の静的解析（ラチェット。global analyzer config）。Directory.Build.props（ルート）が読む。
+# 内容は kit の external/fara-site-kit/tools/lint/dotnet.editorconfig と同じ（違いは CA1031 だけ）。
+# kit の設定を同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（CS MultipleGlobalAnalyzerKeys）ため、
+# kit のファイルは読まず、このファイルに全部書く。kit の設定が変わったら、ここも合わせる（docs/lint.md（2））。
+is_global = true
+
+# error: 違反 0 件（確認済み）
+dotnet_diagnostic.CS4014.severity = error
+dotnet_diagnostic.VSTHRD100.severity = error
+dotnet_diagnostic.CA1816.severity = error
+dotnet_diagnostic.IDE0059.severity = error
+# error（kit では warning）: このサイトは違反 0 件（一般の例外の catch を書いていない）。増えたら止める
+dotnet_diagnostic.CA1031.severity = error
+
+# warning: 違反が残る（件数は docs/lint.md）
+dotnet_diagnostic.CA2000.severity = warning
+dotnet_diagnostic.VSTHRD002.severity = warning
+dotnet_diagnostic.VSTHRD003.severity = warning
+dotnet_diagnostic.VSTHRD103.severity = warning
