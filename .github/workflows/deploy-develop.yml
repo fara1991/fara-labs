@@ -23,7 +23,8 @@ permissions:
 
 concurrency:
   group: deploy-develop
-  cancel-in-progress: true
+  # 途中で取り消さない（取り消すと、確認用の公開が中途半端なまま残るおそれがあるため。本番と同じ。待っている分は、新しいものに置き換わる）
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -56,6 +57,12 @@ jobs:
       - name: Publish static site (develop)
         run: npm run publish:site:develop
 
+      # メンテナンス表示の文は、--var に渡す前に確かめる（200 文字まで・改行なし。scripts/maintenance-message.mjs）
+      - name: Check maintenance message
+        run: node .github/scripts/maintenance-message.mjs
+        env:
+          MAINTENANCE_MESSAGE_INPUT: ${{ inputs.maintenance_message }}
+
       # メンテナンス表示（Worker の変数）は、手動実行の入力があるときだけ --var で渡す。空なら付けない（keep_vars で現在の値が残る）
       - name: Deploy to Cloudflare Workers (develop)
         shell: bash
@@ -78,17 +85,7 @@ jobs:
           {
             echo "### メンテナンス表示 (${WORKER_NAME})"
             echo "- 設定した値: MAINTENANCE_MODE=\`${MAINTENANCE_MODE_INPUT:-(変更なし)}\` / MAINTENANCE_MESSAGE=\`${msg:-(変更なし)}\`"
-            node -e '
-              const j = (v) => JSON.stringify(v);
-              fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${process.env.WORKER_NAME}/settings`, { headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}` } })
-                .then((r) => r.json())
-                .then((b) => {
-                  const list = b?.result?.bindings ?? [];
-                  const v = (n) => { const x = list.find((y) => y.name === n); return x ? (x.type === "plain_text" ? j(x.text).replaceAll("`", "\u0027") : `(${x.type})`) : "(未設定)"; };
-                  console.log(`- 反映後の現在値: MAINTENANCE_MODE=\`${v("MAINTENANCE_MODE")}\` / MAINTENANCE_MESSAGE=\`${v("MAINTENANCE_MESSAGE")}\``);
-                })
-                .catch(() => console.log("- 反映後の現在値: 取得できませんでした"));
-            '
+            node .github/scripts/maintenance-summary.mjs
           } >> "$GITHUB_STEP_SUMMARY"
         env:
           MAINTENANCE_MODE_INPUT: ${{ inputs.maintenance_mode }}

@@ -4,12 +4,14 @@
 //   node .github/scripts/require-maintenance.mjs <Worker 名>
 //   必要な環境変数: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID（公開に使っているものと同じ。Workers Scripts の読み取りができること）
 //   SKIP_MAINTENANCE_CHECK=true のときは、確かめずに通す（緊急の修正を、お知らせなしで公開したいとき。ワークフローの手動実行の入力から渡す）
+//   ALLOW_MISSING_WORKER=1 のときだけ、Worker がまだ無いことを通す（初回の公開。ワークフローの手動実行の first_publish から渡す）
 //
 // 目的: 本番の公開の前に、お知らせ（notice）を出しておく運用にする。お知らせなしに本番が更新されるのを防ぐ。
 //   notice … 通す（お知らせを出している）
 //   true   … 通す（すでにメンテナンス中。公開をやり直すとき）
 //   false・未設定・そのほか … 止める
-//   Worker がまだ無い（初回の公開。404）… 通す
+//   Worker が無い（404）… 止める。Worker 名のずれ・アカウント ID の誤りでも 404 になり、確かめたことにならないため。
+//                         初回の公開だけ、ALLOW_MISSING_WORKER=1 を付けて通す
 //   確認できなかった（通信・権限の問題）… 止める（確かめずに公開しない）
 // 変数は、ダッシュボードで「テキスト」にしておく（シークレットは値を読めないため、確かめられない）。
 
@@ -74,8 +76,12 @@ export async function run({ workerName, env, fetchImpl, log = console.log, error
     return 1;
   }
   if (settings.missing) {
-    log(`Worker ${workerName} がまだありません（初回の公開）。確認を飛ばして公開します`);
-    return 0;
+    if (String(env.ALLOW_MISSING_WORKER ?? "") === "1") {
+      log(`Worker ${workerName} がまだありません（ALLOW_MISSING_WORKER=1。初回の公開として、確認を飛ばして公開します）`);
+      return 0;
+    }
+    error(`::error::Worker ${workerName} が見つかりません（404）。Worker 名・アカウント ID が合っているか確かめてください。初回の公開なら、手動実行で first_publish を入れてください`);
+    return 1;
   }
   const result = evaluate(readMaintenanceValue(settings.bindings));
   if (result.ok) { log(result.message); return 0; }

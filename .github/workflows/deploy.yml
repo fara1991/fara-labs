@@ -11,6 +11,10 @@ on:
         description: "MAINTENANCE_MODE=notice の確認を飛ばして公開する（緊急の修正用。お知らせなしで公開され、メンテナンス画面にもならない）"
         type: boolean
         default: false
+      first_publish:
+        description: "Worker がまだ無いとき（初回の公開）だけ入れる。入れないと、Worker が見つからない（404）場合は公開を止める"
+        type: boolean
+        default: false
       maintenance_mode:
         description: "メンテナンス表示の切り替え。true = 全体メンテナンス（全ページがメンテナンス画面・503）、notice = お知らせ帯、false = 通常。空 = 変更しない"
         type: choice
@@ -75,6 +79,14 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           SKIP_MAINTENANCE_CHECK: ${{ inputs.skip_maintenance_check }}
+          # 初回の公開（Worker がまだ無い）だけ 1。それ以外は、Worker が見つからない（404）と止める
+          ALLOW_MISSING_WORKER: ${{ inputs.first_publish && '1' || '0' }}
+
+      # メンテナンス表示の文は、--var に渡す前に確かめる（200 文字まで・改行なし。scripts/maintenance-message.mjs）
+      - name: Check maintenance message
+        run: node .github/scripts/maintenance-message.mjs
+        env:
+          MAINTENANCE_MESSAGE_INPUT: ${{ inputs.maintenance_message }}
 
       # push と、何も指定しない手動実行だけ、公開と同時に MAINTENANCE_MODE=true（メンテナンス画面）にする。作業が終わったら、Run workflow（maintenance_mode=false）か Cloudflare で戻す（お知らせも一緒に消える）。
       # skip_maintenance_check のとき（緊急の修正）と、maintenance_message だけの手動実行は、MAINTENANCE_MODE を渡さない（現在の値を保持）
@@ -104,17 +116,7 @@ jobs:
           {
             echo "### メンテナンス表示 (${WORKER_NAME})"
             echo "- 設定した値: MAINTENANCE_MODE=\`${MAINTENANCE_MODE_INPUT:-(変更なし)}\` / MAINTENANCE_MESSAGE=\`${msg:-(変更なし)}\`"
-            node -e '
-              const j = (v) => JSON.stringify(v);
-              fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${process.env.WORKER_NAME}/settings`, { headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}` } })
-                .then((r) => r.json())
-                .then((b) => {
-                  const list = b?.result?.bindings ?? [];
-                  const v = (n) => { const x = list.find((y) => y.name === n); return x ? (x.type === "plain_text" ? j(x.text).replaceAll("`", "\u0027") : `(${x.type})`) : "(未設定)"; };
-                  console.log(`- 反映後の現在値: MAINTENANCE_MODE=\`${v("MAINTENANCE_MODE")}\` / MAINTENANCE_MESSAGE=\`${v("MAINTENANCE_MESSAGE")}\``);
-                })
-                .catch(() => console.log("- 反映後の現在値: 取得できませんでした"));
-            '
+            node .github/scripts/maintenance-summary.mjs
           } >> "$GITHUB_STEP_SUMMARY"
         env:
           MAINTENANCE_MODE_INPUT: ${{ inputs.maintenance_mode }}

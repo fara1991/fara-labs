@@ -72,10 +72,20 @@ test("run: false・未設定・シークレットのときは止める", async (
   }
 });
 
-test("run: Worker がまだ無い（初回の公開）ときは通す", async () => {
+test("run: Worker が無い（404）は止める。名前のずれ・アカウント ID の誤りでも 404 になるため", async () => {
   const r = await runWith(async () => new Response("", { status: 404 }));
+  assert.equal(r.code, 1);
+  assert.match(r.text, /::error::.*404/);
+  assert.match(r.text, /first_publish/);
+});
+
+test("run: ALLOW_MISSING_WORKER=1 のときだけ、Worker が無いことを通す（初回の公開）", async () => {
+  const r = await runWith(async () => new Response("", { status: 404 }), { ...ENV, ALLOW_MISSING_WORKER: "1" });
   assert.equal(r.code, 0);
   assert.match(r.text, /初回/);
+  // 1 以外の値では通さない（手動実行の入力の真偽値は "1" に変えてから渡す）
+  assert.equal((await runWith(async () => new Response("", { status: 404 }), { ...ENV, ALLOW_MISSING_WORKER: "true" })).code, 1);
+  assert.equal((await runWith(async () => new Response("", { status: 404 }), { ...ENV, ALLOW_MISSING_WORKER: "" })).code, 1);
 });
 
 test("run: 確かめられなかったとき（通信・権限）は止める", async () => {
