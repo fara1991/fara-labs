@@ -89,7 +89,9 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
    → Deploy (develop) が自動で動き、https://dev.fara-labs.com/ に公開される（初回はカスタムドメインの作成で数分かかることがあります）
 2. dev.fara-labs.com で表示を確認
 3. **develop → master** に PR をマージ
-   → Deploy が自動で動き、https://fara-labs.com/ に公開される
+   → Deploy が自動で動き、https://fara-labs.com/ に公開される（Worker がまだ無いときは、下の注意のとおり止まります）
+
+本番の公開（Deploy）は、Worker の変数 `MAINTENANCE_MODE` が `notice` のときだけ通ります（お知らせなしに本番が更新されないため）。Worker が見つからない（404）ときも止まります（Worker 名やアカウント ID の誤りでも 404 になるため）。初回の公開だけは、Actions の **Deploy (production)** を **master** から手動で実行し、**first_publish** にチェックを入れてください。Worker ができたあとは、このチェックを外します。
 
 ---
 

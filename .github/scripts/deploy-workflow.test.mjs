@@ -5,6 +5,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { checkMessage, MAX_MESSAGE_LENGTH } from "./maintenance-message.mjs";
+import { describeBindings } from "./maintenance-summary.mjs";
 
 const read = (name) => readFileSync(new URL(`../workflows/${name}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
@@ -81,7 +84,10 @@ test("本番: ゲートは、mode が true / notice / false のときだけ飛�
   assert.match(gate, /if: \$\{\{ !contains\(fromJSON\('\["true","notice","false"\]'\), inputs\.maintenance_mode\) \}\}/);
   assert.match(gate, /SKIP_MAINTENANCE_CHECK: \$\{\{ inputs\.skip_maintenance_check \}\}/);
   assert.match(gate, /require-maintenance\.mjs fara-portfolio/);
-  const order = ["Require master", "Test (data files)", "Publish static site", "Require MAINTENANCE_MODE=notice", "Deploy to Cloudflare Workers", "Summary (maintenance)"]
+  // 初回の公開（Worker がまだ無い）だけ、first_publish で 404 を通す。それ以外は 404 で止まる
+  assert.match(gate, /ALLOW_MISSING_WORKER: \$\{\{ inputs\.first_publish && '1' \|\| '0' \}\}/);
+  assert.match(prod, /first_publish:\n {8}description:[^\n]*\n {8}type: boolean\n {8}default: false/);
+  const order = ["Require master", "Test (data files)", "Publish static site", "Require MAINTENANCE_MODE=notice", "Check maintenance message", "Deploy to Cloudflare Workers", "Summary (maintenance)"]
     .map((n) => prod.indexOf(`- name: ${n}\n`));
   assert.ok(order.every((v) => v >= 0), "ステップが足りません");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "ステップの順序が違います");
@@ -104,4 +110,45 @@ test("wrangler.jsonc: run_worker_first と keep_vars を維持する", () => {
   const w = readFileSync(new URL("../../wrangler.jsonc", import.meta.url), "utf8");
   assert.match(w, /"keep_vars": true/);
   assert.match(w, /"run_worker_first": true/);
+});
+
+test("メンテナンス表示の文: 空は通す。200 文字まで（文字数で数える）・改行や制御文字は止める", () => {
+  assert.equal(checkMessage(""), null);
+  assert.equal(checkMessage(undefined), null);
+  assert.equal(checkMessage("a".repeat(MAX_MESSAGE_LENGTH)), null);
+  assert.match(checkMessage("a".repeat(MAX_MESSAGE_LENGTH + 1)), /200 文字までです（いま 201 文字）/);
+  // 絵文字（サロゲートの組）は 1 文字と数える
+  assert.equal(checkMessage("😀".repeat(MAX_MESSAGE_LENGTH)), null);
+  assert.match(checkMessage("1行目\n2行目"), /制御文字/);
+  assert.match(checkMessage("タブ\tあり"), /制御文字/);
+});
+
+test("メンテナンス表示の文: スクリプトを実行したとき、問題があれば終了コード 1 と ::error::", () => {
+  const run = (message) => spawnSync(process.execPath, [fileURLToPath(new URL("./maintenance-message.mjs", import.meta.url))], {
+    env: { PATH: process.env.PATH, MAINTENANCE_MESSAGE_INPUT: message }, encoding: "utf8",
+  });
+  assert.equal(run("お知らせ").status, 0);
+  const bad = run("a\nb");
+  assert.equal(bad.status, 1);
+  assert.match(bad.stdout, /::error::/);
+});
+
+test("反映後の現在値: 変数の値を JSON の文字列で出し、バッククォートは外す。無いものは（未設定）", () => {
+  const line = describeBindings([
+    { name: "MAINTENANCE_MODE", type: "plain_text", text: "notice" },
+    { name: "MAINTENANCE_MESSAGE", type: "plain_text", text: "は`x`" },
+  ]);
+  assert.equal(line, "- 反映後の現在値: MAINTENANCE_MODE=`\"notice\"` / MAINTENANCE_MESSAGE=`\"は'x'\"`");
+  assert.equal(describeBindings([{ name: "MAINTENANCE_MODE", type: "secret_text" }]), "- 反映後の現在値: MAINTENANCE_MODE=`(secret_text)` / MAINTENANCE_MESSAGE=`(未設定)`");
+  assert.equal(describeBindings(undefined), "- 反映後の現在値: MAINTENANCE_MODE=`(未設定)` / MAINTENANCE_MESSAGE=`(未設定)`");
+});
+
+test("ワークフロー: 概要は共通のスクリプトを使い（node -e の重複なし）、develop は取り消さない（本番と同じ）", () => {
+  for (const text of [prod, dev]) {
+    assert.match(text, /node \.github\/scripts\/maintenance-summary\.mjs/);
+    assert.doesNotMatch(text, /node -e/);
+    assert.match(text, /node \.github\/scripts\/maintenance-message\.mjs/);
+  }
+  assert.match(dev, /cancel-in-progress: false/);
+  assert.match(prod, /cancel-in-progress: false/);
 });
