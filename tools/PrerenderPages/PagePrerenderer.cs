@@ -42,7 +42,9 @@ public static class PagePrerenderer
         services.AddSingleton(data);
         services.AddSingleton<BrowserClock>();
         services.AddSingleton(new RenderEnvironment(IsInteractive: false));
-        services.AddSingleton(new HttpClient());
+        // DI に渡したインスタンスは、コンテナは破棄しないので、ここで破棄する（provider より後に破棄されるよう先に宣言する）
+        using var http = new HttpClient();
+        services.AddSingleton(http);
         services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Profile));
         services.AddScoped<NavigationManager, PrerenderNavigationManager>();
         services.AddSingleton<IJSRuntime, NoJsRuntime>();

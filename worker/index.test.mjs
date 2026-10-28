@@ -1,7 +1,7 @@
 // ポートフォリオの Worker（worker/index.js）のテスト: 報告の経路、メンテナンス中の 503、メンテナンスの状態（/api/maintenance）。  node --test worker/index.test.mjs
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker from "./index.js";
+import worker, { errorSummary } from "./index.js";
 
 const HOST = "https://fara-labs.com";
 
@@ -46,6 +46,34 @@ test("メンテナンス中のページは、HTML のメンテナンス画面を
   assert.equal(res.status, 503);
   assert.equal(res.headers.get("X-Robots-Tag"), "noindex");
   assert.match(await res.text(), /ただいまメンテナンス中です/);
+});
+
+test("errorSummary: 例外の名前とメッセージを出し、URL（Webhook の秘密を含む）は外す。長さも切る", () => {
+  assert.equal(errorSummary(new TypeError("bad input")), "TypeError: bad input");
+  const s = errorSummary(new Error("failed to fetch https://discord.example/api/webhooks/123/secret-token now"));
+  assert.equal(s, "Error: failed to fetch [url] now");
+  assert.ok(!s.includes("secret-token"));
+  assert.ok(errorSummary(new Error("x".repeat(1000))).length < 320);
+  assert.equal(errorSummary("plain"), "Error: plain");
+});
+
+test("報告の受け口で例外が起きたら、500 を返し、ログに例外の名前とメッセージ（URL は外す）を残す。応答には詳細を出さない", async () => {
+  const logged = [];
+  const original = console.error;
+  console.error = (...args) => logged.push(args.join(" "));
+  try {
+    // 読んだときに例外になる変数（報告の処理の中で読まれる）
+    const env = { ASSETS: ASSETS, get TURNSTILE_SITE_KEY() { throw new TypeError("boom https://discord.example/webhooks/9/secret-x"); } };
+    const res = await worker.fetch(new Request(`${HOST}/api/report/config`), env);
+    assert.equal(res.status, 500);
+    const body = await res.text();
+    assert.ok(!body.includes("boom") && !body.includes("secret"), body);
+    assert.equal(logged.length, 1);
+    assert.match(logged[0], /TypeError: boom \[url\]/);
+    assert.ok(!logged[0].includes("secret-x"));
+  } finally {
+    console.error = original;
+  }
 });
 
 test("報告以外の /api/ は、404（静的アセットには流さない）", async () => {

@@ -43,6 +43,7 @@
     {
         if (Services.GetService(typeof(IJSRuntime)) is IJSRuntime js)
         {
+            // 意図的に握る: 本文へのフォーカスの移動だけなので、失敗しても本文は読める（JS 以外の例外は握らない）
             try { await js.InvokeVoidAsync("faraSite.focusMain"); } catch (JSException) { }
         }
     }

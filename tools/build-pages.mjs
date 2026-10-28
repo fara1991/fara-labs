@@ -37,6 +37,12 @@ export function adjustFiles(files) {
     const ogImage = /^( *)(<meta property="og:image" content="([^"]*)" \/>)/m;
     for (const [name, content] of files) {
         if (name.endsWith(".html") && typeof content === "string") {
+            // og:image の行が見つからないのは、kit の出力の形が変わったとき。黙って抜けると共有カードの説明が消えるので、ビルドを失敗させる
+            // （404.html は、共有カードの画像を持たないページなので対象外）
+            if (!ogImage.test(content)) {
+                if (name === "404.html") continue;
+                throw new Error(`${name} に og:image の行が見つかりません（kit の build-pages の出力の形が変わったかもしれません。tools/build-pages.mjs の正規表現を確かめてください）`);
+            }
             files.set(name, content.replace(ogImage, (_all, indent, tag, url) => [
                 `${indent}${tag}`,
                 `<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />`,
