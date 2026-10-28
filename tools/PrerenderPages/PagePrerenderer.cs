@@ -128,7 +128,7 @@ public static class PagePrerenderer
     private sealed class NoJsRuntime : IJSRuntime
     {
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
-            throw new NotSupportedException($"書き出しでは JavaScript を呼べません: {identifier}");
+            throw new JSException($"書き出しでは JavaScript を呼べません: {identifier}");   // kit の部品が片づけで JS を呼ぶとき、JS が使えない（JSException）として受ける
 
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) =>
             InvokeAsync<TValue>(identifier, args);
