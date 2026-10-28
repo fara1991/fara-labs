@@ -106,6 +106,12 @@ img { max-width: 100%; display: block; }
     outline-offset: 3px;
     border-radius: 6px;
 }
+/* MudBlazor の a:focus-visible { outline: none } は、この汎用の :focus-visible より詳細度が高いので、
+   リンク・ボタンの枠が消える（ナビ・ボタン・作品カード・フッター）。html を付けて、そちらより詳細度を上げる */
+html a:focus-visible, html button:focus-visible {
+    outline: 2px solid var(--lavender);
+    outline-offset: 3px;
+}
 
 .container { width: min(1120px, 100% - 32px); margin-inline: auto; }
 .container.narrow { width: min(820px, 100% - 32px); }
@@ -240,14 +246,18 @@ img { max-width: 100%; display: block; }
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 15px;
+    /* 文字が 2 行に割れないように（割れると、アクティブの丸枠が縦に伸びる）。幅が狭いときは、下の 900px 以下でメニューにする */
+    white-space: nowrap;
     transition: color .2s ease, background .2s ease;
 }
 .nav-link:hover { color: var(--text); background: rgba(255, 255, 255, .05); }
 .nav-link.active { color: #fff; background: rgba(168, 85, 247, .2); box-shadow: inset 0 0 0 1px rgba(196, 167, 255, .25); }
+/* MudBlazor の a:focus-visible { outline: none } に負けないように、ナビのフォーカスの枠は詳細度を上げて明示する（.brand と同じ） */
+.nav-link:focus-visible { outline: 2px solid var(--lavender); outline-offset: 3px; }
 
 .menu-toggle {
     display: none;
-    width: 42px; height: 42px;
+    width: 44px; height: 44px;
     place-items: center;
     border-radius: 12px;
     border: 1px solid var(--border);
@@ -256,7 +266,8 @@ img { max-width: 100%; display: block; }
     cursor: pointer;
 }
 
-@media (max-width: 720px) {
+/* メニュー（ハンバーガー）に切り替える幅。7 項目を 1 行に並べられるのは 901px 付近から（計測で確かめた）。それ以下はメニューにする */
+@media (max-width: 900px) {
     .menu-toggle { display: grid; }
     .site-nav {
         position: absolute;
@@ -331,6 +342,8 @@ img { max-width: 100%; display: block; }
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    /* タップの領域を 44px 以上に（文字は小さいままで、高さだけ広げる） */
+    min-height: 44px;
     color: var(--lavender);
     font-weight: 500;
     transition: color .2s ease, gap .25s var(--ease-out);
@@ -748,11 +761,14 @@ img { max-width: 100%; display: block; }
     line-height: 1.8;
 }
 .fsk-footer a:hover { color: var(--lavender); }
+/* タップの領域は 44px 以上（文字の大きさは変えず、リンクの箱の高さを広げる。SNS のアイコンは下の ::after で広げる） */
+.fsk-footer a:not(.fsk-footer-social) { display: inline-flex; align-items: center; min-height: 44px; }
 .fsk-footer-line { gap: 4px 10px; }
 .fsk-footer-line > * { white-space: nowrap; }
 .fsk-footer-name { color: var(--text); font-weight: 600; }
 .fsk-footer-socials { gap: 6px; margin-left: 2px; }
-a.fsk-footer-social { width: 28px; height: 28px; border-radius: 8px; }
+a.fsk-footer-social { position: relative; width: 28px; height: 28px; border-radius: 8px; }
+a.fsk-footer-social::after { content: ""; position: absolute; inset: -8px; }
 a.fsk-footer-social svg { width: 16px; height: 16px; }
 /* 狭い画面: 折り返したときに区切りの | が行頭・行末に残らないよう、区切りは出さず、項目の間を gap で空ける（PC は区切りを残す） */
 @media (max-width: 767.98px) {
@@ -766,6 +782,11 @@ a.fsk-footer-social svg { width: 16px; height: 16px; }
 .policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
 .policy ul { padding-left: 1.4em; }
 .policy a { color: var(--lavender); }
+/* 報告フォームの補足（内容の文字数など）。kit の fsk-muted の small は既定で 11px 台になるので、12px 以上にそろえる */
+.site-main small.fsk-muted { font-size: 12px; }
+/* 報告フォームの選択欄（MudSelect の入力部。既定の高さは 40px）: タップの領域を 44px 以上に */
+.site-main .fsk-select .mud-input,
+.site-main .fsk-select .mud-input-control-input-container { height: 44px; }
 
 /* ---------- 日本語の改行（本文の中。語の途中で折り返さない） ----------
    word-break: auto-phrase は Chromium 系だけ。対応しない環境は normal（既定）のまま。日付の塊は .nowrap で分けない */
