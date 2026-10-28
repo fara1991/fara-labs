@@ -1,7 +1,7 @@
 <Project>
 
   <!--
-    C# の静的解析（ラチェット）。ルールの中身と理由は external/fara-site-kit/docs/lint.md（2）。
+    C# の静的解析（ラチェット）。ルールの中身と理由は external/fara-blazor-component/docs/lint.md（2）。
     設定は tools/lint/dotnet.site.editorconfig（kit の dotnet.editorconfig と同じ内容。CA1031 だけ error）。
     kit のプロジェクトは kit 自身の Directory.Build.props を使う（MSBuild は一番近い 1 つだけ読む）。
   -->

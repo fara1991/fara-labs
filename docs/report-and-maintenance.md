@@ -130,9 +130,9 @@ GitHub から自動で公開（デプロイ）しても、ダッシュボード�
 - アバターの「みんなで練習」は、すでにつながっている人の接続は切れません（新しくつなぐ人だけ 503 になります）。
 - メンテナンス中は、作者への報告フォームも使えません（503）。
 - メンテナンス中の画面の見た目は、[`maintenance.html`](maintenance.html) と同じ作りです。アバター・Bot・ポートフォリオは、Worker が 503 の画面を返します（ポートフォリオは、ページも API もすべて 503 です）。**ポケモンは、ページ自体は通常どおり読み込まれ（200）、そのあと、アプリが同じ見た目のメンテナンス画面を出します**（API だけが 503 です）。そのため、ポケモンでは、画面が出るまで一瞬かかり、検索エンジンへの「503」の通知にもなりません。
-- 画面の文面・見た目を変えるときは、共通部品 fara-site-kit の `worker/maintenance.js` を変更します（このリポジトリでは `external/fara-site-kit` のサブモジュール。kit で直してタグを付け、各サイトで上げます）。
+- 画面の文面・見た目を変えるときは、共通部品 fara-blazor-component の `worker/maintenance.js` を変更します（このリポジトリでは `external/fara-blazor-component` のサブモジュール。kit で直してタグを付け、各サイトで上げます）。
 - 以前に、Cloudflare の WAF にメンテナンス用のカスタムルール（`production-maintenance` など）を作っていた場合は、削除してください（このしくみとは別のものです）。
-- `worker/maintenance.js` と `worker/report.js` は、fara-site-kit のものを import しています（このリポジトリにコピーは置きません）。
+- `worker/maintenance.js` と `worker/report.js` は、fara-blazor-component のものを import しています（このリポジトリにコピーは置きません）。
 - ポートフォリオの `/api/maintenance` は、`MAINTENANCE_MODE=true` でも 200 を返します（アプリが状態を読むための入口なので、503 にしない。ページ・報告の API は 503）。
 - ポートフォリオの帯は、kit の `MaintenanceBanner` がヘッダーと本文の間に出します（ページを切り替えても動きません）。Worker は HTML に帯を入れません（Blazor が画面を描き直すため）。
 

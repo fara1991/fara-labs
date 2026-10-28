@@ -3,8 +3,8 @@ using System.Text.Unicode;
 using FaraPortfolio.Web.Components;
 using FaraPortfolio.Web.Pages;
 using FaraPortfolio.Web.Services;
-using FaraSiteKit.Core;
-using FaraSiteKit.Razor;
+using FaraBlazorComponent.Core;
+using FaraBlazorComponent.Razor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
@@ -45,7 +45,7 @@ public static class PagePrerenderer
         // DI に渡したインスタンスは、コンテナは破棄しないので、ここで破棄する（provider より後に破棄されるよう先に宣言する）
         using var http = new HttpClient();
         services.AddSingleton(http);
-        services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Profile));
+        services.AddFaraBlazorComponent(options => SiteInfo.Configure(options, data.Profile));
         services.AddScoped<NavigationManager, PrerenderNavigationManager>();
         services.AddSingleton<IJSRuntime, NoJsRuntime>();
         await using var provider = services.BuildServiceProvider();

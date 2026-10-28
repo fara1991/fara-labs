@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- 静的な本文の書き出し: Razor のページ（src/FaraPortfolio.Web）を、サーバー側の HtmlRenderer で HTML にする。
-       出力（pages.json）を、fara-site-kit の build-pages（tools/build-pages.mjs）に渡して、入口ページ（本文入り）を作る -->
+       出力（pages.json）を、fara-blazor-component の build-pages（tools/build-pages.mjs）に渡して、入口ページ（本文入り）を作る -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>

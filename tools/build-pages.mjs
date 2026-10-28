@@ -8,7 +8,7 @@
 import { readFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildPages, writeFiles, assertTemplateNotOverwritten } from "../external/fara-site-kit/build/build-pages.mjs";
+import { buildPages, writeFiles, assertTemplateNotOverwritten } from "../external/fara-blazor-component/build/build-pages.mjs";
 import { assertEnvironment } from "./environments.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");

@@ -5,12 +5,12 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { startStaticServer } from "../external/fara-site-kit/tools/layout-check/serve-static.mjs";
+import { startStaticServer } from "../external/fara-blazor-component/tools/layout-check/serve-static.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const publishDir = join(root, "publish", "wwwroot");
 const config = join(root, "layout-check.config.mjs");
-const cli = join(root, "external", "fara-site-kit", "tools", "layout-check", "cli.mjs");
+const cli = join(root, "external", "fara-blazor-component", "tools", "layout-check", "cli.mjs");
 const START_PORT = 8840;
 
 if (!existsSync(join(publishDir, "index.html"))) {

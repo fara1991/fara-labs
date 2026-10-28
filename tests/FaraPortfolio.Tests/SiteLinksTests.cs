@@ -1,6 +1,6 @@
 using FaraPortfolio.Web.Models;
 using FaraPortfolio.Web.Services;
-using FaraSiteKit.Core;
+using FaraBlazorComponent.Core;
 
 namespace FaraPortfolio.Tests;
 

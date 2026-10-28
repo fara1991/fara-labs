@@ -1,7 +1,7 @@
 using FaraPortfolio.Web;
 using FaraPortfolio.Web.Services;
-using FaraSiteKit.Core;
-using FaraSiteKit.Razor;
+using FaraBlazorComponent.Core;
+using FaraBlazorComponent.Razor;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
@@ -19,12 +19,12 @@ var data = dataTask.Result;
 builder.Services.AddSingleton(data);
 builder.Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
 
-// 共通部品（fara-site-kit の Razor。フッター・報告フォームなど）の設定。値は Services/SiteInfo.cs。
+// 共通部品（fara-blazor-component の Razor。フッター・報告フォームなど）の設定。値は Services/SiteInfo.cs。
 // 確認用のホストで開いているときの、fara-labs.com 配下のリンクの切り替えは、開いているホスト名で決める
-builder.Services.AddFaraSiteKit(options => SiteInfo.Configure(options, data.Profile));
+builder.Services.AddFaraBlazorComponent(options => SiteInfo.Configure(options, data.Profile));
 SiteLinks.CurrentHost = new Uri(baseAddress).Host;
 
-// メンテナンスの状態（Worker の変数 MAINTENANCE_MODE。external/fara-site-kit/worker/maintenance.js）。読めなければ通常
+// メンテナンスの状態（Worker の変数 MAINTENANCE_MODE。external/fara-blazor-component/worker/maintenance.js）。読めなければ通常
 builder.Services.AddSingleton(maintenanceTask.Result);
 
 builder.Services.AddSingleton(http);
