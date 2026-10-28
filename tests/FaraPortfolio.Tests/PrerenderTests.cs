@@ -138,8 +138,8 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Report_page_is_the_same_form_the_browser_renders_so_the_heading_does_not_change_on_boot()
     {
         var html = Text(production[5]);
-        Assert.Contains("<h3>問い合わせ</h3>", html);
-        Assert.DoesNotContain("<h1>問い合わせ</h1>", html);
+        Assert.Contains("<h1 class=\"fsk-page-title\">問い合わせ</h1>", html);   // kit v0.5.0 から、題名はページの h1
+        Assert.DoesNotContain("<h3>問い合わせ</h3>", html);
         Assert.Contains("id=\"report-message\"", html);
         Assert.Contains("id=\"report-category\"", html);
         Assert.Contains("fsk-page-header fsk-page-column", html);
