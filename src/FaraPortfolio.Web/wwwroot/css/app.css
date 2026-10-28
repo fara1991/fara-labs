@@ -613,6 +613,11 @@ html a:focus-visible, html button:focus-visible {
     .work-detail-head { padding-left: 56px; min-height: 48px; }
     .work-detail-body { padding: 22px 20px 24px; }
 }
+/* 480px 未満: アイコンを見出しの横に置くと、見出し・サブタイトルが 56px 狭くなり、見出しが 1 行 10 字前後になる。アイコンを見出しの上に積み、幅を戻す */
+@media (max-width: 479.98px) {
+    .work-detail-visual { position: static; place-items: start; padding: 22px 20px 0; }
+    .work-detail-head { padding-left: 0; min-height: 0; }
+}
 
 /* ---------- 更新履歴 ---------- */
 .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
