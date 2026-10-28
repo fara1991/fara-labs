@@ -94,12 +94,14 @@ test("本番: ゲートは、mode が true / notice / false のときだけ飛�
   assert.match(stepBlock(prod, "Require master"), /if: github\.ref != 'refs\/heads\/master'/);
 });
 
-test("ワークフロー: 旧名 MAINTENANCE は使わない。入力・サマリーがある。サマリーは always()", () => {
+test("ワークフロー: 旧名 MAINTENANCE は使わない。入力・サマリーがある。サマリーは、文の検査が通ったときだけ（always() かつ検査の成功）", () => {
   for (const text of [prod, dev]) {
     assert.doesNotMatch(text, /(?<![A-Z_])MAINTENANCE(?![A-Z_])/);
     assert.match(text, /maintenance_mode:\n {8}description:[^\n]*\n {8}type: choice\n {8}options: \["", "true", "notice", "false"\]\n {8}default: ""/);
     assert.match(text, /maintenance_message:\n {8}description:[^\n]*\n {8}type: string\n {8}default: ""/);
-    assert.match(stepBlock(text, "Summary (maintenance)"), /if: \$\{\{ always\(\) \}\}/);
+    // 文の検査が失敗したら、未検査の文を概要に書かない（公開だけが失敗した場合は書く）
+    assert.match(stepBlock(text, "Summary (maintenance)"), /if: \$\{\{ always\(\) && steps\.message\.outcome == 'success' \}\}/);
+    assert.match(stepBlock(text, "Check maintenance message"), /\n {8}id: message\n/);
   }
   assert.match(stepBlock(prod, "Summary (maintenance)"), /WORKER_NAME: fara-portfolio\n/);
   assert.match(stepBlock(dev, "Summary (maintenance)"), /WORKER_NAME: fara-portfolio-dev\n/);

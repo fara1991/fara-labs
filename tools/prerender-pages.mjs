@@ -5,15 +5,15 @@ import { readFileSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { assertEnvironment, originKey } from "./environments.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_FILE = join(root, "tools", "site.json");
-const ENVIRONMENTS = ["production", "develop"];
 
 /** dotnet run に渡す引数。env に応じて、本番（origin）か確認用（devOrigin）のホスト名を使う。 */
 export function prerenderArgs({ env, site }) {
-  if (!ENVIRONMENTS.includes(env)) throw new Error(`--env は ${ENVIRONMENTS.join(" か ")} を指定してください`);
-  const key = env === "develop" ? "devOrigin" : "origin";
+  assertEnvironment(env);
+  const key = originKey(env);
   if (typeof site[key] !== "string") throw new Error(`tools/site.json に ${key} がありません`);
   const host = new URL(site[key]).host;
   return [

@@ -1,5 +1,5 @@
 // 本番の公開（デプロイ）の前に、Cloudflare の Worker の変数 MAINTENANCE_MODE が "notice"（または "true"）になっているかを確かめる。
-// 3 サイト（pokemon・avatar・bot）とポートフォリオで同じファイルを使う（各リポジトリの .github/scripts/ に同じ内容を置いている）。
+// 他のサイト（pokemon・avatar・bot）と同じ考え方だが、内容は各リポジトリで別々に管理する（ポートフォリオは ALLOW_MISSING_WORKER を 1 だけ受ける。avatar は 1 と true）。
 //
 //   node .github/scripts/require-maintenance.mjs <Worker 名>
 //   必要な環境変数: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID（公開に使っているものと同じ。Workers Scripts の読み取りができること）
