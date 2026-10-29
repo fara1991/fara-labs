@@ -714,7 +714,6 @@ html a:focus-visible, html button:focus-visible {
 .link-text { flex: 1; min-width: 0; display: grid; }
 .link-label { font-family: var(--font-display); font-weight: 700; font-size: 19px; }
 .link-handle { color: var(--lavender); font-size: 14px; }
-.link-desc { color: var(--muted); font-size: 14px; margin-top: 2px; }
 .link-arrow { color: var(--faint); transition: color .2s ease; }
 .link-card:hover .link-arrow { color: var(--text); }
 .service-github { --brand: #6e40c9; }

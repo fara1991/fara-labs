@@ -33,7 +33,6 @@ public sealed class SocialLink
     public string Label { get; init; } = "";
     public string Handle { get; init; } = "";
     public string Url { get; init; } = "";
-    public string Description { get; init; } = "";
 }
 
 /// <summary>data/works.json の 1 要素。</summary>
