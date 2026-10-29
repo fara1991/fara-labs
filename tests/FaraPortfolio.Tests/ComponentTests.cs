@@ -108,6 +108,15 @@ public sealed class ComponentTests : BunitContext
     }
 
     [Fact]
+    public void Header_menu_labels_match_the_page_titles()
+    {
+        NavigateTo("/");
+        var cut = Render<SiteHeader>();
+        Assert.Equal(["ホーム", "プロフィール", "作ったもの", "更新履歴", "リンク", "問い合わせ", "プライバシーポリシー"],
+            cut.FindAll("a.nav-link").Select(a => a.TextContent.Trim()));
+    }
+
+    [Fact]
     public void Opening_the_menu_moves_the_focus_to_the_first_link()
     {
         NavigateTo("/");

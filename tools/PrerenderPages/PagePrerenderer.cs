@@ -82,7 +82,7 @@ public static class PagePrerenderer
         notFoundNav.Set($"https://{host}/", $"https://{host}/%E3%83%9A");
         await using var notFoundRenderer = new HtmlRenderer(notFoundScope.ServiceProvider, notFoundScope.ServiceProvider.GetRequiredService<ILoggerFactory>());
         var notFoundHtml = await notFoundRenderer.Dispatcher.InvokeAsync(() => RenderBodyAsync(notFoundRenderer, typeof(NotFoundContent)));
-        return new PrerenderResult(rendered, new PrerenderedPage("/404", "ページが見つかりません | Fara", "", notFoundHtml));
+        return new PrerenderResult(rendered, new PrerenderedPage("/404", "ページが見つかりません | Fara Labs", "", notFoundHtml));
     }
 
     private static readonly System.Text.RegularExpressions.Regex InternalAttribute = new(" __internal_[A-Za-z0-9_]+(?==| |>|/)");

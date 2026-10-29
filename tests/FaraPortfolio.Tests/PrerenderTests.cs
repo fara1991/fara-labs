@@ -33,7 +33,10 @@ public sealed class PrerenderTests : IAsyncLifetime
     {
         Assert.Equal(["/", "/profile", "/works", "/updates", "/links", "/report", "/privacy"], production.Select(p => p.Path));
         Assert.Equal("Fara Labs", production[0].Title);
-        Assert.Equal("Works | Fara", production[2].Title);
+        Assert.Equal("プロフィール | Fara Labs", production[1].Title);
+        Assert.Equal("作ったもの | Fara Labs", production[2].Title);
+        Assert.Equal("更新履歴 | Fara Labs", production[3].Title);
+        Assert.Equal("リンク | Fara Labs", production[4].Title);
         Assert.Equal("問い合わせ | Fara Labs", production[5].Title);
         Assert.All(production, p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
@@ -116,6 +119,14 @@ public sealed class PrerenderTests : IAsyncLifetime
     }
 
     [Fact]
+    public void Links_page_h1_matches_the_menu()
+    {
+        var html = Text(production[4]);
+        Assert.Contains("<h1>リンク</h1>", html);
+        Assert.DoesNotContain("SNS・リンク", html);
+    }
+
+    [Fact]
     public void Works_page_lists_every_work_with_its_id_anchor()
     {
         var data = SiteData.Load(Path.Combine(AppContext.BaseDirectory, "data"));
@@ -166,7 +177,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     {
         var html = Text(notFound);
         Assert.StartsWith("<div class=\"entry-static\">", notFound.BodyHtml);
-        Assert.Equal("ページが見つかりません | Fara", notFound.Title);
+        Assert.Equal("ページが見つかりません | Fara Labs", notFound.Title);
         Assert.Contains("class=\"fbc-not-found-code\"", html);
         Assert.Contains("ページが見つかりません", html);
         Assert.Contains("href=\"/\"", html);
