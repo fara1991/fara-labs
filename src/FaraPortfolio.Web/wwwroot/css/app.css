@@ -511,7 +511,6 @@ html a:focus-visible, html button:focus-visible {
 /* ---------- プロフィール ---------- */
 .profile-card { padding: clamp(28px, 5vw, 56px); }
 .profile-bio { font-size: clamp(15px, 1.6vw, 17px); color: var(--muted); margin-top: 0; }
-.profile-card .cta-socials { justify-content: flex-start; margin: 0; }
 
 /* ---------- 作品カード ---------- */
 .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
@@ -725,22 +724,6 @@ html a:focus-visible, html button:focus-visible {
 .service-discord { --brand: #5865f2; }
 .service-youtube { --brand: #e0245e; }
 .service-bluesky { --brand: #3b82f6; }
-
-/* ---------- CTA ---------- */
-.cta { padding: clamp(32px, 6vw, 64px); text-align: center; display: grid; justify-items: center; gap: 8px; }
-.cta-socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 8px 0 24px; }
-.social-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 18px 8px 8px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .05);
-    border: 1px solid var(--border);
-    transition: background .2s ease, border-color .2s ease;
-}
-.social-pill:hover { background: color-mix(in srgb, var(--brand, var(--violet)) 20%, transparent); border-color: var(--brand, var(--violet)); }
-.pill-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--brand, var(--violet)); }
 
 /* ---------- フッター（kit の SiteFooter。形は 4 サイト共通。色と余白はこのサイトの紫に合わせる） ---------- */
 .fbc-footer {
