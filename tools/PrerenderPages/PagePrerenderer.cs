@@ -54,7 +54,6 @@ public static class PagePrerenderer
         (PageCatalog.Page Page, Type Component)[] pages =
         [
             (PageCatalog.Home(profile), typeof(Home)),
-            (PageCatalog.ProfilePage(profile), typeof(Profile)),
             (PageCatalog.Works(profile), typeof(Works)),
             (PageCatalog.Updates(profile), typeof(Updates)),
             (PageCatalog.Report(), typeof(ReportContent)),

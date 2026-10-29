@@ -95,9 +95,8 @@ public class SiteLinksTests
     [Fact]
     public void Page_titles_follow_the_profile_name()
     {
-        var profile = new Profile { Name = "Fara", Tagline = "t", Bio = "b" };
+        var profile = new Profile { Name = "Fara", Tagline = "t" };
         Assert.Equal("Fara Labs", PageCatalog.Home(profile).Title);
-        Assert.Equal("プロフィール | Fara Labs", PageCatalog.ProfilePage(profile).Title);
         Assert.Equal("作ったもの | Fara Labs", PageCatalog.Works(profile).Title);
         Assert.Equal("更新履歴 | Fara Labs", PageCatalog.Updates(profile).Title);
         Assert.Equal("問い合わせ | Fara Labs", PageCatalog.Report().Title);

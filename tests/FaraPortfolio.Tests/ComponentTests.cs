@@ -19,7 +19,7 @@ public sealed class ComponentTests : BunitContext
     public ComponentTests()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
-        var profile = new FaraPortfolio.Web.Models.Profile { Name = "Fara", Tagline = "t", Bio = "b" };
+        var profile = new FaraPortfolio.Web.Models.Profile { Name = "Fara", Tagline = "t" };
         Services.AddFaraBlazorComponent(options => SiteInfo.Configure(options, profile));
         Services.AddSingleton(new BrowserClock { Today = new DateOnly(2026, 10, 23) });
         Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
@@ -48,7 +48,7 @@ public sealed class ComponentTests : BunitContext
         Assert.Single(current);
         Assert.Equal("作ったもの", current[0].TextContent.Trim());
         Assert.Contains("active", current[0].ClassName);
-        Assert.Equal(5, cut.FindAll("a.nav-link:not([aria-current])").Count);
+        Assert.Equal(4, cut.FindAll("a.nav-link:not([aria-current])").Count);
     }
 
     [Fact]
@@ -67,17 +67,22 @@ public sealed class ComponentTests : BunitContext
     }
 
     [Fact]
-    public void Home_has_one_hidden_h1_and_the_site_icon_in_the_core()
+    public void Home_has_one_h1_with_the_avatar_and_the_site_icon_in_the_core()
     {
         NavigateTo("/");
         var cut = Render<Home>();
 
-        // h1 は 1 つ。画面には出さない（.sr-only）ので、大きな見出し（hero-heading）は無い
+        // h1 は 1 つ。画面の先頭に、アイコン（アバター。装飾なので alt は空）と名前を出す
         var h1 = cut.FindAll("h1");
         Assert.Single(h1);
-        Assert.Equal("sr-only", h1[0].ClassName);
-        Assert.Equal("Fara Labs", h1[0].TextContent.Trim());
-        Assert.Empty(cut.FindAll(".hero-heading"));
+        Assert.Contains("hero-name", h1[0].ClassName);
+        Assert.Equal("Fara", h1[0].TextContent.Trim());
+        var avatar = h1[0].QuerySelector("img.avatar")!;
+        Assert.Equal("/images/avatar.jpg", avatar.GetAttribute("src"));
+        Assert.Equal("64", avatar.GetAttribute("width"));
+        Assert.Equal("64", avatar.GetAttribute("height"));
+        Assert.NotNull(avatar.GetAttribute("alt"));
+        Assert.Empty(cut.FindAll(".sr-only"));
 
         // 軌道の中央は文字の「F」ではなく、サイトアイコン（装飾。大きさを指定してレイアウトのずれを出さない）
         var core = cut.Find(".core");
@@ -112,7 +117,7 @@ public sealed class ComponentTests : BunitContext
     {
         NavigateTo("/");
         var cut = Render<SiteHeader>();
-        Assert.Equal(["ホーム", "プロフィール", "作ったもの", "更新履歴", "問い合わせ", "プライバシーポリシー"],
+        Assert.Equal(["ホーム", "作ったもの", "更新履歴", "問い合わせ", "プライバシーポリシー"],
             cut.FindAll("a.nav-link").Select(a => a.TextContent.Trim()));
     }
 

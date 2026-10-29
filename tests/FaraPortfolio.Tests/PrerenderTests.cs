@@ -35,12 +35,11 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Every_page_is_rendered_in_the_agreed_order_with_title_and_description()
     {
-        Assert.Equal(["/", "/profile", "/works", "/updates", "/report", "/privacy"], production.Select(p => p.Path));
+        Assert.Equal(["/", "/works", "/updates", "/report", "/privacy"], production.Select(p => p.Path));
         Assert.Equal("Fara Labs", production[0].Title);
-        Assert.Equal("プロフィール | Fara Labs", production[1].Title);
-        Assert.Equal("作ったもの | Fara Labs", production[2].Title);
-        Assert.Equal("更新履歴 | Fara Labs", production[3].Title);
-        Assert.Equal("問い合わせ | Fara Labs", production[4].Title);
+        Assert.Equal("作ったもの | Fara Labs", production[1].Title);
+        Assert.Equal("更新履歴 | Fara Labs", production[2].Title);
+        Assert.Equal("問い合わせ | Fara Labs", production[3].Title);
         Assert.All(production, p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 
@@ -86,10 +85,10 @@ public sealed class PrerenderTests : IAsyncLifetime
             Assert.Contains("© 2026 ", html);
             Assert.Contains("href=\"https://github.com/fara1991\"", html);
         }
-        Assert.Contains("href=\"/report?from=%2Fworks\"", Text(production[2]));
+        Assert.Contains("href=\"/report?from=%2Fworks\"", Text(production[1]));
         // 問い合わせ・プライバシーのページ自身は、?from= を付けない
+        Assert.DoesNotContain("?from=", Text(production[3]));
         Assert.DoesNotContain("?from=", Text(production[4]));
-        Assert.DoesNotContain("?from=", Text(production[5]));
     }
 
     [Fact]
@@ -107,11 +106,11 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Home_has_the_hero_works_and_updates_from_the_data_files()
     {
         var html = Text(production[0]);
-        // 「Fara Labs」は画面の見出しにせず、h1 は .sr-only で隠して 1 つだけ残す（Blazor の描画と同じ構造）
-        Assert.DoesNotContain("hero-title", html);
-        Assert.DoesNotContain("hero-heading", html);
+        // 見出し（h1）は 1 つだけ。画面の先頭に、アイコン（アバター）と名前を出す（Blazor の描画と同じ構造）
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(html, "<h1[ >]"));
-        Assert.Contains("<h1 class=\"sr-only\">Fara Labs</h1>", html);
+        Assert.Matches("<h1 class=\"hero-name name-with-avatar reveal\"[^>]*><img class=\"avatar\" src=\"/images/avatar.jpg\" alt(=\"\")? width=\"64\" height=\"64\"[^>]*/?>Fara</h1>", html);
+        Assert.DoesNotContain("sr-only", html);
+        Assert.Contains("管理者のFaraです。作ったもの置き場です。", html);
         // 中央はサイトアイコンの img（文字の「F」は使わない）
         Assert.Matches("<div class=\"core\" aria-hidden=\"true\">\\s*<img src=\"/favicon.svg\" alt(=\"\")? width=\"64\" height=\"64\"", html);
         Assert.DoesNotContain("<span>F</span>", html);
@@ -122,27 +121,25 @@ public sealed class PrerenderTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Profile_page_has_the_links_and_home_has_no_link_buttons()
+    public void Profile_page_is_gone_and_home_has_no_link_buttons()
     {
-        // リンク（SNS など）はプロフィールにまとめる。リンクのページ（/links）は無い
-        var profile = Text(production[1]);
-        Assert.Contains(">リンク</h2>", profile);
-        Assert.Contains("class=\"link-card", profile);
-        Assert.Contains("@game_fara", profile);
-        Assert.DoesNotContain("お気軽にフォロー", profile);
-        Assert.DoesNotContain("SNS・リンク", profile);
+        // プロフィールのページ（/profile）は無い。リンクのページ（/links）も無い（SNS はフッターだけ）
+        var all = string.Concat(production.Select(Text));
+        Assert.DoesNotContain("/profile", all);
+        Assert.DoesNotContain("プロフィール", all);
+        Assert.DoesNotContain("class=\"link-card", all);
         var home = Text(production[0]);
         Assert.DoesNotContain("リンク一覧", home);
         Assert.DoesNotContain("btn btn-ghost", home);
         Assert.DoesNotContain("social-pill", home);
-        Assert.DoesNotContain("/links", string.Concat(production.Select(Text)));
+        Assert.DoesNotContain("/links", all);
     }
 
     [Fact]
     public void Works_page_lists_every_work_with_its_id_anchor()
     {
         var data = SiteData.Load(Path.Combine(AppContext.BaseDirectory, "data"));
-        var html = Text(production[2]);
+        var html = Text(production[1]);
         Assert.All(data.Works, w =>
         {
             Assert.Contains($"id=\"{w.Id}\"", html);
@@ -154,7 +151,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Updates_page_has_no_filter_buttons_and_no_new_chip_in_the_static_body()
     {
         // 絞り込みは、ブラウザで Blazor が動いてから（静的な本文では押せない）。NEW は、見る人の今日の日付で決める
-        var html = Text(production[3]);
+        var html = Text(production[2]);
         Assert.DoesNotContain("filter-chip", html);
         Assert.DoesNotContain("chip-new", html);
         Assert.Contains("update-item", html);
@@ -163,7 +160,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Report_page_is_the_same_form_the_browser_renders_so_the_heading_does_not_change_on_boot()
     {
-        var html = Text(production[4]);
+        var html = Text(production[3]);
         Assert.Contains("<h1 class=\"fbc-page-title\">問い合わせ</h1>", html);   // kit v0.5.0 から、題名はページの h1
         Assert.DoesNotContain("<h3>問い合わせ</h3>", html);
         Assert.Contains("id=\"report-message\"", html);
@@ -174,8 +171,8 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Aria_current_marks_the_page_in_the_static_header()
     {
-        Assert.Contains("href=\"/works\" aria-current=\"page\"", Text(production[2]));
-        Assert.Single(System.Text.RegularExpressions.Regex.Matches(Text(production[2]), "aria-current=\"page\""));
+        Assert.Contains("href=\"/works\" aria-current=\"page\"", Text(production[1]));
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(Text(production[1]), "aria-current=\"page\""));
     }
 
     [Fact]
@@ -202,7 +199,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Privacy_policy_matches_what_the_site_stores_in_the_browser()
     {
         // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
-        var policy = Text(production[5]);
+        var policy = Text(production[4]);
         Assert.Contains("Cookie を使いません", policy);
         Assert.Contains("日本時間の 0 時ごろ", policy);
         var body = policy[policy.IndexOf("<article", StringComparison.Ordinal)..policy.IndexOf("</article>", StringComparison.Ordinal)];
@@ -243,7 +240,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Privacy_page_has_the_policy_in_the_wide_column()
     {
-        var html = Text(production[5]);
+        var html = Text(production[4]);
         Assert.Contains("class=\"page container wide fbc-page-column fbc-page-column--wide\"", html);
         Assert.Contains("ブラウザに保存する情報", html);
         Assert.Contains("Cloudflare Turnstile", html);
@@ -259,9 +256,9 @@ public sealed class PrerenderTests : IAsyncLifetime
     {
         // 作者のホームページ（フッター）と、作品のリンク（pokemon.fara-labs.com など）
         Assert.Contains("href=\"https://dev.fara-labs.com/\"", Text(develop[0]));
-        Assert.Contains("pokemon-dev.fara-labs.com", Text(develop[2]));
-        Assert.DoesNotContain("//pokemon.fara-labs.com", Text(develop[2]));
+        Assert.Contains("pokemon-dev.fara-labs.com", Text(develop[1]));
+        Assert.DoesNotContain("//pokemon.fara-labs.com", Text(develop[1]));
         Assert.Contains("href=\"https://fara-labs.com/\"", Text(production[0]));
-        Assert.Contains("//pokemon.fara-labs.com", Text(production[2]));
+        Assert.Contains("//pokemon.fara-labs.com", Text(production[1]));
     }
 }
