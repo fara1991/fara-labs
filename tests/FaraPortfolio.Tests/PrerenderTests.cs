@@ -112,10 +112,12 @@ public sealed class PrerenderTests : IAsyncLifetime
         Assert.DoesNotContain("sr-only", html);
         Assert.Contains("管理者のFaraです。作ったもの置き場です。", html);
         // 中央はサイトアイコンの img（文字の「F」は使わない）
-        Assert.Matches("<div class=\"core\" aria-hidden=\"true\">\\s*<img src=\"/favicon.svg\" alt(=\"\")? width=\"64\" height=\"64\"", html);
+        Assert.Matches("<a class=\"core\" href=\"/works\" aria-label=\"作ったもの\">\\s*<img src=\"/favicon.svg\" alt(=\"\")? width=\"64\" height=\"64\"", html);
         Assert.DoesNotContain("<span>F</span>", html);
         Assert.Contains("class=\"orbit-hint\"", html);
-        Assert.Contains("class=\"work-card", html);
+        // ホームの下側に、作品を並べるブロック（旧 #works）は無い。作品へは、軌道のアイコンと中央のアイコン・ボタンから
+        Assert.DoesNotContain("work-card", html);
+        Assert.DoesNotContain("id=\"works\"", html);
         Assert.Contains("最近の更新", html);
         Assert.Contains("class=\"satellite", html);
     }
