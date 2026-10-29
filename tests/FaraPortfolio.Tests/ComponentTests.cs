@@ -86,7 +86,11 @@ public sealed class ComponentTests : BunitContext
 
         // 軌道の中央は文字の「F」ではなく、サイトアイコン（装飾。大きさを指定してレイアウトのずれを出さない）
         var core = cut.Find(".core");
-        Assert.Equal("true", core.GetAttribute("aria-hidden"));
+        // 中央は作ったもの（/works）へのリンク（名前は aria-label。aria-hidden にしない）
+        Assert.Equal("a", core.TagName.ToLowerInvariant());
+        Assert.Equal("/works", core.GetAttribute("href"));
+        Assert.Equal("作ったもの", core.GetAttribute("aria-label"));
+        Assert.Null(core.GetAttribute("aria-hidden"));
         Assert.Empty(core.QuerySelectorAll("span"));
         var img = core.QuerySelector("img")!;
         Assert.Equal("/favicon.svg", img.GetAttribute("src"));

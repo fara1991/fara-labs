@@ -421,7 +421,8 @@ html a:focus-visible, html button:focus-visible {
     animation: spin 120s linear infinite;
 }
 /* 回転アニメーション（transform）で重なり順のまとまりになるので、説明（.satellite-tip）が中央の .core より上に出るよう前面に置く */
-.orbit-outer { inset: 0; z-index: 1; }
+.orbit-outer { inset: 0; z-index: 1; pointer-events: none; }   /* 軌道の枠そのものは、下の中央のアイコン（リンク）へのクリックを邪魔しない。周りのアイコンだけが受ける */
+.orbit-outer .satellite { pointer-events: auto; }
 .orbit-inner { inset: 22%; border-style: solid; border-color: rgba(232, 121, 249, .2); animation: none; }
 .satellite {
     position: absolute;
@@ -480,7 +481,7 @@ html a:focus-visible, html button:focus-visible {
     top: calc(100% + 38px);   /* 軌道の線の上を回るアイコン（半分が外へ出る）に重ならない位置 */
     left: 50%;
     width: max-content;
-    max-width: 90vw;
+    max-width: min(90vw, 28em);   /* 長い文は 2 行に折り返し、画面の右端・左の文章に重ならない */
     margin: 0;
     transform: translateX(-50%);
     color: var(--muted);
@@ -504,40 +505,19 @@ html a:focus-visible, html button:focus-visible {
     box-shadow: 0 0 80px rgba(168, 85, 247, .7), 0 0 160px rgba(232, 121, 249, .3);
 }
 .core img { display: block; width: 72%; height: auto; aspect-ratio: 1; pointer-events: none; }
+/* 中央のアイコンは作ったものへのリンク。ホバー・押したときは transform（スクロールの出現は親の translate なので衝突しない）。
+   フォーカスの枠は、MudBlazor の a:focus-visible { outline: none } に負けないよう .core:focus-visible で明示する */
+.core { transition: transform .25s var(--ease-out), box-shadow .25s ease; }
+.core:hover { transform: scale(1.06); box-shadow: 0 0 96px rgba(168, 85, 247, .85), 0 0 180px rgba(232, 121, 249, .4); }
+.core:active { transform: scale(.97); }
+.core:focus-visible { outline: 3px solid var(--lavender); outline-offset: 5px; }
 
 @media (max-width: 860px) {
     .hero-inner { grid-template-columns: 1fr; text-align: left; }
     .hero-visual { width: min(300px, 70vw); order: -1; margin-bottom: 4rem; }
 }
 
-/* ---------- 作品カード ---------- */
-.work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-.work-card {
-    --accent: var(--violet);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    padding: 28px;
-    border-radius: var(--radius);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    overflow: hidden;
-    transition: border-color .3s ease;
-}
-.work-card::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: .8;
-}
-.work-card:hover { border-color: color-mix(in srgb, var(--accent) 70%, transparent); }
-.work-card h3 { font-size: 22px; margin: 18px 0 2px; }
-.work-card .muted { flex: 1; font-size: 15px; }
-.work-card-top { display: flex; justify-content: space-between; align-items: center; }
+/* ---------- 作品（作品ページで使う部品） ---------- */
 .work-subtitle { color: var(--accent); font-size: 14px; font-weight: 500; margin-bottom: 12px; }
 .work-icon {
     width: 56px; height: 56px;
@@ -548,8 +528,6 @@ html a:focus-visible, html button:focus-visible {
     box-shadow: 0 10px 30px -8px var(--accent);
 }
 .work-icon.big { width: 72px; height: 72px; border-radius: 22px; }
-.card-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--lavender); font-weight: 500; font-size: 14px; transition: gap .25s var(--ease-out); }
-.work-card:hover .card-more { gap: 10px; }
 
 .accent-violet { --accent: #a855f7; }
 .accent-pink { --accent: #e879f9; }

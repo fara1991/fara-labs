@@ -35,29 +35,14 @@
                 }
             </div>
             <div class="orbit orbit-inner" aria-hidden="true"></div>
-            @* 中央はサイトアイコン（ファビコンと同じ SVG）。装飾なので alt は空。width/height を指定してレイアウトのずれを出さない *@
-            <div class="core" aria-hidden="true"><img src="/favicon.svg" alt="" width="64" height="64" decoding="async" /></div>
-            @* 周りのアイコンが作品へのリンクだと分かるように、軌道の下に一言そえる（マウスの端末とタッチの端末で文言を変える。CSS の hover メディア特性） *@
+            @* 中央はサイトアイコン（ファビコンと同じ SVG）。作ったもの（/works）へのリンク。リンクの名前は aria-label、画像は飾りなので alt は空。width/height を指定してレイアウトのずれを出さない *@
+            <a class="core" href="/works" aria-label="作ったもの"><img src="/favicon.svg" alt="" width="64" height="64" decoding="async" /></a>
+            @* アイコンが作ったものへのリンクだと分かるように、軌道の下に一言そえる（マウスの端末とタッチの端末で文言を変える。CSS の hover メディア特性） *@
             <p class="orbit-hint" aria-hidden="true">
-                <span class="hint-hover">アイコンにカーソルを合わせると作品名が出て、押すと紹介へ移動します</span>
-                <span class="hint-touch">アイコンを押すと、作品の紹介へ移動します</span>
+                <span class="hint-hover">アイコンにカーソルを合わせると作品名が出ます。押すと作ったものへ移動します</span>
+                <span class="hint-touch">アイコンを押すと、作ったものへ移動します</span>
             </p>
         </div>
-    </div>
-</section>
-
-<section id="works" class="section container reveal">
-    <div class="section-head">
-        <div>
-            <h2>作ったもの</h2>
-        </div>
-        <a class="text-link" href="/works">すべて見る <Icon Name="arrow-right" Size="16" /></a>
-    </div>
-    <div class="work-grid">
-        @foreach (var work in Data.Works)
-        {
-            <WorkCard Work="work" />
-        }
     </div>
 </section>
 
