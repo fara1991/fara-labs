@@ -203,17 +203,19 @@ public sealed class PrerenderTests : IAsyncLifetime
     {
         // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
         var policy = Text(production[5]);
-        Assert.Contains("Cookie も設定しません", policy);
+        Assert.Contains("Cookie を使いません", policy);
         Assert.Contains("日本時間の 0 時ごろ", policy);
+        var body = policy[policy.IndexOf("<article", StringComparison.Ordinal)..policy.IndexOf("</article>", StringComparison.Ordinal)];
+        // 閲覧者に意味のない実装の詳細（保存の仕組みの名前・ハッシュ・トークン・ホスト名）は書かない
+        foreach (var tech in new[] { "ハッシュ", "トークン", "localStorage", "sessionStorage", "fara-labs.com", "秘密の鍵" }) Assert.DoesNotContain(tech, body);
         // 運営者の約束・宣言や法的な注記は書かない
         foreach (var banned in new[] { "匿名", "閲覧しません", "受け取りません", "外部送信規律", "個人関連情報" }) Assert.DoesNotContain(banned, policy);
         Assert.DoesNotContain("報告", policy);
         // 送信回数の制限（送信元の識別子を、その日の間だけ保存する）の記載
-        Assert.Contains("1 日に 3 回までに制限しています", policy);
+        Assert.Contains("問い合わせは、1 日に 3 回までです", policy);
         Assert.Contains("IP アドレスそのものは保存しません", policy);
-        Assert.Contains("sessionStorage", policy);
+        Assert.Contains("タブを閉じるまで使う保存領域", policy);
         // 初出の用語の説明・内部用語を使わないこと・利用目的の節・広告の追記予告を載せないこと
-        Assert.Contains("ブラウザの保存領域（localStorage）", policy);
         Assert.DoesNotContain("掃除", policy);
         Assert.Contains("利用目的", policy);
         Assert.Contains("EU 圏内", policy);
