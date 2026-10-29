@@ -12,7 +12,7 @@ public static class PageCatalog
     public const string ReportPath = "/report";
     public const string PrivacyPath = "/privacy";
 
-    public static Page Home(Profile p) => new("/", $"{p.Name} | Portfolio", p.Tagline);
+    public static Page Home(Profile p) => new("/", SiteInfo.Name, p.Tagline);
     public static Page ProfilePage(Profile p) => new("/profile", $"Profile | {p.Name}", p.Bio);
     public static Page Works(Profile p) => new("/works", $"Works | {p.Name}", "作ったものの紹介です。Web アプリ、ツール、VRChat アバターの改変などを載せています。");
     public static Page Updates(Profile p) => new("/updates", $"Updates | {p.Name}", "サイトや作品の更新履歴です。");

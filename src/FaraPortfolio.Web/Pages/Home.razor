@@ -7,7 +7,7 @@
     <div class="container hero-inner">
         <div class="hero-text">
             @* ページの見出し（h1）は、画面には出さず読み上げ・検索向けに残す（静的な本文と Blazor で同じ構造） *@
-            <h1 class="sr-only">@(Data.Profile.Name)'s Portfolio</h1>
+            <h1 class="sr-only">@SiteInfo.Name</h1>
             <p class="hero-tagline reveal" style="--d:2">@Data.Profile.Tagline</p>
             <div class="hero-actions reveal" style="--d:3">
                 <a class="btn btn-primary" href="/works">作ったものを見る <Icon Name="arrow-right" Size="18" /></a>

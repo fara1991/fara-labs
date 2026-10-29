@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-ポートフォリオサイト（https://fara-labs.com/）。.NET 10 / Blazor WebAssembly + MudBlazor（共通部品は fara-blazor-component。`external/fara-blazor-component` のサブモジュール）の静的サイトを、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
+Fara Labs のサイト（https://fara-labs.com/）。.NET 10 / Blazor WebAssembly + MudBlazor（共通部品は fara-blazor-component。`external/fara-blazor-component` のサブモジュール）の静的サイトを、Cloudflare Workers（静的アセット + 小さな Worker）に公開する。詳細は README.md、Cloudflare の初期設定は docs/cloudflare-setup.md。
 
 ## ブランチ運用（必ず守る）
 

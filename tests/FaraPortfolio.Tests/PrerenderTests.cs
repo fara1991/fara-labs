@@ -32,9 +32,9 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Every_page_is_rendered_in_the_agreed_order_with_title_and_description()
     {
         Assert.Equal(["/", "/profile", "/works", "/updates", "/links", "/report", "/privacy"], production.Select(p => p.Path));
-        Assert.Equal("Fara | Portfolio", production[0].Title);
+        Assert.Equal("Fara Labs", production[0].Title);
         Assert.Equal("Works | Fara", production[2].Title);
-        Assert.Equal("問い合わせ | Fara Portfolio", production[5].Title);
+        Assert.Equal("問い合わせ | Fara Labs", production[5].Title);
         Assert.All(production, p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 
@@ -75,7 +75,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         foreach (var page in production)
         {
             var html = Text(page);
-            Assert.Contains("<span class=\"fbc-footer-name\">Fara Portfolio</span>", html);
+            Assert.Contains("<span class=\"fbc-footer-name\">Fara Labs</span>", html);
             Assert.Contains("プライバシーポリシー", html);
             Assert.Contains("© 2026 ", html);
             Assert.Contains("href=\"https://github.com/fara1991\"", html);
@@ -101,11 +101,11 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Home_has_the_hero_works_and_updates_from_the_data_files()
     {
         var html = Text(production[0]);
-        // 「Fara's Portfolio」は画面の見出しにせず、h1 は .sr-only で隠して 1 つだけ残す（Blazor の描画と同じ構造）
+        // 「Fara Labs」は画面の見出しにせず、h1 は .sr-only で隠して 1 つだけ残す（Blazor の描画と同じ構造）
         Assert.DoesNotContain("hero-title", html);
         Assert.DoesNotContain("hero-heading", html);
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(html, "<h1[ >]"));
-        Assert.Contains("<h1 class=\"sr-only\">Fara's Portfolio</h1>", html);
+        Assert.Contains("<h1 class=\"sr-only\">Fara Labs</h1>", html);
         // 中央はサイトアイコンの img（文字の「F」は使わない）
         Assert.Matches("<div class=\"core\" aria-hidden=\"true\">\\s*<img src=\"/favicon.svg\" alt(=\"\")? width=\"64\" height=\"64\"", html);
         Assert.DoesNotContain("<span>F</span>", html);
