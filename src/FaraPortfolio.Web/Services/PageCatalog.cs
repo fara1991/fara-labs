@@ -12,8 +12,10 @@ public static class PageCatalog
     public const string ReportPath = "/report";
     public const string PrivacyPath = "/privacy";
 
-    public static Page Home(Profile p) => new("/", SiteInfo.Name, p.Tagline);
-    public static Page ProfilePage(Profile p) => new("/profile", $"プロフィール | {SiteInfo.Name}", p.Bio);
+    /// <summary>ホームの説明（meta description・OGP）。画面の一言（Tagline）とは別に、検索結果で意味が通る説明を持つ。</summary>
+    public const string HomeDescription = "Blazor の Web アプリや Twitch 配信向けのツール、VRChat アバターの改変、Beat Saber の Mod などを作っています。";
+
+    public static Page Home(Profile p) => new("/", SiteInfo.Name, HomeDescription);
     public static Page Works(Profile p) => new("/works", $"作ったもの | {SiteInfo.Name}", "作ったものの紹介です。Web アプリ、ツール、VRChat アバターの改変などを載せています。");
     public static Page Updates(Profile p) => new("/updates", $"更新履歴 | {SiteInfo.Name}", "サイトや作品の更新履歴です。");
     public static Page Report() => new(ReportPath, $"問い合わせ | {SiteInfo.Name}", "不具合・要望・ご意見を、作者に直接送れる問い合わせフォームです。");
@@ -21,5 +23,5 @@ public static class PageCatalog
 
     /// <summary>公開するページ（sitemap に載せる順）。</summary>
     public static IReadOnlyList<Page> All(Profile p) =>
-        [Home(p), ProfilePage(p), Works(p), Updates(p), Report(), Privacy()];
+        [Home(p), Works(p), Updates(p), Report(), Privacy()];
 }

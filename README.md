@@ -2,10 +2,9 @@
 
 作ったもの一覧のサイト（https://fara-labs.com/）。C# / .NET 10 の Blazor WebAssembly + MudBlazor（共通部品は fara-blazor-component）で作った静的サイトを、Cloudflare Workers に公開します。
 
-- プロフィール
 - 作ったもの（ポケモン対戦アシスタントなど）の紹介
 - 更新履歴（何月何日に何を更新したか）
-- SNS リンク
+- フッターの SNS リンク
 
 サーバー・データベースは使っていません（Worker は、メンテナンスの状態・問い合わせの受け口だけ）。サイトの中身は `wwwroot/data/` の JSON を編集して更新します。ブラウザは起動のときに JSON を 1 回だけ読み、検索エンジン・JavaScript の無い環境向けの本文入りの HTML は、公開用の作成（`npm run publish:site`）のときに JSON から作ります。
 
@@ -23,12 +22,12 @@ fara-labs/
 │   ├── App.razor                     ルーティング（見つからない URL は kit の 404）
 │   ├── Components/                   AppShell（背景・ヘッダー・フッターの枠）・ヘッダー・アイコン・カード
 │   ├── Layout/MainLayout.razor       全ページ共通の枠（MudBlazor の土台・お知らせの帯）
-│   ├── Pages/                        Home / Profile / Works / Updates / Report / Privacy
+│   ├── Pages/                        Home / Works / Updates / Report / Privacy
 │   ├── Models/ Services/             データの型と読み込み・ページの題名（PageCatalog）・サイト設定（SiteInfo）
 │   └── wwwroot/
 │       ├── index.html                起動の土台（読み込み表示・CSS/JS の読み込み順。ダーク固定）
 │       ├── data/                     ★ サイトの中身（ここを編集する）
-│       │   ├── profile.json          名前・自己紹介・SNS リンク
+│       │   ├── profile.json          名前・ホームの一言・フッターの SNS リンク
 │       │   ├── works.json            作品一覧
 │       │   └── updates.json          更新履歴
 │       ├── css/app.css               デザイン（紫ベース）

@@ -1,9 +1,8 @@
 {
-  // サイト全体のプロフィール。編集は develop 向けの PR で行い、develop → master にマージすると本番に反映されます。
+  // サイトの名前・ホームの一言・フッターの SNS リンク。編集は develop 向けの PR で行い、develop → master にマージすると本番に反映されます。
   "name": "Fara",
   // ホームのヒーローに出す 1 行の紹介
-  "tagline": "Blazor の Web アプリや Twitch 配信向けのツール、VRChat アバターの改変、Beat Saber の Mod などを作っています。",
-  "bio": "I'm Japanese. スノウエルフ族のFaraです。BlenderとかUnityでたまに改変したりBeatSaberやったりしてます。",
+  "tagline": "管理者のFaraです。作ったもの置き場です。",
   // url が空のものはサイトに表示されません。service: github / twitter / x / twitch / youtube / bluesky / mail / link
   "socials": [
     {

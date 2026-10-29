@@ -16,7 +16,6 @@ public static class SiteJson
 public sealed class Profile
 {
     public string Name { get; init; } = "";
-    public string Bio { get; init; } = "";
 
     /// <summary>ホームのヒーローに出す 1 行の紹介。</summary>
     public string Tagline { get; init; } = "";
