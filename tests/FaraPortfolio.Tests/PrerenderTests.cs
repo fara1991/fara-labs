@@ -218,6 +218,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         Assert.Contains("利用目的", policy);
         Assert.Contains("EU 圏内", policy);
         Assert.DoesNotContain("追記します", policy);
+        Assert.Contains("Cloudflare（Turnstile など）と Google Fonts は、それぞれの仕組みで、ブラウザに情報を保存することがあります。", policy);
         var siteJs = File.ReadAllText(FindUp("src/FaraPortfolio.Web/wwwroot/js/site.js"));
         Assert.Contains("sessionStorage", siteJs);
         Assert.DoesNotContain("localStorage", siteJs);
