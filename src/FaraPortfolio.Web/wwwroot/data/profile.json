@@ -1,0 +1,39 @@
+{
+  // サイトの名前・ホームの一言・フッターの SNS リンク。編集は develop 向けの PR で行い、develop → master にマージすると本番に反映されます。
+  "name": "Fara",
+  // ホームのヒーローに出す 1 行の紹介
+  "tagline": "管理者のFaraです。作ったもの置き場です。",
+  // url が空のものはサイトに表示されません。service: github / twitter / x / twitch / youtube / bluesky / mail / link
+  "socials": [
+    {
+      "service": "github",
+      "label": "GitHub",
+      "handle": "@fara1991",
+      "url": "https://github.com/fara1991"
+    },
+    {
+      "service": "twitter",
+      "label": "Twitter",
+      "handle": "@game_fara",
+      "url": "https://twitter.com/game_fara"
+    },
+    {
+      "service": "twitch",
+      "label": "Twitch",
+      "handle": "@game_fara",
+      "url": "https://twitch.tv/game_fara"
+    },
+    {
+      "service": "discord",
+      "label": "Discord",
+      "handle": "@game_fara",
+      "url": "https://discord.com/invite/B38eCSYyk5"
+    },
+    {
+      "service": "youtube",
+      "label": "YouTube",
+      "handle": "",
+      "url": ""
+    }
+  ]
+}

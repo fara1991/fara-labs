@@ -1,0 +1,12 @@
+@* ルーティング。見つからない URL は、kit の 404（NotFoundView）を、いつものレイアウトの中に出す。
+   Cloudflare は、存在しない URL に 404.html（読み込み表示だけの汎用）を 404 で返し、そこで Blazor が起動して、この 404 を描く *@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <NotFoundContent />
+        </LayoutView>
+    </NotFound>
+</Router>

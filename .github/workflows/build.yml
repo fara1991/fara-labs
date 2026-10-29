@@ -1,0 +1,113 @@
+name: Build
+
+# PR と、develop・master への push で、ビルド・テストと公開設定のチェックだけ行う（公開はしない）。
+# 公開は Deploy (develop)・Deploy (production) が行う。動くときはほかのリポジトリの build.yml とそろえている。
+on:
+  # PR の間は pull_request の 1 回だけ動かす（作業ブランチへの push では動かさない）。develop・master に入ったときは push で動く
+  push:
+    branches: [develop, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test
+        run: dotnet test --configuration Release
+
+      - name: Maintenance test
+        run: npm run test:maintenance
+
+      - name: Report endpoint test
+        run: npm run test:report
+
+      - name: Worker API test
+        run: npm run test:worker
+
+      - name: Build pages test
+        run: npm run test:pages
+
+      - name: Deploy gate test
+        run: npm run test:gate
+
+      - name: Deploy workflow test
+        run: npm run test:workflow
+
+      - name: Maintenance summary test
+        run: npm run test:summary
+
+      # 公開する静的サイトの作成（dotnet publish → 本文入りの入口ページ → _headers・robots・sitemap）。失敗したら、ここで止まる
+      - name: Publish static site
+        run: npm run publish:site
+
+      # Cloudflare にはつながずに wrangler.jsonc と公開ファイルを検証する
+      - name: Check Cloudflare config (dry run)
+        run: |
+          npx wrangler deploy --dry-run --env=""
+          npx wrangler deploy --dry-run --env develop
+
+  # ESLint（tools/・worker/・.github/scripts/・wwwroot/js/）。違反があれば止める
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+  # レイアウトの自動計測（幅 360〜1440px・8 ページ。横スクロール・見出し・Tab・押せる範囲・文字の大きさ・Esc）。公開はしない
+  layout-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # 計測するのは、公開と同じ静的サイト（publish/wwwroot）
+      - name: Publish static site
+        run: npm run publish:site
+
+      - name: Install Chromium
+        run: npx playwright-core install --with-deps chromium
+
+      - name: Layout check
+        run: npm run layout-check

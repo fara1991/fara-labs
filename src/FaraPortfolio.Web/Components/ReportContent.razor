@@ -1,0 +1,12 @@
+@* 問い合わせの本文。ブラウザ（Pages/Report.razor）と、静的な本文の書き出し（tools/PrerenderPages）が同じものを描く。
+   フォームは kit の ReportFormView（MudBlazor。送信は /api/report、ボット判定は Turnstile）。これまでどおり検索に出す（noindex にしない） *@
+<section class="page container">
+    <ReportFormView From="@From" NoIndex="false"
+                    UnavailableNote="お急ぎの場合は、フッターの SNS のリンクから連絡してください。"
+                    MessagePlaceholder="例: 〇〇のページで、画像が表示されません（使っている環境・操作の手順も書いてもらえると助かります）" />
+</section>
+
+@code {
+    /// <summary>報告のきっかけになったページのパス（?from=）。</summary>
+    [Parameter] public string? From { get; set; }
+}
