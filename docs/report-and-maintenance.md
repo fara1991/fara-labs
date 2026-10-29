@@ -38,8 +38,8 @@ Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker �
 | `fara-avatar-dev` | https://avatar-dev.fara-labs.com/ |
 | `fara-twitch-bot` | https://twitch-bot.fara-labs.com/ |
 | `fara-twitch-bot-dev` | https://twitch-bot-dev.fara-labs.com/ |
-| `fara-portfolio` | https://fara-labs.com/ |
-| `fara-portfolio-dev` | https://dev.fara-labs.com/ |
+| `fara-labs` | https://fara-labs.com/ |
+| `fara-labs-dev` | https://dev.fara-labs.com/ |
 
 | 名前 | 値 |
 | --- | --- |
@@ -104,7 +104,7 @@ Cloudflare のダッシュボードで **変数を書き換えるだけ**で、�
 
 ### 2-2. 変数の登録（最初の 1 回）
 
-1. Cloudflare のダッシュボード →「Workers & Pages」→ 対象の Worker（`fara-pokemon` / `fara-avatar` / `fara-twitch-bot` / `fara-portfolio` と、それぞれの `-dev`。本番はデプロイ後）→「設定」→「変数とシークレット」→「追加」。
+1. Cloudflare のダッシュボード →「Workers & Pages」→ 対象の Worker（`fara-pokemon` / `fara-avatar` / `fara-twitch-bot` / `fara-labs` と、それぞれの `-dev`。本番はデプロイ後）→「設定」→「変数とシークレット」→「追加」。
 2. 種類は「**テキスト**」（あとから値を見て、書き換えるため）。環境は「プロダクション」だけにチェックを付けます（プレビューは使っていません）。
 3. `MAINTENANCE_MODE` = `false`、`MAINTENANCE_MESSAGE` = 空でもよい（例: 文を書いておく）。「デプロイ」。
 

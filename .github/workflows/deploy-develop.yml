@@ -93,6 +93,6 @@ jobs:
         env:
           MAINTENANCE_MODE_INPUT: ${{ inputs.maintenance_mode }}
           MAINTENANCE_MESSAGE_INPUT: ${{ inputs.maintenance_message }}
-          WORKER_NAME: fara-portfolio-dev
+          WORKER_NAME: fara-labs-dev
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
