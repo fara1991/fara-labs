@@ -97,8 +97,12 @@ public class SiteLinksTests
     {
         var profile = new Profile { Name = "Fara", Tagline = "t", Bio = "b" };
         Assert.Equal("Fara Labs", PageCatalog.Home(profile).Title);
-        Assert.Equal("Profile | Fara", PageCatalog.ProfilePage(profile).Title);
+        Assert.Equal("プロフィール | Fara Labs", PageCatalog.ProfilePage(profile).Title);
+        Assert.Equal("作ったもの | Fara Labs", PageCatalog.Works(profile).Title);
+        Assert.Equal("更新履歴 | Fara Labs", PageCatalog.Updates(profile).Title);
+        Assert.Equal("リンク | Fara Labs", PageCatalog.Links(profile).Title);
         Assert.Equal("問い合わせ | Fara Labs", PageCatalog.Report().Title);
+        Assert.Equal("プライバシーポリシー | Fara Labs", PageCatalog.Privacy().Title);
         Assert.All(PageCatalog.All(profile), p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 }

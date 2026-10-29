@@ -244,7 +244,7 @@ html a:focus-visible, html button:focus-visible {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 15px;
-    /* 文字が 2 行に割れないように（割れると、アクティブの丸枠が縦に伸びる）。幅が狭いときは、下の 900px 以下でメニューにする */
+    /* 文字が 2 行に割れないように（割れると、アクティブの丸枠が縦に伸びる）。幅が狭いときは、下の 959px 以下でメニューにする */
     white-space: nowrap;
     transition: color .2s ease, background .2s ease;
 }
@@ -264,8 +264,8 @@ html a:focus-visible, html button:focus-visible {
     cursor: pointer;
 }
 
-/* メニュー（ハンバーガー）に切り替える幅。7 項目を 1 行に並べられるのは 901px 付近から（計測で確かめた）。それ以下はメニューにする */
-@media (max-width: 900px) {
+/* メニュー（ハンバーガー）に切り替える幅。7 項目（「プライバシーポリシー」を含む）を 1 行に並べられるのは 940px 付近から（計測で確かめた）。余裕を見て 960px 未満はメニューにする */
+@media (max-width: 959px) {
     .menu-toggle { display: grid; }
     .site-nav {
         position: absolute;
