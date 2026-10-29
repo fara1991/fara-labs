@@ -480,7 +480,7 @@ html a:focus-visible, html button:focus-visible {
     top: calc(100% + 38px);   /* 軌道の線の上を回るアイコン（半分が外へ出る）に重ならない位置 */
     left: 50%;
     width: max-content;
-    max-width: 90vw;
+    max-width: min(90vw, 28em);   /* 長い文は 2 行に折り返し、画面の右端・左の文章に重ならない */
     margin: 0;
     transform: translateX(-50%);
     color: var(--muted);
