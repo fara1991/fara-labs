@@ -750,17 +750,33 @@ a.fbc-footer-social svg { width: 16px; height: 16px; }
 }
 
 /* ---------- 作者へ報告・プライバシーポリシー ---------- */
-.policy { padding: clamp(20px, 3vw, 36px); line-height: 1.85; }
-.policy h2 { font-size: 1.15rem; margin: 1.8em 0 .5em; }
+.policy { padding: clamp(20px, 3vw, 36px); line-height: 1.85; max-width: 52rem; }
+.policy h2 { font-size: 1.2rem; line-height: 1.5; margin: 2.2em 0 .7em; padding-bottom: .35em; border-bottom: 1px solid var(--border); }
 .policy h2:first-child { margin-top: 0; }
-.policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
-.policy ul { padding-left: 1.4em; }
-.policy a { color: var(--lavender); }
-/* 外部サービスの表。狭い画面では表の中だけ横にスクロールする */
-.policy-table-wrap { overflow-x: auto; margin: 0 0 .8em; }
-.policy-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .92rem; color: var(--muted); }
-.policy-table th, .policy-table td { text-align: left; vertical-align: top; padding: .6em .8em; border-bottom: 1px solid rgba(255, 255, 255, .12); }
-.policy-table th { color: inherit; font-weight: 600; white-space: nowrap; }
+.policy h3 { font-size: 1.02rem; line-height: 1.5; margin: 1.6em 0 .4em; }
+.policy p, .policy ul { margin: 0 0 .9em; color: var(--muted); }
+.policy ul { padding-left: 1.4em; list-style: disc; }
+.policy li + li { margin-top: .35em; }
+/* 本文のリンクは、色と下線で見分ける（文字色との差は明るさと下線） */
+.policy a { color: var(--lavender); text-decoration: underline; text-underline-offset: .18em; }
+.policy a:hover { color: var(--text); text-decoration-thickness: 2px; }
+.policy a:focus-visible { outline: 2px solid var(--lavender); outline-offset: 3px; border-radius: 4px; }
+.page-head .policy-date { margin: 0; font-size: .92rem; color: var(--muted); }
+/* 外部サービスの表。広い画面は 4 列、狭い画面（800px 以下）は 1 行ずつのカードにして、横にスクロールさせない */
+.policy-table-wrap { margin: 0 0 1em; }
+.policy-table { border-collapse: collapse; width: 100%; font-size: .93rem; line-height: 1.65; color: var(--muted); }
+.policy-table th, .policy-table td { text-align: left; vertical-align: top; padding: .6em .8em; border-bottom: 1px solid var(--border); }
+.policy-table thead th { color: var(--text); font-weight: 600; white-space: nowrap; border-bottom-color: var(--border-strong); }
+.policy-table tbody th { color: var(--text); font-weight: 600; width: 22%; }
+@media (max-width: 800px) {
+    .policy-table, .policy-table tbody, .policy-table tr, .policy-table th, .policy-table td { display: block; }
+    .policy-table thead { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+    .policy-table tbody tr { margin-bottom: .8em; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+    .policy-table th, .policy-table td { border: 0; padding: .35em .85em; }
+    .policy-table tbody th { width: auto; padding-top: .6em; padding-bottom: .5em; background: var(--surface-strong); border-bottom: 1px solid var(--border); }
+    .policy-table td::before { content: attr(data-label); display: block; color: var(--faint); font-size: .8rem; line-height: 1.5; }
+    .policy-table td:last-child { padding-bottom: .65em; }
+}
 /* 報告フォームの選択欄（MudSelect の入力部。既定の高さは 40px）: タップの領域を 44px 以上に */
 .site-main .fbc-select .mud-input,
 .site-main .fbc-select .mud-input-control-input-container { height: 44px; }
@@ -771,7 +787,7 @@ a.fbc-footer-social svg { width: 16px; height: 16px; }
 /* ---------- 日本語の改行（本文の中。語の途中で折り返さない） ----------
    word-break: auto-phrase は Chromium 系だけ。対応しない環境は normal（既定）のまま。日付の塊は .nowrap で分けない */
 .site-main p, .site-main li, .site-main h1, .site-main h2, .site-main h3, .site-main .muted,
-.site-main .policy, .site-main .policy p, .site-main .policy li {
+.site-main .policy, .site-main .policy p, .site-main .policy li, .site-main .policy td, .site-main .policy h3 {
     word-break: normal;
     word-break: auto-phrase;
     line-break: strict;
