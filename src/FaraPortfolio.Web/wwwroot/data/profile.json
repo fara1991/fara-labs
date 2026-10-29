@@ -10,36 +10,31 @@
       "service": "github",
       "label": "GitHub",
       "handle": "@fara1991",
-      "url": "https://github.com/fara1991",
-      "description": "作ったもののソースコードを公開しています。"
+      "url": "https://github.com/fara1991"
     },
     {
       "service": "twitter",
       "label": "Twitter",
       "handle": "@game_fara",
-      "url": "https://twitter.com/game_fara",
-      "description": "日々の開発状況などをつぶやいています。"
+      "url": "https://twitter.com/game_fara"
     },
     {
       "service": "twitch",
       "label": "Twitch",
       "handle": "@game_fara",
-      "url": "https://twitch.tv/game_fara",
-      "description": "ゲーム配信をしています。"
+      "url": "https://twitch.tv/game_fara"
     },
     {
       "service": "discord",
       "label": "Discord",
       "handle": "@game_fara",
-      "url": "https://discord.com/invite/B38eCSYyk5",
-      "description": ""
+      "url": "https://discord.com/invite/B38eCSYyk5"
     },
     {
       "service": "youtube",
       "label": "YouTube",
       "handle": "",
-      "url": "",
-      "description": "配信のアーカイブや動画を投稿しています。"
+      "url": ""
     }
   ]
 }
