@@ -421,7 +421,8 @@ html a:focus-visible, html button:focus-visible {
     animation: spin 120s linear infinite;
 }
 /* 回転アニメーション（transform）で重なり順のまとまりになるので、説明（.satellite-tip）が中央の .core より上に出るよう前面に置く */
-.orbit-outer { inset: 0; z-index: 1; }
+.orbit-outer { inset: 0; z-index: 1; pointer-events: none; }   /* 軌道の枠そのものは、下の中央のアイコン（リンク）へのクリックを邪魔しない。周りのアイコンだけが受ける */
+.orbit-outer .satellite { pointer-events: auto; }
 .orbit-inner { inset: 22%; border-style: solid; border-color: rgba(232, 121, 249, .2); animation: none; }
 .satellite {
     position: absolute;
