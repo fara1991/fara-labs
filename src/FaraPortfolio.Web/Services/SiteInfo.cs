@@ -9,7 +9,7 @@ namespace FaraPortfolio.Web.Services;
 /// </summary>
 public static class SiteInfo
 {
-    public const string Name = "Fara Portfolio";
+    public const string Name = "Fara Labs";
     /// <summary>サイトを公開した年（© の年）。</summary>
     public const int PublishedYear = 2026;
     public const string Author = "Fara";

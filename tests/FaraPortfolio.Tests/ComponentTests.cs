@@ -76,7 +76,7 @@ public sealed class ComponentTests : BunitContext
         var h1 = cut.FindAll("h1");
         Assert.Single(h1);
         Assert.Equal("sr-only", h1[0].ClassName);
-        Assert.Equal("Fara's Portfolio", h1[0].TextContent.Trim());
+        Assert.Equal("Fara Labs", h1[0].TextContent.Trim());
         Assert.Empty(cut.FindAll(".hero-heading"));
 
         // 軌道の中央は文字の「F」ではなく、サイトアイコン（装飾。大きさを指定してレイアウトのずれを出さない）

@@ -1,6 +1,6 @@
 # 作者への報告とメンテナンス画面の設定（Cloudflare・Discord）
 
-4 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・FaraBotModerator・Fara Portfolio）に共通の設定です。
+4 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・FaraBotModerator・Fara Labs）に共通の設定です。
 コードの側（フッター・`/report`・`/privacy`・`POST /api/report`）は、各リポジトリに入っています。**ここに書いた設定をするまで、報告ページは「いまは報告を受け付けていません」と表示されます**（壊れてはいません）。
 
 ---

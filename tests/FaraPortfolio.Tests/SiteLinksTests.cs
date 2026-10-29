@@ -61,7 +61,7 @@ public class SiteLinksTests
         SiteInfo.Configure(options, profile);
 
         Assert.Equal(["github", "discord"], options.Social.Select(s => s.Service));
-        Assert.Equal("Fara Portfolio", options.Name);
+        Assert.Equal("Fara Labs", options.Name);
         Assert.Equal(SiteInfo.DevelopHost, options.DevelopHost);
     }
 
@@ -96,9 +96,9 @@ public class SiteLinksTests
     public void Page_titles_follow_the_profile_name()
     {
         var profile = new Profile { Name = "Fara", Tagline = "t", Bio = "b" };
-        Assert.Equal("Fara | Portfolio", PageCatalog.Home(profile).Title);
+        Assert.Equal("Fara Labs", PageCatalog.Home(profile).Title);
         Assert.Equal("Profile | Fara", PageCatalog.ProfilePage(profile).Title);
-        Assert.Equal("問い合わせ | Fara Portfolio", PageCatalog.Report().Title);
+        Assert.Equal("問い合わせ | Fara Labs", PageCatalog.Report().Title);
         Assert.All(PageCatalog.All(profile), p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 }

@@ -43,7 +43,7 @@ const TEMPLATE = `<!DOCTYPE html><html lang="ja"><head><!-- SEO-HEAD:START --><t
 <body><div id="boot-indicator"></div><div id="app"><!-- SEO-BODY:START --><!-- SEO-BODY:END --></div></body></html>`;
 
 const PAGES = [
-  { path: "/", title: "Fara | Portfolio", description: "紹介", bodyHtml: '<div class="entry-static"><main>ホーム</main></div>' },
+  { path: "/", title: "Fara Labs", description: "紹介", bodyHtml: '<div class="entry-static"><main>ホーム</main></div>' },
   { path: "/works", title: "Works | Fara", description: "作品", bodyHtml: '<div class="entry-static"><main>作品</main></div>' },
 ];
 
@@ -73,7 +73,7 @@ test("production: 入口ページ（ホームは index.html）・404.html・robo
   try {
     run({ dir, env: "production", pagesFile });
     const index = readFileSync(join(dir, "index.html"), "utf8");
-    assert.match(index, /<title>Fara \| Portfolio<\/title>/);
+    assert.match(index, /<title>Fara Labs<\/title>/);
     assert.match(index, /<link rel="canonical" href="https:\/\/fara-labs\.com\/" \/>/);
     assert.match(index, /<main>ホーム<\/main>/);
     assert.match(readFileSync(join(dir, "works.html"), "utf8"), /<main>作品<\/main>/);

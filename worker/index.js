@@ -19,12 +19,12 @@ export default {
         headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
       });
     }
-    if (maintenance.state === "on") return maintenanceResponse(request, maintenance, "Fara Portfolio");
+    if (maintenance.state === "on") return maintenanceResponse(request, maintenance, "Fara Labs");
 
     // 作者への報告の受け口（external/fara-blazor-component/worker/report.js。ポケモン・アバター・Bot と同じファイル）
     if (url.pathname === "/api/report" || url.pathname === "/api/report/config") {
       try {
-        return await handleReport(request, env, "Fara Portfolio");
+        return await handleReport(request, env, "Fara Labs");
       } catch (error) {
         // 原因はログに残す（Cloudflare の Logs で見られる）。例外の名前とメッセージだけで、リクエストの本文・シークレットは出さない
         console.error(`報告の受け口で例外: ${errorSummary(error)}`);
