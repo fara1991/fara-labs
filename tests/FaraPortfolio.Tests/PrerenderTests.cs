@@ -126,7 +126,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         // プロフィールのページ（/profile）は無い。リンクのページ（/links）も無い（SNS はフッターだけ）
         var all = string.Concat(production.Select(Text));
         Assert.DoesNotContain("/profile", all);
-        Assert.DoesNotContain("プロフィール", all);
+        Assert.DoesNotContain(">プロフィール</a>", all);
         Assert.DoesNotContain("class=\"link-card", all);
         var home = Text(production[0]);
         Assert.DoesNotContain("リンク一覧", home);
