@@ -50,7 +50,7 @@ CI（`build.yml`）の `lint` job と `layout-check` job が、PR・develop・ma
   - 除外は `exclusions` に **`rule`・`selector`・`reason` を必ず書く**（`reason` が無いと設定エラー）。`page`（`/` で始まるパス）で絞れる。理由に、直せない理由（kit の部品・ブラウザの計測の限界など）を書く。
   - いまの除外は 2 件: 閉じたスマホメニューの項目（見えず押せないのが正しい）と、問い合わせの送信ボタン（ボット判定が済むまで disabled）。
   - 計測は読み込み後の一瞬の状態。`scroll-behavior: smooth` を `.site-scroll` に付けると、Tab の移動の途中を測ってしまうので付けない（ページ内ジャンプは `site.js` で滑らかにする）。
-- **C#（`Directory.Build.props` と `tools/lint/dotnet.site.editorconfig`）**: 設定は kit の `dotnet.editorconfig` と同じ内容（CA1031 だけ error）。kit のファイルを同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（`MultipleGlobalAnalyzerKeys`）ので、読まない。kit の設定が変わったら、このファイルも合わせる。
-  - error（違反 0 件）: CS4014・VSTHRD100・CA1816・IDE0059・CA1031。動くことは、違反を入れた一時ファイルで確かめた（後で消す）。
-  - warning（現在の件数）: CA2000 1（`Program.cs`・HttpClient の寿命）、VSTHRD002 1・VSTHRD003 1・VSTHRD103 3（`SiteData.cs`・`Program.cs` の同期の待ち。起動と `Load` の設計による）。パッケージの既定の VSTHRD200 2（`SiteData.cs`・名前の規則）は、ラチェットの対象外。CA2007（ConfigureAwait）は kit の方針で入れない。
+- **C#（`Directory.Build.props` と `tools/lint/dotnet.site.editorconfig`）**: 設定は kit の `dotnet.editorconfig` と同じ内容（CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103 は kit では warning だがここでは error。VSTHRD200 は kit に無く、ここだけ error）。kit のファイルを同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（`MultipleGlobalAnalyzerKeys`）ので、読まない。kit の設定が変わったら、このファイルも合わせる。
+  - error（違反 0 件）: CS4014・VSTHRD100・CA1816・IDE0059・CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103・VSTHRD200。動くことは、違反を入れた一時ファイルで確かめた（後で消す）。
+  - warning: 無し。CA2000 は `Program.cs` の HttpClient だけ、理由つきでその場で抑止（`#pragma`）。kit の警告（CA1031・VSTHRD103）は kit 側の課題。CA2007（ConfigureAwait）は kit の方針で入れない。
 - 新しい違反は CI が止める。warning を error に上げるときは、件数が 0 になってから。

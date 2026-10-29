@@ -8,14 +8,14 @@ using Microsoft.JSInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var baseAddress = builder.HostEnvironment.BaseAddress;
+// CA2000 の抑止: HttpClient はアプリの生存期間と同じ（DI に登録して最後まで使う）。ここで破棄すると使えなくなる
+#pragma warning disable CA2000
 var http = new HttpClient { BaseAddress = new Uri(baseAddress) };
+#pragma warning restore CA2000
 
 // サイトの中身（wwwroot/data/*.json）は起動のときに 1 回だけ読む。最初の描画の前に必要（静的な本文を、空の画面に置き換えないため）
 // メンテナンスの状態（/api/maintenance）も同時に取る（起動を待たせない）
-var dataTask = SiteData.LoadAsync(http);
-var maintenanceTask = MaintenanceInfo.LoadAsync(http);
-await Task.WhenAll(dataTask, maintenanceTask);
-var data = dataTask.Result;
+var (data, maintenance) = await LoadStartupDataAsync(http);
 builder.Services.AddSingleton(data);
 builder.Services.AddSingleton(new RenderEnvironment(IsInteractive: true));
 
@@ -25,7 +25,7 @@ builder.Services.AddFaraBlazorComponent(options => SiteInfo.Configure(options, d
 SiteLinks.CurrentHost = new Uri(baseAddress).Host;
 
 // メンテナンスの状態（Worker の変数 MAINTENANCE_MODE。external/fara-blazor-component/worker/maintenance.js）。読めなければ通常
-builder.Services.AddSingleton(maintenanceTask.Result);
+builder.Services.AddSingleton(maintenance);
 
 builder.Services.AddSingleton(http);
 builder.Services.AddSingleton<BrowserClock>();
@@ -47,3 +47,12 @@ catch (JSException)
 }
 
 await host.RunAsync();
+
+// サイトの中身とメンテナンスの状態を同時に読む（片方を待つあいだに、もう片方の通信が進む）
+static async Task<(SiteData Data, MaintenanceInfo Maintenance)> LoadStartupDataAsync(HttpClient http)
+{
+    var dataTask = SiteData.LoadAsync(http);
+    var maintenanceTask = MaintenanceInfo.LoadAsync(http);
+    await Task.WhenAll(dataTask, maintenanceTask);
+    return (await dataTask, await maintenanceTask);
+}

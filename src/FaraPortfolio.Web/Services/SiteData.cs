@@ -19,22 +19,32 @@ public sealed class SiteData
     /// <summary>新しい順。</summary>
     public required IReadOnlyList<UpdateEntry> Updates { get; init; }
 
-    /// <summary>ファイル（フォルダの中の 3 つの JSON）から読む。</summary>
-    public static SiteData Load(string dataDir) =>
-        LoadAll(file => Task.FromResult(File.ReadAllText(Path.Combine(dataDir, file)))).GetAwaiter().GetResult();
-
-    /// <summary>ブラウザから、同じオリジンの data/*.json を読む。</summary>
-    public static Task<SiteData> LoadAsync(HttpClient http) =>
-        LoadAll(file => http.GetStringAsync("data/" + file));
-
-    /// <summary>3 つを同時に読む。読み方（readFile：ファイル・HTTP）によらず、同じ形にして、同じエラーにする。</summary>
-    private static async Task<SiteData> LoadAll(Func<string, Task<string>> readFile)
+    /// <summary>ファイル（フォルダの中の 3 つの JSON）から読む。同期で読む（書き出しツールとテスト用。ブラウザでは使わない）。</summary>
+    public static SiteData Load(string dataDir)
     {
-        var profile = Read<Profile>(ProfileFile, readFile);
-        var works = Read<List<Work>>(WorksFile, readFile);
-        var updates = Read<List<UpdateEntry>>(UpdatesFile, readFile);
+        T ReadFile<T>(string file)
+        {
+            try
+            {
+                return Deserialize<T>(file, File.ReadAllText(Path.Combine(dataDir, file)));
+            }
+            catch (Exception ex) when (IsReadError(ex))
+            {
+                throw Wrap(file, ex);
+            }
+        }
+
+        return Create(ReadFile<Profile>(ProfileFile), ReadFile<List<Work>>(WorksFile), ReadFile<List<UpdateEntry>>(UpdatesFile));
+    }
+
+    /// <summary>ブラウザから、同じオリジンの data/*.json を読む。3 つを同時に読む。</summary>
+    public static async Task<SiteData> LoadAsync(HttpClient http)
+    {
+        var profile = ReadAsync<Profile>(ProfileFile, http);
+        var works = ReadAsync<List<Work>>(WorksFile, http);
+        var updates = ReadAsync<List<UpdateEntry>>(UpdatesFile, http);
         await Task.WhenAll(profile, works, updates);
-        return Create(profile.Result, works.Result, updates.Result);
+        return Create(await profile, await works, await updates);
     }
 
     private static SiteData Create(Profile profile, List<Work> works, List<UpdateEntry> updates) => new()
@@ -44,18 +54,26 @@ public sealed class SiteData
         Updates = updates.OrderByDescending(u => u.Date).ToList(),
     };
 
-    /// <summary>1 つの JSON を読む。読めない・空のときは、どのファイルかが分かる例外にする（読み方は readFile）。</summary>
-    private static async Task<T> Read<T>(string file, Func<string, Task<string>> readFile)
+    /// <summary>1 つの JSON を HTTP で読む。読めない・空のときは、どのファイルかが分かる例外にする。</summary>
+    private static async Task<T> ReadAsync<T>(string file, HttpClient http)
     {
         try
         {
-            var text = await readFile(file);
-            return JsonSerializer.Deserialize<T>(text, SiteJson.Options)
-                   ?? throw new InvalidDataException($"{file} が空です");
+            return Deserialize<T>(file, await http.GetStringAsync("data/" + file));
         }
-        catch (Exception ex) when (ex is JsonException or IOException or HttpRequestException or InvalidDataException or NotSupportedException)
+        catch (Exception ex) when (IsReadError(ex))
         {
-            throw new InvalidDataException($"{file} を読めません: {ex.Message}", ex);
+            throw Wrap(file, ex);
         }
     }
+
+    private static T Deserialize<T>(string file, string text) =>
+        JsonSerializer.Deserialize<T>(text, SiteJson.Options)
+        ?? throw new InvalidDataException($"{file} が空です");
+
+    private static bool IsReadError(Exception ex) =>
+        ex is JsonException or IOException or HttpRequestException or InvalidDataException or NotSupportedException;
+
+    private static InvalidDataException Wrap(string file, Exception ex) =>
+        new($"{file} を読めません: {ex.Message}", ex);
 }

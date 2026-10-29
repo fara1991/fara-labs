@@ -1,5 +1,5 @@
 # このサイトの C# の静的解析（ラチェット。global analyzer config）。Directory.Build.props（ルート）が読む。
-# 内容は kit の external/fara-blazor-component/tools/lint/dotnet.editorconfig と同じ（違いは CA1031 だけ）。
+# 内容は kit の external/fara-blazor-component/tools/lint/dotnet.editorconfig と同じ（違いは CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103・VSTHRD200 の severity だけ）。
 # kit の設定を同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（CS MultipleGlobalAnalyzerKeys）ため、
 # kit のファイルは読まず、このファイルに全部書く。kit の設定が変わったら、ここも合わせる（docs/lint.md（2））。
 is_global = true
@@ -9,11 +9,14 @@ dotnet_diagnostic.CS4014.severity = error
 dotnet_diagnostic.VSTHRD100.severity = error
 dotnet_diagnostic.CA1816.severity = error
 dotnet_diagnostic.IDE0059.severity = error
-# error（kit では warning）: このサイトは違反 0 件（一般の例外の catch を書いていない）。増えたら止める
+# error（kit では warning）: このサイトは違反 0 件。増えたら止める
+# CA1031: 一般の例外の catch を書いていない
 dotnet_diagnostic.CA1031.severity = error
-
-# warning: 違反が残る（件数は docs/lint.md）
-dotnet_diagnostic.CA2000.severity = warning
-dotnet_diagnostic.VSTHRD002.severity = warning
-dotnet_diagnostic.VSTHRD003.severity = warning
-dotnet_diagnostic.VSTHRD103.severity = warning
+# CA2000: HttpClient（Program.cs）は寿命がアプリと同じなので、その場で最小範囲の抑止（理由つき）
+dotnet_diagnostic.CA2000.severity = error
+# VSTHRD002・VSTHRD003・VSTHRD103: 同期の待ちを無くした（SiteData.Load は同期の読みにした）
+dotnet_diagnostic.VSTHRD002.severity = error
+dotnet_diagnostic.VSTHRD003.severity = error
+dotnet_diagnostic.VSTHRD103.severity = error
+# error（kit の設定にない）: 非同期のメソッド名の Async 接尾辞。このサイトは違反 0 件
+dotnet_diagnostic.VSTHRD200.severity = error
