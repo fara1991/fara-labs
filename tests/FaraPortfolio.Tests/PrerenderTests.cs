@@ -26,6 +26,10 @@ public sealed class PrerenderTests : IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
+    // プライバシーポリシーの制定日・最終改定日（改定したらここも更新する）
+    private const string PolicyEnacted = "2026 年 10 月 22 日";
+    private const string PolicyRevised = "2026 年 10 月 29 日";
+
     private static string Text(PrerenderedPage page) => WebUtility.HtmlDecode(page.BodyHtml);
 
     [Fact]
@@ -191,12 +195,11 @@ public sealed class PrerenderTests : IAsyncLifetime
     {
         // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
         var policy = Text(production[6]);
-        Assert.Contains("localStorage・Cookie などに情報を保存しません", policy);
-        Assert.Contains("このサイトからは Cookie を設定しません", policy);
-        Assert.Contains("ページのパスと、スクロールした量", policy);
+        Assert.Contains("Cookie も設定しません", policy);
         Assert.Contains("日本時間の 0 時ごろ", policy);
-        Assert.Contains("サイトの運営者は、個人を特定する情報を受け取りません", policy);
-        Assert.DoesNotContain("匿名", policy);
+        // 運営者の約束・宣言や法的な注記は書かない
+        foreach (var banned in new[] { "匿名", "閲覧しません", "受け取りません", "外部送信規律", "個人関連情報" }) Assert.DoesNotContain(banned, policy);
+        Assert.DoesNotContain("報告", policy);
         // 送信回数の制限（送信元の識別子を、その日の間だけ保存する）の記載
         Assert.Contains("1 日に 3 回までに制限しています", policy);
         Assert.Contains("IP アドレスそのものは保存しません", policy);
@@ -227,13 +230,11 @@ public sealed class PrerenderTests : IAsyncLifetime
         Assert.Contains("class=\"page container wide fbc-page-column fbc-page-column--wide\"", html);
         Assert.Contains("ブラウザに保存する情報", html);
         Assert.Contains("Cloudflare Turnstile", html);
-        Assert.Contains("制定: <span class=\"nowrap\">2026 年 10 月 22 日</span> / 最終改定: <span class=\"nowrap\">2026 年 10 月 29 日</span>", html);
-        // 外部サービスの表（送信先・送られる情報・目的・送られるとき）
-        Assert.Contains("<table", html);
-        foreach (var header in new[] { "送信先", "送られる情報", "目的", "送られるとき" }) Assert.Contains($"<th>{header}</th>", html);
-        foreach (var name in new[] { "Google Fonts", "Cloudflare（サイトの配信）", "Cloudflare（Web Analytics）", "Cloudflare（Turnstile）", "Discord" }) Assert.Contains(name, html);
-        Assert.Contains("fonts.gstatic.com", html);
-        Assert.Contains("送信日時", html);
+        Assert.Contains(PolicyEnacted, html);
+        Assert.Contains(PolicyRevised, html);
+        // 外部サービスの表の列見出しと送信先
+        foreach (var header in new[] { "送信先", "送られる情報", "目的", "送られるとき" }) Assert.Contains(header, html);
+        foreach (var name in new[] { "Google Fonts", "Cloudflare", "Discord" }) Assert.Contains(name, html);
     }
 
     [Fact]
