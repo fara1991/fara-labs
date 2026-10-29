@@ -9,6 +9,13 @@
         <p class="muted">これまでに作ったものの紹介です。</p>
     </header>
 
+    <nav class="work-jump" aria-label="作品へ移動">
+        @foreach (var work in Data.Works)
+        {
+            <a class="work-jump-link accent-@work.Accent" href="/works#@work.Id">@work.Title</a>
+        }
+    </nav>
+
     <div class="work-detail-list">
         @foreach (var work in Data.Works)
         {
