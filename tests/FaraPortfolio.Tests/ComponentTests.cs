@@ -67,6 +67,30 @@ public sealed class ComponentTests : BunitContext
     }
 
     [Fact]
+    public void Home_has_one_hidden_h1_and_the_site_icon_in_the_core()
+    {
+        NavigateTo("/");
+        var cut = Render<Home>();
+
+        // h1 は 1 つ。画面には出さない（.sr-only）ので、大きな見出し（hero-heading）は無い
+        var h1 = cut.FindAll("h1");
+        Assert.Single(h1);
+        Assert.Equal("sr-only", h1[0].ClassName);
+        Assert.Equal("Fara's Portfolio", h1[0].TextContent.Trim());
+        Assert.Empty(cut.FindAll(".hero-heading"));
+
+        // 軌道の中央は文字の「F」ではなく、サイトアイコン（装飾。大きさを指定してレイアウトのずれを出さない）
+        var core = cut.Find(".core");
+        Assert.Equal("true", core.GetAttribute("aria-hidden"));
+        Assert.Empty(core.QuerySelectorAll("span"));
+        var img = core.QuerySelector("img")!;
+        Assert.Equal("/favicon.svg", img.GetAttribute("src"));
+        Assert.Equal("", img.GetAttribute("alt"));
+        Assert.Equal("64", img.GetAttribute("width"));
+        Assert.Equal("64", img.GetAttribute("height"));
+    }
+
+    [Fact]
     public async Task Header_follows_navigation_and_closes_the_menu()
     {
         NavigateTo("/");
