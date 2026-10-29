@@ -4,7 +4,7 @@
   //   本番:   npx wrangler deploy              → https://fara-labs.com/       （Deploy ワークフロー・master への push。手動でも実行可）
   //   確認用: npx wrangler deploy --env develop → https://dev.fara-labs.com/   （Deploy (develop) ワークフロー・develop への push）
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fara-portfolio",
+  "name": "fara-labs",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   // 報告の 1 日の送信回数の制限（送信元ごと 3 回）。Durable Object（SQLite）。環境は継承しないので、env.develop にも書く
@@ -32,7 +32,7 @@
   "env": {
     "develop": {
       // Worker 名（ダッシュボードで変更した名前に合わせる）
-      "name": "fara-portfolio-dev",
+      "name": "fara-labs-dev",
       "durable_objects": {
         "bindings": [{ "name": "REPORT_LIMITER", "class_name": "ReportRateLimiter" }]
       },

@@ -85,7 +85,7 @@ test("本番: ゲートは、mode が true / notice / false のときだけ飛�
   const gate = stepBlock(prod, "Require MAINTENANCE_MODE=notice");
   assert.match(gate, /if: \$\{\{ !contains\(fromJSON\('\["true","notice","false"\]'\), inputs\.maintenance_mode\) \}\}/);
   assert.match(gate, /SKIP_MAINTENANCE_CHECK: \$\{\{ inputs\.skip_maintenance_check \}\}/);
-  assert.match(gate, /require-maintenance\.mjs fara-portfolio/);
+  assert.match(gate, /require-maintenance\.mjs fara-labs/);
   // 初回の公開（Worker がまだ無い）だけ、first_publish で 404 を通す。それ以外は 404 で止まる
   assert.match(gate, /ALLOW_MISSING_WORKER: \$\{\{ inputs\.first_publish && '1' \|\| '0' \}\}/);
   assert.match(prod, /first_publish:\n {8}description:[^\n]*\n {8}type: boolean\n {8}default: false/);
@@ -105,8 +105,8 @@ test("ワークフロー: 旧名 MAINTENANCE は使わない。入力・サマ�
     assert.match(stepBlock(text, "Summary (maintenance)"), /if: \$\{\{ always\(\) && steps\.message\.outcome == 'success' \}\}/);
     assert.match(stepBlock(text, "Check maintenance message"), /\n {8}id: message\n/);
   }
-  assert.match(stepBlock(prod, "Summary (maintenance)"), /WORKER_NAME: fara-portfolio\n/);
-  assert.match(stepBlock(dev, "Summary (maintenance)"), /WORKER_NAME: fara-portfolio-dev\n/);
+  assert.match(stepBlock(prod, "Summary (maintenance)"), /WORKER_NAME: fara-labs\n/);
+  assert.match(stepBlock(dev, "Summary (maintenance)"), /WORKER_NAME: fara-labs-dev\n/);
   assert.match(prod, /skip_maintenance_check:\n[\s\S]*?type: boolean/);
 });
 
@@ -140,7 +140,7 @@ test("サマリー（メンテナンス表示）: 文面の Markdown の特殊�
     const file = join(dir, "summary.md");
     // node（概要の取得）は関数に差し替える。書き先は GITHUB_STEP_SUMMARY（一時ファイル）
     const r = spawnSync("bash", ["-e", "-o", "pipefail", "-c", `node() { echo "- 反映後の現在値: 確認"; }\n${summary}`], {
-      env: { PATH: process.env.PATH, GITHUB_STEP_SUMMARY: file, WORKER_NAME: "fara-portfolio", MAINTENANCE_MESSAGE_INPUT: "a`b<c>d\ne", MAINTENANCE_MODE_INPUT: "notice" },
+      env: { PATH: process.env.PATH, GITHUB_STEP_SUMMARY: file, WORKER_NAME: "fara-labs", MAINTENANCE_MESSAGE_INPUT: "a`b<c>d\ne", MAINTENANCE_MODE_INPUT: "notice" },
       encoding: "utf8",
     });
     assert.equal(r.status, 0, r.stderr);

@@ -6,8 +6,8 @@
 
 | 公開先 | 置き場所 | 公開のタイミング | ワークフロー |
 |---|---|---|---|
-| https://fara-labs.com/ | Worker `fara-portfolio` | master への push ごと | `.github/workflows/deploy.yml` |
-| https://dev.fara-labs.com/ | Worker `fara-portfolio-dev` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
+| https://fara-labs.com/ | Worker `fara-labs` | master への push ごと | `.github/workflows/deploy.yml` |
+| https://dev.fara-labs.com/ | Worker `fara-labs-dev` | develop への push ごと | `.github/workflows/deploy-develop.yml` |
 | https://pokemon.fara-labs.com/ | Worker `fara-pokemon`（`fara-pokemon-battle-assistant` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
 | https://pokemon-dev.fara-labs.com/ | Worker `fara-pokemon-dev`（同上） | そのリポジトリの develop への push ごと | そのリポジトリの `.github/workflows/deploy-develop.yml` |
 | https://avatar.fara-labs.com/ | Worker `fara-avatar`（`fara-avatar-modding-guide` リポジトリ） | そのリポジトリの master への push ごと | そのリポジトリの `.github/workflows/deploy.yml` |
@@ -92,6 +92,34 @@ Worker のカスタムドメインは初回デプロイ時に自動でレコー�
    → Deploy が自動で動き、https://fara-labs.com/ に公開される（Worker がまだ無いときは、下の注意のとおり止まります）
 
 本番の公開（Deploy）は、Worker の変数 `MAINTENANCE_MODE` が `notice` のときだけ通ります（お知らせなしに本番が更新されないため）。Worker が見つからない（404）ときも止まります（Worker 名やアカウント ID の誤りでも 404 になるため）。初回の公開だけは、Actions の **Deploy (production)** を **master** から手動で実行し、**first_publish** にチェックを入れてください。Worker ができたあとは、このチェックを外します。
+
+## Worker 名の変更（2026-10-29）
+
+Worker の名前を、サイト名に合わせて変えました。名前を変えても、公開先の URL・カスタムドメインは同じです。
+
+| 公開先 | 旧 | 新 |
+|---|---|---|
+| https://dev.fara-labs.com/（確認用） | `fara-portfolio-dev` | `fara-labs-dev` |
+| https://fara-labs.com/（本番） | （まだ無い） | `fara-labs` |
+
+本番の Worker は、まだ存在しません。初回の公開は、新しい名前 `fara-labs` で作られます（上の「7. 初回の公開」のとおり）。以下は、確認用だけの切り替え手順です。
+
+1. **このブランチをマージする（develop）**。Deploy (develop) が自動で動き、新しい Worker `fara-labs-dev` とカスタムドメイン `dev.fara-labs.com` を作ります。確認用のワークフローには、本番のような公開前ゲート（`require-maintenance.mjs`）も `first_publish` の入力もないので、そのまま公開されます（Worker が無いことで止まることはありません）。
+2. **カスタムドメインを確認する**。`dev.fara-labs.com` は、いまは旧 Worker に付いています。新しい Worker への付け替えが自動で通らず、デプロイが「ドメインはすでに使われている」といった内容で失敗したときは、ダッシュボードで手動で付け替えます。
+   1. 「Workers & Pages」→ 旧 `fara-portfolio-dev` →「設定」→「ドメインとルート」→ `dev.fara-labs.com` の「…」→ 削除。
+   2. Actions → Deploy (develop) → Run workflow（`develop`）で、もう一度公開する（または、新しい `fara-labs-dev` →「ドメインとルート」→ 追加 → カスタムドメイン `dev.fara-labs.com`）。
+   - 付け替えの間は、数分だけ `dev.fara-labs.com` が開けません（確認用なので問題ありません）。
+3. **シークレットを設定し直す**（Worker の名前が変わるとシークレットは引き継がれません）。確認用は `env.develop` の Worker なので、`--env develop` を付けます（`--name fara-labs-dev` でも同じです）。値は、旧 Worker に入れていたものと同じです（ダッシュボードの「変数とシークレット」では値が見えないので、Turnstile のダッシュボード・Discord の Webhook の設定から取り直します）。
+   ```bash
+   npx wrangler secret put TURNSTILE_SITE_KEY --env develop
+   npx wrangler secret put TURNSTILE_SECRET --env develop
+   npx wrangler secret put DISCORD_WEBHOOK_URL --env develop
+   ```
+   ダッシュボードから入れるときは、「Workers & Pages」→ `fara-labs-dev` →「設定」→「変数とシークレット」→ 種類は「シークレット」。メンテナンスの変数 `MAINTENANCE_MODE` / `MAINTENANCE_MESSAGE` も、旧 Worker に入れていたなら、新しい Worker に入れ直します（未設定は「通常」として扱われます。Deploy (develop) の Run workflow の入力でも設定できます）。
+4. **動作を確認する**。ページが表示される・問い合わせ（作者への報告）が Discord に届く・同じ送信元からの 1 日 3 回の制限が効く（4 回目が断られる）。制限の回数は Durable Object（`REPORT_LIMITER`）に保存されます。Worker の名前が変わると、migrations（`v1`）は新しい Worker で最初から適用されます。旧 Worker の回数は引き継がれません（1 日分だけなので問題ありません）。
+5. **旧 `fara-portfolio-dev` を削除する**。`dev.fara-labs.com` が新しい Worker に付いていることを確認してから、ダッシュボードで「Workers & Pages」→ `fara-portfolio-dev` →「設定」→ 削除。
+
+---
 
 ---
 

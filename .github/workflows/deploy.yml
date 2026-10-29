@@ -74,7 +74,7 @@ jobs:
       # maintenance_mode に true / notice / false を指定した手動実行（maintenance-cli の set）は、操作した人の意思なので、確認を飛ばす
       - name: Require MAINTENANCE_MODE=notice
         if: ${{ !contains(fromJSON('["true","notice","false"]'), inputs.maintenance_mode) }}
-        run: node .github/scripts/require-maintenance.mjs fara-portfolio
+        run: node .github/scripts/require-maintenance.mjs fara-labs
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
@@ -124,6 +124,6 @@ jobs:
         env:
           MAINTENANCE_MODE_INPUT: ${{ inputs.maintenance_mode }}
           MAINTENANCE_MESSAGE_INPUT: ${{ inputs.maintenance_message }}
-          WORKER_NAME: fara-portfolio
+          WORKER_NAME: fara-labs
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
