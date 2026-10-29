@@ -48,7 +48,7 @@ public sealed class ComponentTests : BunitContext
         Assert.Single(current);
         Assert.Equal("作ったもの", current[0].TextContent.Trim());
         Assert.Contains("active", current[0].ClassName);
-        Assert.Equal(6, cut.FindAll("a.nav-link:not([aria-current])").Count);
+        Assert.Equal(5, cut.FindAll("a.nav-link:not([aria-current])").Count);
     }
 
     [Fact]
@@ -98,12 +98,12 @@ public sealed class ComponentTests : BunitContext
         cut.Find("button.menu-toggle").Click();
         Assert.Equal("true", cut.Find("button.menu-toggle").GetAttribute("aria-expanded"));
 
-        await cut.InvokeAsync(() => NavigateTo("/links"));
+        await cut.InvokeAsync(() => NavigateTo("/works"));
 
         cut.WaitForAssertion(() =>
         {
             Assert.Equal("false", cut.Find("button.menu-toggle").GetAttribute("aria-expanded"));
-            Assert.Equal("リンク", cut.Find("a.nav-link[aria-current='page']").TextContent.Trim());
+            Assert.Equal("作ったもの", cut.Find("a.nav-link[aria-current='page']").TextContent.Trim());
         });
     }
 
@@ -112,7 +112,7 @@ public sealed class ComponentTests : BunitContext
     {
         NavigateTo("/");
         var cut = Render<SiteHeader>();
-        Assert.Equal(["ホーム", "プロフィール", "作ったもの", "更新履歴", "リンク", "問い合わせ", "プライバシーポリシー"],
+        Assert.Equal(["ホーム", "プロフィール", "作ったもの", "更新履歴", "問い合わせ", "プライバシーポリシー"],
             cut.FindAll("a.nav-link").Select(a => a.TextContent.Trim()));
     }
 

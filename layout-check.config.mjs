@@ -10,7 +10,6 @@ export default {
     { path: "/works", name: "作品" },
     { path: "/updates", name: "更新履歴" },
     { path: "/profile", name: "プロフィール" },
-    { path: "/links", name: "リンク" },
     { path: "/report", name: "問い合わせ" },
     { path: "/privacy", name: "プライバシーポリシー" },
     // 存在しないパスの画面（NotFoundView）。配信側は /404.html を返すので、Blazor のルーターが、その URL を見つからないと判定して 404 の画面を描く

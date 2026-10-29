@@ -23,7 +23,7 @@ fara-labs/
 │   ├── App.razor                     ルーティング（見つからない URL は kit の 404）
 │   ├── Components/                   AppShell（背景・ヘッダー・フッターの枠）・ヘッダー・アイコン・カード
 │   ├── Layout/MainLayout.razor       全ページ共通の枠（MudBlazor の土台・お知らせの帯）
-│   ├── Pages/                        Home / Profile / Works / Updates / Links / Report / Privacy
+│   ├── Pages/                        Home / Profile / Works / Updates / Report / Privacy
 │   ├── Models/ Services/             データの型と読み込み・ページの題名（PageCatalog）・サイト設定（SiteInfo）
 │   └── wwwroot/
 │       ├── index.html                起動の土台（読み込み表示・CSS/JS の読み込み順。ダーク固定）

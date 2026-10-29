@@ -57,7 +57,6 @@ public static class PagePrerenderer
             (PageCatalog.ProfilePage(profile), typeof(Profile)),
             (PageCatalog.Works(profile), typeof(Works)),
             (PageCatalog.Updates(profile), typeof(Updates)),
-            (PageCatalog.Links(profile), typeof(Links)),
             (PageCatalog.Report(), typeof(ReportContent)),
             (PageCatalog.Privacy(), typeof(Privacy)),
         ];
