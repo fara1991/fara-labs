@@ -1,5 +1,5 @@
 # このサイトの C# の静的解析（ラチェット。global analyzer config）。Directory.Build.props（ルート）が読む。
-# 内容は kit の external/fara-blazor-component/tools/lint/dotnet.editorconfig と同じ（違いは CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103・VSTHRD200 の severity だけ）。
+# 内容は kit の external/fara-blazor-component/tools/lint/dotnet.editorconfig（v1.0.1）と同じ（違いは VSTHRD200 を足していることだけ。CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103 は kit も v1.0.1 から error）。
 # kit の設定を同時に読むと、同じキーが 2 つのファイルで設定されて両方とも無効になる（CS MultipleGlobalAnalyzerKeys）ため、
 # kit のファイルは読まず、このファイルに全部書く。kit の設定が変わったら、ここも合わせる（docs/lint.md（2））。
 is_global = true
@@ -9,7 +9,7 @@ dotnet_diagnostic.CS4014.severity = error
 dotnet_diagnostic.VSTHRD100.severity = error
 dotnet_diagnostic.CA1816.severity = error
 dotnet_diagnostic.IDE0059.severity = error
-# error（kit では warning）: このサイトは違反 0 件。増えたら止める
+# error（kit も v1.0.1 から error）: このサイトは違反 0 件。増えたら止める
 # CA1031: 一般の例外の catch を書いていない
 dotnet_diagnostic.CA1031.severity = error
 # CA2000: HttpClient（Program.cs）は寿命がアプリと同じなので、その場で最小範囲の抑止（理由つき）
