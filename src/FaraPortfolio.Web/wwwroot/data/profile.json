@@ -3,7 +3,7 @@
   "name": "Fara",
   // ホームのヒーローに出す 1 行の紹介
   "tagline": "Blazor の Web アプリや Twitch 配信向けのツール、VRChat アバターの改変、Beat Saber の Mod などを作っています。",
-  "bio": "I'm Japanese. スノウエルフ族の Fara です。Blender や Unity でたまに改変したり、Beat Saber をやったりしています。",
+  "bio": "I'm Japanese. スノウエルフ族のFaraです。BlenderとかUnityでたまに改変したりBeatSaberやったりしてます。",
   // url が空のものはサイトに表示されません。service: github / twitter / x / twitch / youtube / bluesky / mail / link
   "socials": [
     {
