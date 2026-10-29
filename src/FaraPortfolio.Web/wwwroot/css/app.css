@@ -774,6 +774,11 @@ a.fbc-footer-social svg { width: 16px; height: 16px; }
 .policy p, .policy ul { margin: 0 0 .8em; color: var(--muted); }
 .policy ul { padding-left: 1.4em; }
 .policy a { color: var(--lavender); }
+/* 外部サービスの表。狭い画面では表の中だけ横にスクロールする */
+.policy-table-wrap { overflow-x: auto; margin: 0 0 .8em; }
+.policy-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .92rem; color: var(--muted); }
+.policy-table th, .policy-table td { text-align: left; vertical-align: top; padding: .6em .8em; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.policy-table th { color: inherit; font-weight: 600; white-space: nowrap; }
 /* 報告フォームの選択欄（MudSelect の入力部。既定の高さは 40px）: タップの領域を 44px 以上に */
 .site-main .fbc-select .mud-input,
 .site-main .fbc-select .mud-input-control-input-container { height: 44px; }
