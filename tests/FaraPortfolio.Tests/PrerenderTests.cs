@@ -101,11 +101,14 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Home_has_the_hero_works_and_updates_from_the_data_files()
     {
         var html = Text(production[0]);
-        // 以前の 2 行の大きな見出し（hero-title）は出さず、控えめな大きさの h1 を 1 つだけ画面に出す
+        // 「Fara's Portfolio」は画面の見出しにせず、h1 は .sr-only で隠して 1 つだけ残す（Blazor の描画と同じ構造）
         Assert.DoesNotContain("hero-title", html);
+        Assert.DoesNotContain("hero-heading", html);
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(html, "<h1[ >]"));
-        Assert.Contains("Fara's Portfolio</h1>", html);
-        Assert.DoesNotContain("<h1 class=\"sr-only\">", html);
+        Assert.Contains("<h1 class=\"sr-only\">Fara's Portfolio</h1>", html);
+        // 中央はサイトアイコンの img（文字の「F」は使わない）
+        Assert.Matches("<div class=\"core\" aria-hidden=\"true\">\\s*<img src=\"/favicon.svg\" alt(=\"\")? width=\"64\" height=\"64\"", html);
+        Assert.DoesNotContain("<span>F</span>", html);
         Assert.Contains("class=\"orbit-hint\"", html);
         Assert.Contains("class=\"work-card", html);
         Assert.Contains("最近の更新", html);
