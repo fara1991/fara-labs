@@ -815,6 +815,8 @@ a.fbc-footer-social svg { width: 16px; height: 16px; }
     overflow-wrap: break-word;
     text-wrap: pretty;
 }
+/* 上の指定の対象外（表の見出し・チップ・リンクの文字・ボタン・フッター・お知らせの帯など）でも、句読点・閉じ括弧・小さい文字が行頭に来ないよう、禁則を全体に継承させる */
+body { line-break: strict; }
 .nowrap { white-space: nowrap; }
 
 /* ---------- 404（kit の NotFoundView。.fbc-not-found） ---------- */
