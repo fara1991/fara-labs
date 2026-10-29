@@ -212,6 +212,13 @@ public sealed class PrerenderTests : IAsyncLifetime
         Assert.Contains("1 日に 3 回までに制限しています", policy);
         Assert.Contains("IP アドレスそのものは保存しません", policy);
         Assert.Contains("sessionStorage", policy);
+        // 初出の用語の説明・内部用語を使わないこと・利用目的の節・広告の追記予告を載せないこと
+        Assert.Contains("ブラウザの保存領域（localStorage）", policy);
+        Assert.DoesNotContain("掃除", policy);
+        Assert.Contains("利用目的", policy);
+        Assert.Contains("EU 圏内", policy);
+        Assert.DoesNotContain("追記します", policy);
+        Assert.Contains("Cloudflare（Turnstile など）と Google Fonts は、それぞれの仕組みで、ブラウザに情報を保存することがあります。", policy);
         var siteJs = File.ReadAllText(FindUp("src/FaraPortfolio.Web/wwwroot/js/site.js"));
         Assert.Contains("sessionStorage", siteJs);
         Assert.DoesNotContain("localStorage", siteJs);
@@ -242,7 +249,7 @@ public sealed class PrerenderTests : IAsyncLifetime
         Assert.Contains(PolicyRevised, html);
         // 外部サービスの表の列見出しと送信先
         foreach (var header in new[] { "送信先", "送られる情報", "目的", "送られるとき" }) Assert.Contains(header, html);
-        foreach (var name in new[] { "Google Fonts", "Cloudflare", "Discord" }) Assert.Contains(name, html);
+        foreach (var name in new[] { "Google Fonts", "Cloudflare Web Analytics", "Cloudflare Turnstile", "Discord" }) Assert.Contains(name, html);
     }
 
     [Fact]
