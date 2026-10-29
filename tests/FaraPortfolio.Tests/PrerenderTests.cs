@@ -35,13 +35,12 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Every_page_is_rendered_in_the_agreed_order_with_title_and_description()
     {
-        Assert.Equal(["/", "/profile", "/works", "/updates", "/links", "/report", "/privacy"], production.Select(p => p.Path));
+        Assert.Equal(["/", "/profile", "/works", "/updates", "/report", "/privacy"], production.Select(p => p.Path));
         Assert.Equal("Fara Labs", production[0].Title);
         Assert.Equal("プロフィール | Fara Labs", production[1].Title);
         Assert.Equal("作ったもの | Fara Labs", production[2].Title);
         Assert.Equal("更新履歴 | Fara Labs", production[3].Title);
-        Assert.Equal("リンク | Fara Labs", production[4].Title);
-        Assert.Equal("問い合わせ | Fara Labs", production[5].Title);
+        Assert.Equal("問い合わせ | Fara Labs", production[4].Title);
         Assert.All(production, p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
     }
 
@@ -89,8 +88,8 @@ public sealed class PrerenderTests : IAsyncLifetime
         }
         Assert.Contains("href=\"/report?from=%2Fworks\"", Text(production[2]));
         // 問い合わせ・プライバシーのページ自身は、?from= を付けない
+        Assert.DoesNotContain("?from=", Text(production[4]));
         Assert.DoesNotContain("?from=", Text(production[5]));
-        Assert.DoesNotContain("?from=", Text(production[6]));
     }
 
     [Fact]
@@ -123,11 +122,20 @@ public sealed class PrerenderTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Links_page_h1_matches_the_menu()
+    public void Profile_page_has_the_links_and_home_has_no_link_buttons()
     {
-        var html = Text(production[4]);
-        Assert.Contains("<h1>リンク</h1>", html);
-        Assert.DoesNotContain("SNS・リンク", html);
+        // リンク（SNS など）はプロフィールにまとめる。リンクのページ（/links）は無い
+        var profile = Text(production[1]);
+        Assert.Contains(">リンク</h2>", profile);
+        Assert.Contains("class=\"link-card", profile);
+        Assert.Contains("@game_fara", profile);
+        Assert.DoesNotContain("お気軽にフォロー", profile);
+        Assert.DoesNotContain("SNS・リンク", profile);
+        var home = Text(production[0]);
+        Assert.DoesNotContain("リンク一覧", home);
+        Assert.DoesNotContain("btn btn-ghost", home);
+        Assert.DoesNotContain("social-pill", home);
+        Assert.DoesNotContain("/links", string.Concat(production.Select(Text)));
     }
 
     [Fact]
@@ -155,7 +163,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Report_page_is_the_same_form_the_browser_renders_so_the_heading_does_not_change_on_boot()
     {
-        var html = Text(production[5]);
+        var html = Text(production[4]);
         Assert.Contains("<h1 class=\"fbc-page-title\">問い合わせ</h1>", html);   // kit v0.5.0 から、題名はページの h1
         Assert.DoesNotContain("<h3>問い合わせ</h3>", html);
         Assert.Contains("id=\"report-message\"", html);
@@ -194,7 +202,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     public void Privacy_policy_matches_what_the_site_stores_in_the_browser()
     {
         // プライバシーポリシーの記載（localStorage・Cookie は使わない。sessionStorage にスクロール位置だけ）が、実装と合っているか
-        var policy = Text(production[6]);
+        var policy = Text(production[5]);
         Assert.Contains("Cookie も設定しません", policy);
         Assert.Contains("日本時間の 0 時ごろ", policy);
         // 運営者の約束・宣言や法的な注記は書かない
@@ -226,7 +234,7 @@ public sealed class PrerenderTests : IAsyncLifetime
     [Fact]
     public void Privacy_page_has_the_policy_in_the_wide_column()
     {
-        var html = Text(production[6]);
+        var html = Text(production[5]);
         Assert.Contains("class=\"page container wide fbc-page-column fbc-page-column--wide\"", html);
         Assert.Contains("ブラウザに保存する情報", html);
         Assert.Contains("Cloudflare Turnstile", html);
