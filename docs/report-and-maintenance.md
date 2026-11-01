@@ -1,6 +1,6 @@
 # 作者への報告とメンテナンス画面の設定（Cloudflare・Discord）
 
-4 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・FaraBotModerator・Fara Labs）に共通の設定です。
+3 つのサイト（Pokémon Battle Assistant・Avatar Modding Guide・Fara Labs）に共通の設定です。
 コードの側（フッター・`/report`・`/privacy`・`POST /api/report`）は、各リポジトリに入っています。**ここに書いた設定をするまで、報告ページは「いまは報告を受け付けていません」と表示されます**（壊れてはいません）。
 
 ---
@@ -19,14 +19,13 @@
 ### 1-2. Cloudflare Turnstile（ボット判定）を作る
 
 1. Cloudflare のダッシュボード →「Turnstile」→「ウィジェットを追加」。
-2. 名前: `fara sites report`、ホスト名に次の 8 つを追加します。
+2. 名前: `fara sites report`、ホスト名に次の 6 つを追加します。
    - `pokemon.fara-labs.com` / `pokemon-dev.fara-labs.com`
    - `avatar.fara-labs.com` / `avatar-dev.fara-labs.com`
-   - `twitch-bot.fara-labs.com` / `twitch-bot-dev.fara-labs.com`
    - `fara-labs.com` / `dev.fara-labs.com`（このポートフォリオ。フッターの「作者へ報告」を送る先）
 3. ウィジェットのモードは「Managed（管理）」にします。作成すると、**サイトキー**（公開してよい）と**シークレットキー**（秘密）が表示されます。
 
-### 1-3. 8 つの Worker に値を登録する
+### 1-3. 6 つの Worker に値を登録する
 
 Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker を 1 つずつ開き、「設定」→「変数とシークレット」→「追加」で、下の 3 つを登録します（**種類は 3 つとも「シークレット」**にしてください。理由は下の注意）。
 
@@ -36,8 +35,6 @@ Cloudflare のダッシュボード →「Workers & Pages」→ 次の Worker �
 | `fara-pokemon-dev` | https://pokemon-dev.fara-labs.com/ |
 | `fara-avatar` | https://avatar.fara-labs.com/ |
 | `fara-avatar-dev` | https://avatar-dev.fara-labs.com/ |
-| `fara-twitch-bot` | https://twitch-bot.fara-labs.com/ |
-| `fara-twitch-bot-dev` | https://twitch-bot-dev.fara-labs.com/ |
 | `fara-labs` | https://fara-labs.com/ |
 | `fara-labs-dev` | https://dev.fara-labs.com/ |
 
@@ -104,7 +101,7 @@ Cloudflare のダッシュボードで **変数を書き換えるだけ**で、�
 
 ### 2-2. 変数の登録（最初の 1 回）
 
-1. Cloudflare のダッシュボード →「Workers & Pages」→ 対象の Worker（`fara-pokemon` / `fara-avatar` / `fara-twitch-bot` / `fara-labs` と、それぞれの `-dev`。本番はデプロイ後）→「設定」→「変数とシークレット」→「追加」。
+1. Cloudflare のダッシュボード →「Workers & Pages」→ 対象の Worker（`fara-pokemon` / `fara-avatar` / `fara-labs` と、それぞれの `-dev`。本番はデプロイ後）→「設定」→「変数とシークレット」→「追加」。
 2. 種類は「**テキスト**」（あとから値を見て、書き換えるため）。環境は「プロダクション」だけにチェックを付けます（プレビューは使っていません）。
 3. `MAINTENANCE_MODE` = `false`、`MAINTENANCE_MESSAGE` = 空でもよい（例: 文を書いておく）。「デプロイ」。
 
