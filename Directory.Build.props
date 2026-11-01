@@ -1,0 +1,23 @@
+<Project>
+
+  <!--
+    C# の静的解析（ラチェット）。ルールの中身と理由は external/fara-blazor-component/docs/lint.md（2）。
+    設定は tools/lint/dotnet.site.editorconfig（kit の dotnet.editorconfig と同じ内容。CA1031・CA2000・VSTHRD002・VSTHRD003・VSTHRD103・VSTHRD200 だけ error）。
+    kit のプロジェクトは kit 自身の Directory.Build.props を使う（MSBuild は一番近い 1 つだけ読む）。
+  -->
+  <PropertyGroup>
+    <!-- IDE の規則（IDE0059 など）を dotnet build でも検査する -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)tools/lint/dotnet.site.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 非同期の誤用（async void・同期の待ち）を見る。PrivateAssets=all なので、参照先には流れない -->
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

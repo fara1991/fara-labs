@@ -1,0 +1,52 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject MaintenanceInfo Maintenance
+
+@* サイトは、紫のダーク配色だけ（ライト／ダークの切り替えは無い）。MudBlazor（報告フォームの部品）も、ダークで固定する。
+   .mud-layout は、kit の読み込み表示（boot-indicator.js）が「描画が終わった」の合図に使う *@
+<MudThemeProvider Theme="Theme" IsDarkMode="true" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout Class="app-layout">
+    <AppShell>
+        <Banner><MaintenanceBanner Info="Maintenance" /></Banner>
+        <ChildContent>@Body</ChildContent>
+    </AppShell>
+</MudLayout>
+
+@code {
+    private static readonly MudTheme Theme = SiteTheme.Create();
+
+    // ページを移ったあと（と最初の描画のあと）は、新しい本文に対して js/site.js の pageChanged を呼ぶ（フェードイン・#付きの位置・戻る／進むの位置）。
+    // Router の描画が LocationChanged の通知より先に終わることがあるので、通知を受けたあとに必ず描画し直し、
+    // 「通知を受けた URL が、いまの URL」のときだけ呼ぶ。戻る／進む（popstate）かどうかは、js/site.js が見る
+    private bool pageChanged = true;
+    private string? changedUri;
+
+    protected override void OnInitialized()
+    {
+        changedUri = Nav.Uri;
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        pageChanged = true;
+        changedUri = e.Location;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!pageChanged || changedUri != Nav.Uri) return;
+        pageChanged = false;
+        try { await JS.InvokeVoidAsync("faraSite.pageChanged"); }
+        catch (JSException) { /* 意図的に握る: 演出（フェードイン・位置合わせ）が動かなくても、本文は読める。JS 以外の例外は握らない */ }
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}

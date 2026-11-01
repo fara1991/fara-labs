@@ -1,0 +1,5 @@
+# Cloudflare Workers にアップロードしないファイル（publish/wwwroot に対して効く）。
+# 圧縮は Cloudflare が自動で行うので、dotnet publish が作る事前圧縮ファイルは不要。
+*.br
+*.gz
+.assetsignore
